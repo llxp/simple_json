@@ -147,7 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="JsonObject.h" />
+    <ClInclude Include="Examples\DataMappingTest.h" />
     <ClInclude Include="JsonParser.h" />
     <ClInclude Include="Serializable.h" />
     <ClInclude Include="SerializationMapping.h" />
@@ -155,9 +155,11 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="JsonObject.cpp" />
+    <ClCompile Include="Examples\DataMappingTest.cpp" />
     <ClCompile Include="JsonParser.cpp" />
-    <ClCompile Include="Serializable.cpp" />
+    <ClCompile Include="Serializable.cpp">
+      <DeploymentContent>false</DeploymentContent>
+    </ClCompile>
     <ClCompile Include="SerializationMapping.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

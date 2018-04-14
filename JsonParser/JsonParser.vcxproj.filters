@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Examples">
+      <UniqueIdentifier>{0f15fdc0-82ef-4b4e-8cae-a3f41be8b697}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Examples">
+      <UniqueIdentifier>{516be2b2-0838-4f85-a70a-e02a1d7d192c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -24,14 +30,14 @@
     <ClInclude Include="JsonParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="JsonObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Serializable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SerializationMapping.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Examples\DataMappingTest.h">
+      <Filter>Header Files\Examples</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -41,14 +47,14 @@
     <ClCompile Include="JsonParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="JsonObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Serializable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SerializationMapping.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Examples\DataMappingTest.cpp">
+      <Filter>Source Files\Examples</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
