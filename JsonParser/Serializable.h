@@ -16,6 +16,21 @@ constexpr size_t constLength(const char* str)
 	return (*str == 0) ? 0 : constLength(str + 1) + 1;
 }
 
+enum JsonTypes
+{
+	None = 0,
+	Number = 1,
+	String = 2,
+	Bool = 3,
+	Object = 4,
+	Array = 5,
+	NumberArray = 6,
+	StringArray = 7,
+	BoolArray = 8,
+	ObjectArray = 9,
+	ArrayArray = 10
+};
+
 template<typename T>
 class Serializable
 {
@@ -41,7 +56,7 @@ private:
 	size_t addValue(size_t pos, const T &name);
 	bool isNumber(size_t pos);
 	bool isBool(size_t pos);
-	static size_t toNumber(const T &numberStr);
+	static long long toNumber(const T &numberStr);
 	size_t strLen() const;
 	char getChar(size_t pos) const;
 
@@ -60,7 +75,7 @@ private:
 	size_t addBool(size_t pos);
 
 protected:
-	std::map<T, size_t> m_kvPairNumbers;
+	std::map<T, long long> m_kvPairNumbers;
 	std::map<T, bool> m_kvPairBools;
 	std::map<T, T> m_kvPairStrings;
 	std::map<T, Serializable<T> *> m_kvPairObjects;
@@ -74,4 +89,5 @@ protected:
 
 	Serializable<T> * m_parent { nullptr };
 	T *m_fullString{ nullptr };
+	JsonTypes m_type{ JsonTypes::Object };
 };

@@ -2,74 +2,66 @@
 #include "Serializable.h"
 #include "Serializable.cpp"
 
+#define ADD(MEMBER) addMember(#MEMBER, MEMBER);
+
 template<class StringType>
 class SerializationMapping :
 	private Serializable<StringType>
 {
 public:
 	//#define StringType std::string
-	SerializationMapping<StringType>() {}
+	SerializationMapping<StringType>(SerializationMapping<StringType> *parent = nullptr) : Serializable<StringType>(parent) {}
 	~SerializationMapping<StringType>() {}
 
 private:
-	std::map<StringType, size_t *> m_kvPairMappingNumbers;
+	std::map<StringType, long long *> m_kvPairMappingNumbers;
 	std::map<StringType, bool *> m_kvPairMappingBools;
 	std::map<StringType, StringType *> m_kvPairMappingStrings;
 	std::map<StringType, SerializationMapping<StringType> *> m_kvPairMappingObjects;
 	std::map<StringType, SerializationMapping<StringType> *> m_kvPairMappingArrays;
 
+	std::vector<StringType> *m_mappingStringArrays{ nullptr };
+	std::vector<bool> *m_mappingBoolArrays{ nullptr };
+	std::vector<long long> *m_mappingNumberArrays{ nullptr };
+	std::vector<SerializationMapping<StringType>> *m_mappingObjectArrays{ nullptr };
+	std::vector<SerializationMapping<StringType>> *m_mappingArrayArrays{ nullptr };
+
+	//std::map<StringType, std::vector<SerializationMapping<StringType>> *> m_kvPairMappingObjectArrays;
+
+	std::vector<std::pair<StringType, JsonTypes>> m_serializableMembers;
+
 public:
 
-	bool fromString() override
-	{
-		if (Serializable<StringType>::fromString()) {
-			for (std::map<StringType, size_t>::iterator it = m_kvPairNumbers.begin(); it != m_kvPairNumbers.end(); it++) {
-				if (m_kvPairMappingNumbers.count(it->first) > 0) {
-					(*m_kvPairMappingNumbers[it->first]) = std::move(it->second);
-				}
-			}
-			for (std::map<StringType, bool>::iterator it = m_kvPairBools.begin(); it != m_kvPairBools.end(); it++) {
-				if (m_kvPairMappingBools.count(it->first) > 0) {
-					(*m_kvPairMappingBools[it->first]) = std::move(it->second);
-				}
-			}
-			for (std::map<StringType, StringType>::iterator it = m_kvPairStrings.begin(); it != m_kvPairStrings.end(); it++) {
-				if (m_kvPairMappingStrings.count(it->first) > 0) {
-					(*m_kvPairMappingStrings[it->first]) = std::move(it->second);
-				}
-			}
-			for (std::map<StringType, Serializable<StringType> *>::iterator it = m_kvPairObjects.begin(); it != m_kvPairObjects.end(); it++) {
-				if (m_kvPairMappingObjects.count(it->first) > 0) {
-					(*m_kvPairMappingObjects[it->first]) = std::move(*it->second);
-					m_kvPairMappingObjects[it->first]->fromString();
-				}
-			}
-		}
-		return false;
-	}
-	bool fromString(const StringType &str)
-	{
-		this->m_fullString = new StringType(str);
-		return this->fromString();
-	}
+	virtual bool fromString() override;
+	bool fromString(const StringType &str);
 
 	virtual StringType toString() const;
 
 protected:
-	void addMember(const StringType &name, size_t &memberVariable)
-	{
-		m_kvPairMappingNumbers[name] = &memberVariable;
-	}
-	void addMember(const StringType &name, StringType &memberVariable)
-	{
-		this->m_kvPairMappingStrings[name] = &memberVariable;
-	}
-	void addMember(const StringType &name, SerializationMapping<StringType> &memberVariable)
-	{
-		this->m_kvPairMappingObjects[name] = &memberVariable;
-	}
+	void addMember(const StringType &name, long long &memberVariable);
+	void addMember(const StringType &name, StringType &memberVariable);
+	void addMember(const StringType &name, SerializationMapping<StringType> &memberVariable);
+	void addMember(const StringType &name, bool &memberVariable);
+
+	void addMember(const StringType &name, std::vector<StringType> &memberVariable);
+	void addMember(const StringType &name, std::vector<long long> &memberVariable);
+	void addMember(const StringType &name, std::vector<bool> &memberVariable);
+	void addMember(const StringType &name, std::vector<SerializationMapping<StringType>> &memberVariable);
 
 private:
+	StringType makeString(const StringType &str) const;
+	StringType makeKvPairStr(const StringType &name, long long value) const;
+	StringType makeKvPairStr(const StringType &name, const StringType &value) const;
+	StringType makeKvPairStr(const StringType &name, const SerializationMapping<StringType> &value) const;
+	StringType makeKvPairStr(const StringType &name, const bool &value) const;
+	StringType makeKvPairStrArray(const StringType &name, const SerializationMapping<StringType> &value) const;
+
+	StringType makeKvPairStr(const StringType &name, const std::vector<SerializationMapping<StringType>> &value) const;
+	StringType makeKvPairStr(const StringType &name, const std::vector<long long> &value) const;
+	StringType makeKvPairStr(const StringType &name, const std::vector<bool> &value) const;
+	StringType makeKvPairStr(const StringType &name, const std::vector<StringType> &value) const;
+	StringType makeKvPairStrArray(const StringType &name, const std::vector<SerializationMapping<StringType>> &value) const;
+
 	SerializationMapping<StringType> &operator=(const Serializable<StringType> &other)
 	{
 		this->m_kvPairNumbers = other.m_kvPairNumbers;
@@ -85,9 +77,3 @@ private:
 		return *this;
 	}
 };
-
-template<class StringType>
-inline StringType SerializationMapping<StringType>::toString() const
-{
-	return StringType();
-}

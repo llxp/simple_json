@@ -1,28 +1,30 @@
 #pragma once
 #include "..\SerializationMapping.h"
+#include "..\SerializationMapping.cpp"
 
-class DataMappingMemberTest : public SerializationMapping<std::wstring>
+class DataMappingMemberTest : public SerializationMapping<std::string>
 {
 public:
 	DataMappingMemberTest()
 	{
-		addMember(L"str", m_str);
+		ADD(m_str);
 	}
 
 public:
-	std::wstring m_str{ L"" };
+	std::string m_str{ "" };
 };
 
 class DataMappingTest :
-	public SerializationMapping<std::wstring>
+	public SerializationMapping<std::string>
 {
 public:
 	DataMappingTest();
 	~DataMappingTest();
 
 public:
-	std::wstring m_name{ L"" };
-	std::wstring m_nextLink{ L"" };
+	std::string m_name{ "" };
+	std::string m_nextLink{ "" };
 	DataMappingMemberTest m_value;
+	std::vector<std::string> m_array;
 };
 

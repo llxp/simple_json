@@ -104,18 +104,21 @@ size_t Serializable<T>::parseStringArray(size_t pos)
 				if ((i = addObject(i)) <= 0 || !commaFound) {
 					return 0;
 				}
+				this->m_type = JsonTypes::ObjectArray;
 				commaFound = false;
 				break;
 			case '[':
 				if ((i = addArray(i)) <= 0 || !commaFound) {
 					return 0;
 				}
+				this->m_type = JsonTypes::ArrayArray;
 				commaFound = false;
 				break;
 			case '"':
 				if ((i = addString(i)) <= 0 || !commaFound) {
 					return 0;
 				}
+				this->m_type = JsonTypes::StringArray;
 				commaFound = false;
 				break;
 			case ',':
@@ -126,6 +129,23 @@ size_t Serializable<T>::parseStringArray(size_t pos)
 					return i;
 				}
 				break;
+			default:
+				if (isNumber(i)) {
+					if ((i = addInteger(i)) <= 0 || !commaFound) {
+						return 0;
+					}
+					i--;
+					this->m_type = JsonTypes::NumberArray;
+					commaFound = false;
+				}
+				else if (isBool(i)) {
+					if ((i = addBool(i)) <= 0 || !commaFound) {
+						return 0;
+					}
+					this->m_type = JsonTypes::BoolArray;
+					i--;
+					commaFound = false;
+				}
 			}
 		}
 	}
@@ -312,14 +332,18 @@ bool Serializable<T>::isBool(size_t pos)
 }
 
 template<typename T>
-size_t Serializable<T>::toNumber(const T & numberStr)
+long long Serializable<T>::toNumber(const T & numberStr)
 {
-	size_t result = 0;
+	long long result = 0;
 	size_t pos = 0;
 	for (size_t i = numberStr.length() - 1; i >= 0 && i < numberStr.length(); i--) {
 		char ch = numberStr[i];
+		if (ch == '-') {
+			result = -result;
+			continue;
+		}
 		size_t chValue = (((unsigned int)ch) - 48);
-		size_t tenCounter = static_cast<size_t>(std::pow(10, pos));
+		long long tenCounter = static_cast<size_t>(std::pow(10, pos));
 		result += (tenCounter * chValue);
 		pos++;
 	}

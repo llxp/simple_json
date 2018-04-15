@@ -4,9 +4,10 @@
 
 DataMappingTest::DataMappingTest()
 {
-	addMember(L"name", m_name);
-	addMember(L"nextLink", m_nextLink);
-	addMember(L"value", m_value);
+	addMember("name", m_name);
+	addMember("nextLink", m_nextLink);
+	addMember("value", m_value);
+	addMember("array", m_array);
 }
 
 
