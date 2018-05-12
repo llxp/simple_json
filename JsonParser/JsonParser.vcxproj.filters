@@ -39,6 +39,15 @@
     <ClInclude Include="Examples\DataMappingTest.h">
       <Filter>Header Files\Examples</Filter>
     </ClInclude>
+    <ClInclude Include="JsonTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Number.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -55,6 +64,12 @@
     </ClCompile>
     <ClCompile Include="Examples\DataMappingTest.cpp">
       <Filter>Source Files\Examples</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Number.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
