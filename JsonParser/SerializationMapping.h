@@ -47,11 +47,11 @@ namespace JsonParser {
 
 		protected:
 			template<typename T>
-			auto DataContract(std::string name, T value)
+			T DataContract(std::string name, T &value, const T &default)
 			{
-				T* newObj = new T(value);
-				addMember(name, *newObj);
-				return newObj;
+				//T* newObj = new T(value);
+				addMember(name, value);
+				return T(default);
 			}
 
 			void addMember(const std::string &name,

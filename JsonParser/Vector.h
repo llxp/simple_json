@@ -51,13 +51,13 @@ namespace JsonParser {
 				if (this->size() <= 0) {
 					return;
 				}
-				/*for (auto it = this->begin(); it != this->end(); it++) {
+				for (auto it = this->begin(); it != this->end(); it++) {
 					T2 *currentElement = *it;
 					if (currentElement != nullptr) {
 						delete currentElement;
 						//currentElement = nullptr;
 					}
-				}*/
+				}
 				//this->clear();
 			}
 			T2 &operator[](size_t index)
