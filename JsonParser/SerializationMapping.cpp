@@ -138,6 +138,15 @@ std::string JsonParser::SerializationMapping::toString() const
 			}
 		}
 		break;
+		case JsonTypes::Bool:
+		{
+			bool *ptr =
+				this->m_kvPairMappingBools.at(index);
+			if (ptr != nullptr) {
+				outputStr += makeKvPairStrBool(index, ptr);
+			}
+		}
+		break;
 		case JsonTypes::String:
 		{
 			std::string *ptr =
@@ -323,7 +332,7 @@ std::string JsonParser::SerializationMapping::makeKvPairStrBool(
 	const std::string & name,
 	bool value) const
 {
-	return makeString(name) + ':' + std::to_string(value);
+	return makeString(name) + ':' + (value ? "true" : "false");
 }
 
 std::string JsonParser::SerializationMapping::makeKvPairStrArray(

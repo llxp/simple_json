@@ -36,9 +36,6 @@
     <ClInclude Include="SerializationMapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Examples\DataMappingTest.h">
-      <Filter>Header Files\Examples</Filter>
-    </ClInclude>
     <ClInclude Include="JsonTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -50,6 +47,9 @@
     </ClInclude>
     <ClInclude Include="KeyVaultSecrets.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Examples\DataMappingTest.h">
+      <Filter>Header Files\Examples</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -65,26 +65,17 @@
     <ClCompile Include="SerializationMapping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Examples\DataMappingTest.cpp">
-      <Filter>Source Files\Examples</Filter>
-    </ClCompile>
     <ClCompile Include="Vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Number.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\boost\chrono.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\Examples\DataMappingTest.cpp">
+      <Filter>Source Files\Examples</Filter>
     </ClCompile>
-    <ClCompile Include="src\boost\process_cpu_clocks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\boost\thread_clock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="KeyVaultSecrets.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\Examples\KeyVaultSecrets.cpp">
+      <Filter>Source Files\Examples</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

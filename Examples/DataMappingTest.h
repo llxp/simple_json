@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "..\SerializationMapping.h"
+#include "../JsonParser/SerializationMapping.h"
 //#include "..\SerializationMapping.cpp"
 
 class DataMappingMemberTest : public JsonParser::SerializationMapping

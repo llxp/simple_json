@@ -46,6 +46,14 @@ namespace JsonParser {
 			virtual std::string toStringArray() const override;
 
 		protected:
+			template<typename T>
+			auto DataContract(std::string name, T value)
+			{
+				T* newObj = new T(value);
+				addMember(name, *newObj);
+				return newObj;
+			}
+
 			void addMember(const std::string &name,
 				__int64 &memberVariable);
 			void addMember(const std::string &name,

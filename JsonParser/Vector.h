@@ -46,7 +46,25 @@ namespace JsonParser {
 	{
 		public:
 			Vector(Vector *parent = nullptr) : m_parent(parent) {}
-			~Vector() {}
+			~Vector()
+			{
+				if (this->size() <= 0) {
+					return;
+				}
+				/*for (auto it = this->begin(); it != this->end(); it++) {
+					T2 *currentElement = *it;
+					if (currentElement != nullptr) {
+						delete currentElement;
+						//currentElement = nullptr;
+					}
+				}*/
+				//this->clear();
+			}
+			T2 &operator[](size_t index)
+			{
+				T2 *ptr = this->at(index);
+				return *ptr;
+			}
 			Vector operator=(const std::vector<T2 *> &other)
 			{
 				std::vector<T2 *>::operator=(other);
