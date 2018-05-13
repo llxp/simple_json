@@ -12,7 +12,7 @@ namespace JsonParser {
 			explicit Number(const std::string &numberStr);
 			explicit Number(__int64 number);
 			explicit Number(__int64 *number) : m_numberRef(number) {}
-			explicit Number() {}
+			explicit Number() : m_numberStr(new std::string("0")) {}
 			__int64 toNumber() const;
 			std::string toString() const;
 

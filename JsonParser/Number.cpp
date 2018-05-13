@@ -39,7 +39,7 @@ std::string JsonParser::Number::toString() const
 	if (m_numberStr != nullptr) {
 		return *this->m_numberStr;
 	}
-	return "";
+	return "0";
 }
 
 #endif  // JSONPARSER_NUMBER_CPP_

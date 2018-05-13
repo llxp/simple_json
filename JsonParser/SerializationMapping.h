@@ -7,10 +7,8 @@
 #include <vector>
 #include <iterator>
 
-//#include "Serializable.h"
 #include "Serializable.h"
 #include "Vector.h"
-//#include "Vector.cpp"
 
 #define ADD(MEMBER) addMember(#MEMBER, MEMBER);
 
@@ -44,7 +42,8 @@ namespace JsonParser {
 			bool fromStringArray();
 			bool fromString(const std::string &str);
 
-			virtual std::string toString() const;
+			virtual std::string toString() const override;
+			virtual std::string toStringArray() const override;
 
 		protected:
 			void addMember(const std::string &name,
@@ -67,32 +66,32 @@ namespace JsonParser {
 
 		private:
 			std::string makeString(const std::string &str) const;
-			std::string makeKvPairStr(const std::string &name,
-				JsonParser::Number value) const;
-			std::string makeKvPairStr(const std::string &name,
-				const std::string &value) const;
-			std::string makeKvPairStr(const std::string &name,
-				const SerializationMapping &value) const;
-			std::string makeKvPairStr(const std::string &name,
-				const bool &value) const;
+			std::string makeKvPairStrNumber(const std::string &name,
+				JsonParser::Number *value) const;
+			std::string makeKvPairStrString(const std::string &name,
+				std::string *value) const;
+			std::string makeKvPairStrObject(const std::string &name,
+				SerializationMapping *value) const;
+			std::string makeKvPairStrBool(const std::string &name,
+				bool value) const;
 			std::string makeKvPairStrArray(const std::string &name,
-				const SerializationMapping &value) const;
+				SerializationMapping *value) const;
 
-			std::string makeKvPairStr(const std::string &name,
-				const std::vector<SerializationMapping> &value) const;
-			std::string makeKvPairStr(const std::string &name,
-				const std::vector<JsonParser::Number> &value) const;
-			std::string makeKvPairStr(const std::string &name,
-				const std::vector<bool> &value) const;
-			std::string makeKvPairStr(const std::string &name,
-				const std::vector<std::string> &value) const;
-			std::string makeKvPairStrArray(const std::string &name,
-				const std::vector<SerializationMapping> &value) const;
+			std::string makeStrObjectArray(
+				const JsonParser::VectorBase *value) const;
+			std::string makeStrNumberArray(
+				const JsonParser::Vector<JsonParser::Number> *value) const;
+			std::string makeStrBoolArray(
+				const JsonParser::Vector<bool> *value) const;
+			std::string makeStrStringArray(
+				const JsonParser::Vector<std::string> *value) const;
+			std::string makeStrArrayArray(
+				const JsonParser::VectorBase *value) const;
 
 			SerializationMapping *assign(
 				Serializable *other)
 			{
-				this->m_isParsed = other->m_isParsed;
+				//this->m_isParsed = other->m_isParsed;
 				this->m_type = other->m_type;
 				this->m_parent = other->m_parent;
 				this->m_fullString = other->m_fullString;

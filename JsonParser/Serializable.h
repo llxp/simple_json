@@ -29,8 +29,9 @@ namespace JsonParser {
 			friend class JsonParser::SerializationMapping;
 		public:
 			explicit Serializable(Serializable * parent = nullptr);
-			~Serializable();
+			virtual ~Serializable();
 			virtual std::string toString() const;
+			virtual std::string toStringArray() const;
 			bool fromString(const std::string &str);
 
 		protected:
@@ -77,14 +78,13 @@ namespace JsonParser {
 
 			std::vector<Serializable *> m_arrayObjects;
 			std::vector<Serializable *> m_arrayArrays;
-			std::vector<JsonParser::Number> m_arrayNumbers;
-			std::vector<bool> m_arrayBools;
-			std::vector<std::string> m_arrayStrings;
+			std::vector<JsonParser::Number *> m_arrayNumbers;
+			std::vector<bool *> m_arrayBools;
+			std::vector<std::string *> m_arrayStrings;
 
 			Serializable * m_parent{ nullptr };
 			std::string *m_fullString{ nullptr };
 			JsonTypes m_type{ JsonTypes::Object };
-			bool m_isParsed{ false };
 	};
 
 }

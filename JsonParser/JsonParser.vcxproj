@@ -75,12 +75,16 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -139,7 +143,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -152,15 +156,28 @@
       <BasicRuntimeChecks>
       </BasicRuntimeChecks>
       <StringPooling>true</StringPooling>
-      <FloatingPointModel>Precise</FloatingPointModel>
+      <FloatingPointModel>Fast</FloatingPointModel>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-      <DisableLanguageExtensions>true</DisableLanguageExtensions>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <DisableLanguageExtensions>
+      </DisableLanguageExtensions>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <CallingConvention>VectorCall</CallingConvention>
+      <CallingConvention>FastCall</CallingConvention>
+      <OmitFramePointers>true</OmitFramePointers>
+      <FloatingPointExceptions>
+      </FloatingPointExceptions>
+      <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <CompileAsManaged>false</CompileAsManaged>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <OpenMPSupport>
+      </OpenMPSupport>
+      <StructMemberAlignment>
+      </StructMemberAlignment>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -173,6 +190,7 @@
     <ClInclude Include="Examples\DataMappingTest.h" />
     <ClInclude Include="JsonParser.h" />
     <ClInclude Include="JsonTypes.h" />
+    <ClInclude Include="KeyVaultSecrets.h" />
     <ClInclude Include="Number.h" />
     <ClInclude Include="Serializable.h" />
     <ClInclude Include="SerializationMapping.h" />
@@ -183,11 +201,15 @@
   <ItemGroup>
     <ClCompile Include="Examples\DataMappingTest.cpp" />
     <ClCompile Include="JsonParser.cpp" />
+    <ClCompile Include="KeyVaultSecrets.cpp" />
     <ClCompile Include="Number.cpp" />
     <ClCompile Include="Serializable.cpp">
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
     <ClCompile Include="SerializationMapping.cpp" />
+    <ClCompile Include="src\boost\chrono.cpp" />
+    <ClCompile Include="src\boost\process_cpu_clocks.cpp" />
+    <ClCompile Include="src\boost\thread_clock.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

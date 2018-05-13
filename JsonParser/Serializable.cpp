@@ -8,17 +8,10 @@
 
 bool JsonParser::Serializable::fromString()
 {
-	if (m_isParsed == true) {
-		return true;
-	}
 	if (strLen() > 0) {
 		if (checkString()) {
-			std::cout << "successfully parsed" << std::endl;
-			this->m_isParsed = true;
 			return true;
 		} else {
-			std::cout << "parsing failed..." << std::endl;
-			this->m_isParsed = false;
 			return false;
 		}
 	}
@@ -156,6 +149,11 @@ JsonParser::Serializable::~Serializable()
 
 
 std::string JsonParser::Serializable::toString() const
+{
+	return std::string();
+}
+
+std::string JsonParser::Serializable::toStringArray() const
 {
 	return std::string();
 }
@@ -464,8 +462,8 @@ size_t JsonParser::Serializable::addArray(size_t pos)
 size_t JsonParser::Serializable::addString(size_t pos)
 {
 	size_t i = pos;
-	std::string value = std::string();
-	if ((i = addName(i + 1, &value)) <= 0) {
+	std::string *value = new std::string();
+	if ((i = addName(i + 1, value)) <= 0) {
 		return 0;
 	}
 	m_arrayStrings.push_back(value);
@@ -500,7 +498,7 @@ size_t JsonParser::Serializable::addInteger(size_t pos)
 			|| getChar(i) == ','
 			|| getChar(i) == 'L'
 			|| getChar(i) == 'l') {
-			JsonParser::Number number(numberStr);
+			JsonParser::Number *number = new JsonParser::Number(numberStr);
 			m_arrayNumbers.push_back(number);
 			return i;
 		} else {
@@ -513,10 +511,12 @@ size_t JsonParser::Serializable::addInteger(size_t pos)
 size_t JsonParser::Serializable::addBool(size_t pos)
 {
 	if (tolower(getChar(pos)) == 't') {
-		m_arrayBools.push_back(true);
+		bool *True = new bool(true);
+		m_arrayBools.push_back(True);
 		return pos + constLength("True");
 	} else if (tolower(getChar(pos)) == 'f') {
-		m_arrayBools.push_back(false);
+		bool *False = new bool(false);
+		m_arrayBools.push_back(False);
 		return pos + constLength("False");
 	}
 	return 0;

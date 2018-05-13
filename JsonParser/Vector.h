@@ -16,11 +16,13 @@ namespace JsonParser {
 			//std::vector<SerializationMapping<StringType> *> m_values;
 
 		protected:
+			virtual void clear() {};
 			virtual void addNew() {};
-			void *getLastAddedElement() const
+			void *lastAddedElement() const
 			{
 				return this->m_lastAddedElement;
 			}
+			virtual std::vector<void *>getElements() const = 0;
 
 		protected:
 			void *m_lastAddedElement{ nullptr };
@@ -40,23 +42,35 @@ namespace JsonParser {
 	}
 
 	template<class T2>
-	class Vector : public std::vector<T2>, public VectorBase
+	class Vector : public std::vector<T2 *>, public VectorBase
 	{
 		public:
 			Vector(Vector *parent = nullptr) : m_parent(parent) {}
 			~Vector() {}
-			Vector operator=(const std::vector<T2> &other)
+			Vector operator=(const std::vector<T2 *> &other)
 			{
-				std::vector<T2>::operator=(other);
+				std::vector<T2 *>::operator=(other);
 				return *this;
+			}
+			void clear() override
+			{
+				std::vector<T2 *>::clear();
 			}
 			void addNew() override
 			{
 				//T2 newElement;
 				T2 *newElement = new T2();
-				this->push_back(*newElement);
+				this->push_back(newElement);
 				m_lastAddedElement = newElement;
 				//return newElement;
+			}
+			std::vector<void *> getElements() const
+			{
+				std::vector<void *> elements;
+				for (auto it = this->begin(); it != this->end(); it++) {
+					elements.push_back((void *)*it);
+				}
+				return elements;
 			}
 			//T2 *addNew();
 
