@@ -3,14 +3,6 @@
 
 #include "Number.h"
 
-JsonParser::Number::Number(const std::string & numberStr) : m_numberStr(new std::string(numberStr))
-{
-}
-
-JsonParser::Number::Number(__int64 number) : m_numberStr(new std::string(std::to_string(number)))
-{
-}
-
 __int64 JsonParser::Number::toNumber() const
 {
 	if (m_numberStr == nullptr || m_numberStr->size() <= 0) {
@@ -40,6 +32,11 @@ std::string JsonParser::Number::toString() const
 		return *this->m_numberStr;
 	}
 	return "0";
+}
+
+bool JsonParser::Number::isDefault() const
+{
+	return this->m_default;
 }
 
 #endif  // JSONPARSER_NUMBER_CPP_

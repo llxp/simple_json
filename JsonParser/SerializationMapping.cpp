@@ -20,21 +20,21 @@ bool JsonParser::SerializationMapping::fromString()
 			it != this->m_kvPairNumbers.end();
 			it++) {
 			if (m_kvPairMappingNumbers.count(it->first) > 0) {
-				(*m_kvPairMappingNumbers[it->first]) = std::move(it->second);
+				(*m_kvPairMappingNumbers[it->first]) = it->second;
 			}
 		}
 		for (auto it = this->m_kvPairBools.begin();
 			it != this->m_kvPairBools.end();
 			it++) {
 			if (m_kvPairMappingBools.count(it->first) > 0) {
-				(*m_kvPairMappingBools[it->first]) = std::move(it->second);
+				(*m_kvPairMappingBools[it->first]) = it->second;
 			}
 		}
 		for (auto it = this->m_kvPairStrings.begin();
 			it != this->m_kvPairStrings.end();
 			it++) {
 			if (m_kvPairMappingStrings.count(it->first) > 0) {
-				m_kvPairMappingStrings[it->first]->operator=(std::move(it->second));
+				m_kvPairMappingStrings[it->first]->operator=(it->second);
 			}
 		}
 		for (auto it = this->m_kvPairObjects.begin();
@@ -59,15 +59,15 @@ bool JsonParser::SerializationMapping::fromString()
 
 bool JsonParser::SerializationMapping::fromStringArray()
 {
-	switch (this->m_type) {
+	switch (type()) {
 	case JsonTypes::NumberArray:
-		*m_mappingNumberArrays = this->m_arrayNumbers;
+		m_mappingNumberArrays->assign(this->m_arrayNumbers);
 		break;
 	case JsonTypes::StringArray:
-		*m_mappingStringArrays = this->m_arrayStrings;
+		m_mappingStringArrays->assign(this->m_arrayStrings);
 		break;
 	case JsonTypes::BoolArray:
-		*m_mappingBoolArrays = this->m_arrayBools;
+		m_mappingBoolArrays->assign(this->m_arrayBools);
 		break;
 	case JsonTypes::ObjectArray:
 		if (this->m_arrayObjects.size() > 0) {
@@ -80,8 +80,8 @@ bool JsonParser::SerializationMapping::fromStringArray()
 					this->m_mappingObjectArrays->addNew();
 					SerializationMapping *newElement = static_cast<SerializationMapping *>(
 						this->m_mappingObjectArrays->lastAddedElement());
-					newElement->m_parent = this;
 					if (newElement != nullptr) {
+						newElement->m_parent = this;
 						newElement->assign(currentElement);
 						newElement->fromString();
 					}
@@ -101,6 +101,7 @@ bool JsonParser::SerializationMapping::fromStringArray()
 					SerializationMapping *newElement = static_cast<SerializationMapping *>(
 						m_mappingObjectArrays->lastAddedElement());
 					if (newElement != nullptr) {
+						newElement->m_parent = this;
 						newElement->assign(currentElement);
 						newElement->fromStringArray();
 					}
@@ -122,19 +123,21 @@ bool JsonParser::SerializationMapping::fromString(const std::string & str)
 
 std::string JsonParser::SerializationMapping::toString() const
 {
-	std::string outputStr = "{";
+	std::string outputStr("{");
 	for (auto it = this->m_serializableMembers.begin();
 		it != this->m_serializableMembers.end();
 		it++) {
-		std::pair<std::string, int> currentElement = *it;
+		std::pair<std::string, std::pair<JsonTypes, bool>> currentElement = *it;
 		std::string index = currentElement.first;
-		switch (it->second) {
+		switch (it->second.first) {
 		case JsonTypes::Number:
 		{
 			JsonParser::Number *ptr =
 				this->m_kvPairMappingNumbers.at(index);
-			if (ptr != nullptr) {
+			if (ptr != nullptr && (!(it->second.second && ptr->toNumber() == 0) || !it->second.second)) {
 				outputStr += makeKvPairStrNumber(index, ptr);
+			} else {
+				continue;
 			}
 		}
 		break;
@@ -151,8 +154,10 @@ std::string JsonParser::SerializationMapping::toString() const
 		{
 			std::string *ptr =
 				this->m_kvPairMappingStrings.at(index);
-			if (ptr != nullptr) {
+			if (ptr != nullptr && (!(it->second.second && ptr->length() <= 0) || !it->second.second)) {
 				outputStr += makeKvPairStrString(index, ptr);
+			} else {
+				continue;
 			}
 		}
 		break;
@@ -161,7 +166,11 @@ std::string JsonParser::SerializationMapping::toString() const
 			JsonParser::SerializationMapping *ptr =
 				this->m_kvPairMappingObjects.at(index);
 			if (ptr != nullptr) {
-				outputStr += makeKvPairStrObject(index, ptr);
+				std::string str = makeKvPairStrObject(index, ptr);
+				if (str == makeString(index) + ':' + "{}") {
+					continue;
+				}
+				outputStr += str;
 			}
 		}
 		break;
@@ -193,7 +202,7 @@ std::string JsonParser::SerializationMapping::toString() const
 
 std::string JsonParser::SerializationMapping::toStringArray() const
 {
-	switch (this->m_type) {
+	switch (type()) {
 	case JsonTypes::StringArray:
 		return makeStrStringArray(this->m_mappingStringArrays);
 	case JsonTypes::NumberArray:
@@ -208,96 +217,87 @@ std::string JsonParser::SerializationMapping::toStringArray() const
 	return "[]";
 }
 
+void JsonParser::SerializationMapping::addSerializableMember(const std::string & name, JsonTypes type, bool optional)
+{
+	m_serializableMembers.push_back(
+		std::pair<std::string, std::pair<JsonTypes, bool>>(name, std::pair<JsonTypes, bool>(type, optional))
+	);
+}
+
 void JsonParser::SerializationMapping::addMember(
-	const std::string & name, __int64 & memberVariable)
+	const std::string & name, __int64 & memberVariable, bool optional)
 {
 	m_kvPairMappingNumbers[name] = new JsonParser::Number(&memberVariable);
-	m_serializableMembers.push_back(
-		std::pair<std::string, JsonTypes>(name, JsonTypes::Number)
-	);
+	addSerializableMember(name, JsonTypes::Number, optional);
 }
 
 void JsonParser::SerializationMapping::addMember(
-	const std::string & name, std::string & memberVariable)
+	const std::string & name, std::string & memberVariable, bool optional)
 {
 	this->m_kvPairMappingStrings[name] = &memberVariable;
-	m_serializableMembers.push_back(
-		std::pair<std::string, JsonTypes>(name, JsonTypes::String)
-	);
+	addSerializableMember(name, JsonTypes::String, optional);
 }
 
 void JsonParser::SerializationMapping::addMember(
-	const std::string & name, SerializationMapping& memberVariable)
+	const std::string & name, SerializationMapping& memberVariable, bool optional)
 {
 	this->m_kvPairMappingObjects[name] = &memberVariable;
-	m_serializableMembers.push_back(
-		std::pair<std::string, JsonTypes>(name, JsonTypes::Object)
-	);
+	addSerializableMember(name, JsonTypes::Object, optional);
 }
 
 void JsonParser::SerializationMapping::addMember(
-	const std::string & name, bool & memberVariable)
+	const std::string & name, bool & memberVariable, bool optional)
 {
 	this->m_kvPairMappingBools[name] = &memberVariable;
-	m_serializableMembers.push_back(
-		std::pair<std::string, JsonTypes>(name, JsonTypes::Bool)
-	);
+	addSerializableMember(name, JsonTypes::Bool, optional);
 }
 
 void JsonParser::SerializationMapping::addMember(
 	const std::string & name,
-	JsonParser::Vector<std::string>& memberVariable)
+	JsonParser::Vector<std::string>& memberVariable, bool optional)
 {
 	SerializationMapping *newObj = new SerializationMapping(this);
 	if (newObj != nullptr) {
 		newObj->m_mappingStringArrays = &memberVariable;
 		m_kvPairMappingArrays[name] = newObj;
-		m_serializableMembers.push_back(
-			std::pair<std::string, JsonTypes>(name, JsonTypes::StringArray)
-		);
+		addSerializableMember(name, JsonTypes::StringArray, optional);
 	}
 }
 
 void JsonParser::SerializationMapping::addMember(
 	const std::string & name,
-	JsonParser::Vector<bool> & memberVariable)
+	JsonParser::Vector<bool> & memberVariable, bool optional)
 {
 	SerializationMapping *newObj = new SerializationMapping(this);
 	if (newObj != nullptr) {
 		newObj->m_mappingBoolArrays = &memberVariable;
 		m_kvPairMappingArrays[name] = newObj;
-		m_serializableMembers.push_back(
-			std::pair<std::string, JsonTypes>(name, JsonTypes::BoolArray)
-		);
+		addSerializableMember(name, JsonTypes::BoolArray, optional);
 	}
 }
 
 void JsonParser::SerializationMapping::addMember(
 	const std::string & name,
-	JsonParser::Vector<JsonParser::Number> &memberVariable)
+	JsonParser::Vector<JsonParser::Number> &memberVariable, bool optional)
 {
 	SerializationMapping *newObj = new SerializationMapping(this);
 	if (newObj != nullptr) {
 		newObj->m_mappingNumberArrays = &memberVariable;
 		m_kvPairMappingArrays[name] = newObj;
-		m_serializableMembers.push_back(
-			std::pair<std::string, JsonTypes>(name, JsonTypes::NumberArray)
-		);
+		addSerializableMember(name, JsonTypes::NumberArray, optional);
 	}
 }
 
 void JsonParser::SerializationMapping::addMember(
 	const std::string & name,
-	JsonParser::VectorBase *memberVariable)
+	JsonParser::VectorBase *memberVariable, bool optional)
 {
 	JsonParser::SerializationMapping *newObj =
 		new JsonParser::SerializationMapping(this);
 	if (newObj != nullptr) {
 		newObj->m_mappingObjectArrays = memberVariable;
 		m_kvPairMappingArrays[name] = newObj;
-		m_serializableMembers.push_back(
-			std::pair<std::string, JsonTypes>(name, JsonTypes::ObjectArray)
-		);
+		addSerializableMember(name, JsonTypes::ObjectArray, optional);
 	}
 }
 
@@ -346,48 +346,31 @@ std::string JsonParser::SerializationMapping::makeStrObjectArray(
 	const JsonParser::VectorBase * value) const
 {
 	std::vector<void *> elements = value->getElements();
-	std::string outputStr = "[";
-	for (auto it = elements.begin(); it != elements.end(); it++) {
-		JsonParser::SerializationMapping *currentElement =
-			static_cast<SerializationMapping *>(*it);
-		if (currentElement != nullptr) {
-			outputStr += currentElement->toString();
-			if (it + 1 != elements.end()) {
-				outputStr += ',';
-			}
-		}
-	}
-	outputStr += ']';
-	return outputStr;
+	return makeStr3<SerializationMapping, std::vector<void *>>(
+		&elements, [=](SerializationMapping * currentElement)->std::string{
+		return currentElement->toString();
+	});
 }
 
 std::string JsonParser::SerializationMapping::makeStrNumberArray(
 	const JsonParser::Vector<JsonParser::Number> * value) const
 {
 	if (value == nullptr) {
-		return "[]";
+		return std::string("[]");
 	}
-	std::string outputStr = "[";
-	for (auto it = value->begin(); it != value->end(); it++) {
-		JsonParser::Number *number = *it;
-		if (number != nullptr) {
-			outputStr += number->toString();
-			if (it + 1 != value->end()) {
-				outputStr += ',';
-			}
-		}
-	}
-	outputStr += ']';
-	return outputStr;
+	return makeStr3<JsonParser::Number, JsonParser::Vector<JsonParser::Number>>(
+		value, [=](JsonParser::Number * currentElement)->std::string {
+		return currentElement->toString();
+	});
 }
 
 std::string JsonParser::SerializationMapping::makeStrBoolArray(
 	const JsonParser::Vector<bool> * value) const
 {
 	if (value == nullptr) {
-		return "[]";
+		return std::string("[]");
 	}
-	std::string outputStr = "[";
+	std::string outputStr("[");
 	for (auto it = value->begin(); it != value->end(); it++) {
 		bool *currentElement = *it;
 		if (currentElement != nullptr) {
@@ -405,39 +388,22 @@ std::string JsonParser::SerializationMapping::makeStrStringArray(
 	const JsonParser::Vector<std::string> * value) const
 {
 	if (value == nullptr) {
-		return "[]";
+		return std::string("[]");
 	}
-	std::string outputStr = "[";
-	for (auto it = value->begin(); it != value->end(); it++) {
-		std::string *currentElement = *it;
-		if (currentElement != nullptr) {
-			outputStr += makeString(*currentElement);
-			if (it + 1 != value->end()) {
-				outputStr += ',';
-			}
-		}
-	}
-	outputStr += ']';
-	return outputStr;
+	return makeStr3<std::string, JsonParser::Vector<std::string>>
+		(value, [=](std::string *currentElement)->std::string {
+		return makeString(*currentElement);
+	});
 }
 
 std::string JsonParser::SerializationMapping::makeStrArrayArray(
 	const JsonParser::VectorBase * value) const
 {
 	std::vector<void *> elements = value->getElements();
-	std::string outputStr = "[";
-	for (auto it = elements.begin(); it != elements.end(); it++) {
-		JsonParser::SerializationMapping *currentElement =
-			static_cast<SerializationMapping *>(*it);
-		if (currentElement != nullptr) {
-			outputStr += currentElement->toStringArray();
-			if (it + 1 != elements.end()) {
-				outputStr += ',';
-			}
-		}
-	}
-	outputStr += ']';
-	return outputStr;
+	return makeStr3<SerializationMapping, std::vector<void *>>
+		(&elements, [=](SerializationMapping * currentElement)->std::string {
+		return currentElement->toStringArray();
+	});
 }
 
 #endif  // JSONPARSER_SERIALIZATIONMAPPING_CPP_

@@ -9,7 +9,7 @@
 bool JsonParser::Serializable::fromString()
 {
 	if (strLen() > 0) {
-		if (checkString()) {
+		if (parseString()) {
 			return true;
 		} else {
 			return false;
@@ -24,7 +24,7 @@ bool JsonParser::Serializable::fromString(const std::string & str)
 	return fromString();
 }
 
-size_t JsonParser::Serializable::fromString(size_t pos)
+size_t JsonParser::Serializable::fromString(const size_t &pos)
 {
 	size_t i = 0;
 	size_t openingCount = 0;
@@ -47,7 +47,7 @@ size_t JsonParser::Serializable::fromString(size_t pos)
 	return i;
 }
 
-size_t JsonParser::Serializable::fromStringArray(size_t pos)
+size_t JsonParser::Serializable::fromStringArray(const size_t &pos)
 {
 	size_t i = 0;
 	size_t openingCount = 0;
@@ -70,7 +70,7 @@ size_t JsonParser::Serializable::fromStringArray(size_t pos)
 }
 
 
-size_t JsonParser::Serializable::parseStringArray(size_t pos)
+size_t JsonParser::Serializable::parseStringArray(const size_t &pos)
 {
 	size_t i = 0;
 	bool commaFound = true;
@@ -159,7 +159,7 @@ std::string JsonParser::Serializable::toStringArray() const
 }
 
 
-bool JsonParser::Serializable::checkString()
+bool JsonParser::Serializable::parseString()
 {
 	size_t openingCount = 0;
 	size_t closeCount = 0;
@@ -179,19 +179,19 @@ bool JsonParser::Serializable::checkString()
 }
 
 
-bool JsonParser::Serializable::matchChar(char ch1, char ch2)
+inline bool JsonParser::Serializable::matchChar(char ch1, char ch2) const
 {
 	return ch1 == ch2;
 }
 
 
-bool JsonParser::Serializable::checkEscape(size_t pos)
+bool JsonParser::Serializable::checkEscape(const size_t &pos) const
 {
 	return pos > 0 && matchChar(getChar(pos - 1), '\\');
 }
 
 
-size_t JsonParser::Serializable::addKVPair(size_t pos)
+size_t JsonParser::Serializable::addKVPair(const size_t &pos)
 {
 	size_t i = 0;
 	if (pos > 0 && strLen() > 0 && strLen() > pos) {
@@ -199,7 +199,7 @@ size_t JsonParser::Serializable::addKVPair(size_t pos)
 		for (i = pos; i < strLen(); i++) {
 			switch (getChar(i)) {
 			case '"':
-				if ((i = addName(i + 1, &name)) <= 0) {
+				if ((i = this->getName(i + 1, name)) <= 0) {
 					return 0;
 				}
 				break;
@@ -222,7 +222,7 @@ size_t JsonParser::Serializable::addKVPair(size_t pos)
 }
 
 
-size_t JsonParser::Serializable::addName(size_t pos, std::string *name)
+size_t JsonParser::Serializable::getName(const size_t &pos, std::string &name) const
 {
 	size_t i = 0;
 	if (pos > 0 && strLen() > 0 && strLen() > pos) {
@@ -230,14 +230,14 @@ size_t JsonParser::Serializable::addName(size_t pos, std::string *name)
 			if (getChar(i) == '"' && !checkEscape(i)) {
 				return i;
 			}
-			(*name) += getChar(i);
+			name += getChar(i);
 		}
 	}
 	return 0;
 }
 
 
-size_t JsonParser::Serializable::addValue(size_t pos, const std::string &name)
+size_t JsonParser::Serializable::addValue(const size_t &pos, const std::string &name)
 {
 	if (name.length() <= 0) {
 		return 0;
@@ -295,6 +295,13 @@ size_t JsonParser::Serializable::addValue(size_t pos, const std::string &name)
 					i--;
 					valueSet = true;
 					commaFound = false;
+				} else if (isNull(i)) {
+					if ((i = addNullValue(i, name)) <= 0 || commaFound == false) {
+						return 0;
+					}
+					i--;
+					valueSet = true;
+					commaFound = false;
 				}
 			}
 			if (i >= strLen()) {
@@ -306,7 +313,7 @@ size_t JsonParser::Serializable::addValue(size_t pos, const std::string &name)
 }
 
 
-bool JsonParser::Serializable::isNumber(size_t pos)
+bool JsonParser::Serializable::isNumber(const size_t &pos) const
 {
 	if ((getChar(pos) >= 48
 		&& getChar(pos) <= 57)
@@ -318,7 +325,7 @@ bool JsonParser::Serializable::isNumber(size_t pos)
 }
 
 
-bool JsonParser::Serializable::isBool(size_t pos)
+bool JsonParser::Serializable::isBool(const size_t &pos) const
 {
 	if (tolower(getChar(pos)) == 't') {
 		if (strLen() > pos + 3 && tolower(getChar(pos + 1)) == 'r'
@@ -337,6 +344,18 @@ bool JsonParser::Serializable::isBool(size_t pos)
 	return false;
 }
 
+bool JsonParser::Serializable::isNull(const size_t &pos) const
+{
+	if (tolower(getChar(pos)) == 'n') {
+		if (strLen() > pos + 3 && tolower(getChar(pos + 1)) == 'u'
+			&& tolower(getChar(pos + 2)) == 'l'
+			&& tolower(getChar(pos + 3)) == 'l') {
+			return true;
+		}
+	}
+	return false;
+}
+
 
 size_t JsonParser::Serializable::strLen() const
 {
@@ -347,7 +366,7 @@ size_t JsonParser::Serializable::strLen() const
 }
 
 
-char JsonParser::Serializable::getChar(size_t pos) const
+char JsonParser::Serializable::getChar(const size_t &pos) const
 {
 	if (this->m_fullString != nullptr) {
 		return this->m_fullString->at(pos);
@@ -356,11 +375,11 @@ char JsonParser::Serializable::getChar(size_t pos) const
 }
 
 
-size_t JsonParser::Serializable::addStringValue(size_t pos, const std::string &name)
+size_t JsonParser::Serializable::addStringValue(const size_t &pos, const std::string &name)
 {
 	size_t i = pos;
 	std::string value = std::string();
-	if ((i = addName(i, &value)) <= 0) {
+	if ((i = this->getName(i, value)) <= 0) {
 		return 0;
 	}
 	this->m_kvPairStrings[name] = value;
@@ -368,7 +387,7 @@ size_t JsonParser::Serializable::addStringValue(size_t pos, const std::string &n
 }
 
 
-size_t JsonParser::Serializable::addObjectValue(size_t pos, const std::string &name)
+size_t JsonParser::Serializable::addObjectValue(const size_t &pos, const std::string &name)
 {
 	if (name.length() <= 0) {
 		return 0;
@@ -386,24 +405,25 @@ size_t JsonParser::Serializable::addObjectValue(size_t pos, const std::string &n
 }
 
 
-size_t JsonParser::Serializable::addArrayValue(size_t pos, const std::string &name)
+size_t JsonParser::Serializable::addArrayValue(const size_t &pos, const std::string &name)
 {
 	if (name.length() <= 0) {
 		return 0;
 	}
-	if (pos > 0 && strLen() > 0 && strLen() > pos && getChar(pos) == '[') {
+	size_t pos_ = pos;
+	if (pos_ > 0 && strLen() > 0 && strLen() > pos_ && getChar(pos_) == '[') {
 		JsonParser::Serializable *child = new JsonParser::Serializable(this);
 		child->m_fullString = this->m_fullString;
 		m_kvPairArrays[name] = child;
-		if ((pos = child->fromStringArray(pos)) <= 0) {
+		if ((pos_ = child->fromStringArray(pos_)) <= 0) {
 			return 0;
 		}
 	}
-	return pos;
+	return pos_;
 }
 
 
-size_t JsonParser::Serializable::addIntegerValue(size_t pos, const std::string & name)
+size_t JsonParser::Serializable::addIntegerValue(const size_t &pos, const std::string & name)
 {
 	if (name.length() <= 0) {
 		return 0;
@@ -431,7 +451,7 @@ size_t JsonParser::Serializable::addIntegerValue(size_t pos, const std::string &
 }
 
 
-size_t JsonParser::Serializable::addBoolValue(size_t pos, const std::string & name)
+size_t JsonParser::Serializable::addBoolValue(const size_t &pos, const std::string & name)
 {
 	if (tolower(getChar(pos)) == 't') {
 		m_kvPairBools[name] = true;
@@ -443,14 +463,23 @@ size_t JsonParser::Serializable::addBoolValue(size_t pos, const std::string & na
 	return 0;
 }
 
+size_t JsonParser::Serializable::addNullValue(const size_t & pos, const std::string & name)
+{
+	if (tolower(getChar(pos)) == 'n') {
+		m_kvPairNullValues.push_back(name);
+		return pos + constLength("null");
+	}
+	return 0;
+}
 
-size_t JsonParser::Serializable::addArray(size_t pos)
+
+size_t JsonParser::Serializable::addArray(const size_t &pos)
 {
 	size_t i = pos;
 	if (pos > 0 && strLen() > 0 && strLen() > pos && getChar(pos) == '{') {
 		JsonParser::Serializable *child = new JsonParser::Serializable(this);
 		child->m_fullString = this->m_fullString;
-		if ((i = child->fromStringArray(i)) <= 0) {
+		if ((i = child->fromString(i)) <= 0) {
 			return 0;
 		}
 		m_arrayArrays.push_back(child);
@@ -459,11 +488,11 @@ size_t JsonParser::Serializable::addArray(size_t pos)
 }
 
 
-size_t JsonParser::Serializable::addString(size_t pos)
+size_t JsonParser::Serializable::addString(const size_t &pos)
 {
 	size_t i = pos;
-	std::string *value = new std::string();
-	if ((i = addName(i + 1, value)) <= 0) {
+	std::string value;
+	if ((i = this->getName(i + 1, value)) <= 0) {
 		return 0;
 	}
 	m_arrayStrings.push_back(value);
@@ -471,22 +500,22 @@ size_t JsonParser::Serializable::addString(size_t pos)
 }
 
 
-size_t JsonParser::Serializable::addObject(size_t pos)
+size_t JsonParser::Serializable::addObject(const size_t &pos)
 {
 	size_t i = pos;
 	if (pos > 0 && strLen() > 0 && strLen() > pos && getChar(pos) == '{') {
 		JsonParser::Serializable *child = new JsonParser::Serializable(this);
 		child->m_fullString = this->m_fullString;
-		m_arrayObjects.push_back(child);
 		if ((i = child->fromString(i)) <= 0) {
 			return 0;
 		}
+		m_arrayObjects.push_back(child);
 	}
 	return i;
 }
 
 
-size_t JsonParser::Serializable::addInteger(size_t pos)
+size_t JsonParser::Serializable::addInteger(const size_t &pos)
 {
 	size_t i = 0;
 	std::string numberStr = "";
@@ -498,7 +527,7 @@ size_t JsonParser::Serializable::addInteger(size_t pos)
 			|| getChar(i) == ','
 			|| getChar(i) == 'L'
 			|| getChar(i) == 'l') {
-			JsonParser::Number *number = new JsonParser::Number(numberStr);
+			JsonParser::Number number(numberStr);
 			m_arrayNumbers.push_back(number);
 			return i;
 		} else {
@@ -508,7 +537,7 @@ size_t JsonParser::Serializable::addInteger(size_t pos)
 	return i;
 }
 
-size_t JsonParser::Serializable::addBool(size_t pos)
+size_t JsonParser::Serializable::addBool(const size_t &pos)
 {
 	if (tolower(getChar(pos)) == 't') {
 		bool *True = new bool(true);
@@ -525,6 +554,11 @@ size_t JsonParser::Serializable::addBool(size_t pos)
 void JsonParser::Serializable::setType(const JsonTypes & type)
 {
 	this->m_type = type;
+}
+
+JsonTypes JsonParser::Serializable::type() const
+{
+	return this->m_type;
 }
 
 #endif  // JSONPARSER_SERIALIZABLE_CPP_

@@ -6,6 +6,7 @@
 #include <utility>
 #include <vector>
 #include <iterator>
+#include <functional>
 
 #include "Serializable.h"
 #include "Vector.h"
@@ -22,21 +23,6 @@ namespace JsonParser {
 				SerializationMapping *parent = nullptr);
 			~SerializationMapping() {}
 
-		private:
-			std::map<std::string, JsonParser::Number *> m_kvPairMappingNumbers;
-			std::map<std::string, bool *> m_kvPairMappingBools;
-			std::map<std::string, std::string *> m_kvPairMappingStrings;
-			std::map<std::string, SerializationMapping *> m_kvPairMappingObjects;
-			std::map<std::string, SerializationMapping *> m_kvPairMappingArrays;
-
-			JsonParser::Vector<std::string> *m_mappingStringArrays{ nullptr };
-			JsonParser::Vector<bool> *m_mappingBoolArrays{ nullptr };
-			JsonParser::Vector<JsonParser::Number> *m_mappingNumberArrays{ nullptr };
-			JsonParser::VectorBase *m_mappingObjectArrays{ nullptr };
-			JsonParser::VectorBase *m_mappingArrayArrays{ nullptr };
-
-			std::vector<std::pair<std::string, JsonTypes>> m_serializableMembers;
-
 		public:
 			bool fromString() override;
 			bool fromStringArray();
@@ -47,32 +33,67 @@ namespace JsonParser {
 
 		protected:
 			template<typename T>
-			T DataContract(std::string name, T &value, const T &default)
+			T DataContract(std::string name, T &value, const T &defaultValue)
 			{
 				//T* newObj = new T(value);
 				addMember(name, value);
-				return T(default);
+				return T(defaultValue);
 			}
 
-			void addMember(const std::string &name,
-				__int64 &memberVariable);
-			void addMember(const std::string &name,
-				std::string &memberVariable);
-			void addMember(const std::string &name,
-				SerializationMapping &memberVariable);
-			void addMember(const std::string &name,
-				bool &memberVariable);
+			void addSerializableMember(const std::string &name, JsonTypes type, bool optional = false);
 
 			void addMember(const std::string &name,
-				JsonParser::Vector<std::string> &memberVariable);
+				__int64 &memberVariable, bool optional = false);
 			void addMember(const std::string &name,
-				JsonParser::Vector<JsonParser::Number> &memberVariable);
+				std::string &memberVariable, bool optional = false);
 			void addMember(const std::string &name,
-				JsonParser::Vector<bool> &memberVariable);
+				SerializationMapping &memberVariable, bool optional = false);
 			void addMember(const std::string &name,
-				JsonParser::VectorBase *memberVariable);
+				bool &memberVariable, bool optional = false);
+
+			void addMember(const std::string &name,
+				JsonParser::Vector<std::string> &memberVariable, bool optional = false);
+			void addMember(const std::string &name,
+				JsonParser::Vector<JsonParser::Number> &memberVariable, bool optional = false);
+			void addMember(const std::string &name,
+				JsonParser::Vector<bool> &memberVariable, bool optional = false);
+			void addMember(const std::string &name,
+				JsonParser::VectorBase *memberVariable, bool optional = false);
 
 		private:
+			template<typename T1, typename T2>
+			std::string makeStr2(const T2 &vec, const std::function<std::string(T1 element)> &lambda) const
+			{
+				std::string outputStr("[");
+				for (auto it = vec.begin(); it != vec.end(); it++) {
+					std::string outputStr;
+					T1 currentElement = static_cast<T1>(*it);
+					if (currentElement != nullptr) {
+						outputStr += lambda(currentElement);
+						if (it + 1 != vec.end()) {
+							outputStr += ',';
+						}
+					}
+				}
+				outputStr += ']';
+				return outputStr;
+			}
+			template<typename T1, typename T2>
+			std::string makeStr3(const T2 *vec, const std::function<std::string(T1 * element)> &lambda) const
+			{
+				std::string outputStr("[");
+				for (auto it = vec->begin(); it != vec->end(); it++) {
+					T1 *currentElement = static_cast<T1 *>(*it);
+					if (currentElement != nullptr) {
+						outputStr += lambda(currentElement);
+						if (it + 1 != vec->end()) {
+							outputStr += ',';
+						}
+					}
+				}
+				outputStr += ']';
+				return outputStr;
+			}
 			std::string makeString(const std::string &str) const;
 			std::string makeKvPairStrNumber(const std::string &name,
 				JsonParser::Number *value) const;
@@ -99,7 +120,6 @@ namespace JsonParser {
 			SerializationMapping *assign(
 				Serializable *other)
 			{
-				//this->m_isParsed = other->m_isParsed;
 				this->m_type = other->m_type;
 				this->m_parent = other->m_parent;
 				this->m_fullString = other->m_fullString;
@@ -117,6 +137,21 @@ namespace JsonParser {
 				this->m_arrayStrings = other->m_arrayStrings;
 				return this;
 			}
+
+	private:
+		std::map<std::string, JsonParser::Number *> m_kvPairMappingNumbers;
+		std::map<std::string, bool *> m_kvPairMappingBools;
+		std::map<std::string, std::string *> m_kvPairMappingStrings;
+		std::map<std::string, SerializationMapping *> m_kvPairMappingObjects;
+		std::map<std::string, SerializationMapping *> m_kvPairMappingArrays;
+
+		JsonParser::Vector<std::string> *m_mappingStringArrays{ nullptr };
+		JsonParser::Vector<bool> *m_mappingBoolArrays{ nullptr };
+		JsonParser::Vector<JsonParser::Number> *m_mappingNumberArrays{ nullptr };
+		JsonParser::VectorBase *m_mappingObjectArrays{ nullptr };
+		JsonParser::VectorBase *m_mappingArrayArrays{ nullptr };
+
+		std::vector<std::pair<std::string, std::pair<JsonTypes, bool>>> m_serializableMembers;
 	};
 }
 

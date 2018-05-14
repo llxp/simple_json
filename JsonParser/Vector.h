@@ -45,42 +45,34 @@ namespace JsonParser {
 	class Vector : public std::vector<T2 *>, public VectorBase
 	{
 		public:
-			Vector(Vector *parent = nullptr) : m_parent(parent) {}
+			explicit Vector(Vector *parent = nullptr) : m_parent(parent) {}
 			~Vector()
 			{
-				if (this->size() <= 0) {
-					return;
-				}
-				for (auto it = this->begin(); it != this->end(); it++) {
-					T2 *currentElement = *it;
-					if (currentElement != nullptr) {
-						delete currentElement;
-						//currentElement = nullptr;
-					}
-				}
-				//this->clear();
+				this->clearPointers();
 			}
 			T2 &operator[](size_t index)
 			{
 				T2 *ptr = this->at(index);
 				return *ptr;
 			}
-			Vector operator=(const std::vector<T2 *> &other)
+			void assign(const std::vector<T2> &other)
 			{
-				std::vector<T2 *>::operator=(other);
-				return *this;
+				this->clear();
+				for (auto it = other.begin(); it != other.end(); it++) {
+					this->push_back(new T2(*it));
+				}
+				//std::vector<T2 *>::operator=(other);
 			}
 			void clear() override
 			{
+				this->clearPointers();
 				std::vector<T2 *>::clear();
 			}
 			void addNew() override
 			{
-				//T2 newElement;
 				T2 *newElement = new T2();
 				this->push_back(newElement);
 				m_lastAddedElement = newElement;
-				//return newElement;
 			}
 			std::vector<void *> getElements() const
 			{
@@ -90,26 +82,24 @@ namespace JsonParser {
 				}
 				return elements;
 			}
-			//T2 *addNew();
+
+		private:
+			void clearPointers()
+			{
+				if (this->size() <= 0) {
+					return;
+				}
+				for (auto it = this->begin(); it != this->end(); it++) {
+					T2 *currentElement = *it;
+					if (currentElement != nullptr) {
+						delete currentElement;
+					}
+				}
+			}
 
 		private:
 			Vector * m_parent{ nullptr };
 	};
 }
-/*
-template<class StringType, class T>
-class Vector :
-	private Serializable<StringType>
-{
-public:
-	Vector() {}
-	~Vector() {}
-	size_t size() const { return 0; }
-
-protected:
-	void addValue(Serializable<StringType> *value) {}
-};*/
-
-//#include "Vector.cpp"
 
 #endif  // JSONPARSER_VECTOR_H_
