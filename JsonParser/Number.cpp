@@ -3,17 +3,24 @@
 
 #include "Number.h"
 
+JsonParser::Number::~Number()
+{
+}
+
 __int64 JsonParser::Number::toNumber() const
 {
-	if (m_numberStr == nullptr || m_numberStr->size() <= 0) {
+	if (this->m_numberRef != nullptr) {
+		return *this->m_numberRef;
+	}
+	if (m_numberStr.size() <= 0) {
 		return 0;
 	}
 	__int64 result = 0;
 	size_t pos = 0;
-	for (size_t i = m_numberStr->length() - 1;
-		i >= 0 && i < m_numberStr->length();
+	for (size_t i = m_numberStr.length() - 1;
+		i >= 0 && i < m_numberStr.length();
 		i--) {
-		char ch = m_numberStr->at(i);
+		char ch = m_numberStr.at(i);
 		if (ch == '-') {
 			result = -result;
 			continue;
@@ -28,8 +35,8 @@ __int64 JsonParser::Number::toNumber() const
 
 std::string JsonParser::Number::toString() const
 {
-	if (m_numberStr != nullptr) {
-		return *this->m_numberStr;
+	if (m_numberStr.length() > 0) {
+		return this->m_numberStr;
 	}
 	return "0";
 }

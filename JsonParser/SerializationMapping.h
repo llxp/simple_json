@@ -19,17 +19,19 @@ namespace JsonParser {
 		private JsonParser::Serializable
 	{
 		public:
-			explicit SerializationMapping(
-				SerializationMapping *parent = nullptr);
+			explicit SerializationMapping();
 			~SerializationMapping() {}
 
 		public:
 			bool fromString() override;
 			bool fromStringArray();
-			bool fromString(const std::string &str);
+			bool fromString(std::string * const str) override;
 
 			virtual std::string toString() const override;
 			virtual std::string toStringArray() const override;
+
+	private:
+		bool fromString2();
 
 		protected:
 			template<typename T>
@@ -116,27 +118,6 @@ namespace JsonParser {
 				const JsonParser::Vector<std::string> *value) const;
 			std::string makeStrArrayArray(
 				const JsonParser::VectorBase *value) const;
-
-			SerializationMapping *assign(
-				Serializable *other)
-			{
-				this->m_type = other->m_type;
-				this->m_parent = other->m_parent;
-				this->m_fullString = other->m_fullString;
-
-				this->m_kvPairNumbers = other->m_kvPairNumbers;
-				this->m_kvPairStrings = other->m_kvPairStrings;
-				this->m_kvPairBools = other->m_kvPairBools;
-				this->m_kvPairObjects = other->m_kvPairObjects;
-				this->m_kvPairArrays = other->m_kvPairArrays;
-
-				this->m_arrayObjects = other->m_arrayObjects;
-				this->m_arrayArrays = other->m_arrayArrays;
-				this->m_arrayNumbers = other->m_arrayNumbers;
-				this->m_arrayBools = other->m_arrayBools;
-				this->m_arrayStrings = other->m_arrayStrings;
-				return this;
-			}
 
 	private:
 		std::map<std::string, JsonParser::Number *> m_kvPairMappingNumbers;

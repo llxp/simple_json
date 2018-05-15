@@ -7,10 +7,10 @@
 
 #include "JsonTypes.h"
 #include "Number.h"
+#include "SerializableData.h"
+
 
 namespace JsonParser {
-
-	class SerializationMapping;
 
 	class NotImplemented : public std::logic_error
 	{
@@ -23,20 +23,18 @@ namespace JsonParser {
 		return (*str == 0) ? 0 : constLength(str + 1) + 1;
 	}
 
-	class Serializable
+	class Serializable : public SerializableData
 	{
-		private:
-			friend class JsonParser::SerializationMapping;
 		public:
-			explicit Serializable(Serializable * parent = nullptr);
+			explicit Serializable();
 			virtual ~Serializable();
 			virtual std::string toString() const;
 			virtual std::string toStringArray() const;
-			bool fromString(const std::string &str);
+			virtual bool fromString(std::string * const str);
+			virtual bool fromString() override;
 
 		protected:
 			size_t fromString(const size_t &pos);
-			virtual bool fromString();
 
 		private:
 			size_t fromStringArray(const size_t &pos);
@@ -49,8 +47,6 @@ namespace JsonParser {
 			bool isNumber(const size_t &pos) const;
 			bool isBool(const size_t &pos) const;
 			bool isNull(const size_t &pos) const;
-			size_t strLen() const;
-			char getChar(const size_t &pos) const;
 			inline bool matchChar(char ch1, char ch2) const;
 			bool checkEscape(const size_t &pos) const;
 			size_t getName(const size_t &pos, std::string &name) const;
@@ -69,29 +65,6 @@ namespace JsonParser {
 			size_t addObject(const size_t &pos);
 			size_t addInteger(const size_t &pos);
 			size_t addBool(const size_t &pos);
-
-		private:
-			void setType(const JsonTypes &type);
-			JsonTypes type() const;
-
-		protected:
-			std::map<std::string, JsonParser::Number> m_kvPairNumbers;
-			std::map<std::string, bool> m_kvPairBools;
-			std::map<std::string, std::string> m_kvPairStrings;
-			std::map<std::string, Serializable *> m_kvPairObjects;
-			std::map<std::string, Serializable *> m_kvPairArrays;
-			std::vector<std::string> m_kvPairNullValues;
-
-			std::vector<Serializable *> m_arrayObjects;
-			std::vector<Serializable *> m_arrayArrays;
-			std::vector<JsonParser::Number> m_arrayNumbers;
-			std::vector<bool> m_arrayBools;
-			std::vector<std::string> m_arrayStrings;
-
-		private:
-			Serializable * m_parent{ nullptr };
-			std::string *m_fullString{ nullptr };
-			JsonTypes m_type{ JsonTypes::Object };
 	};
 
 }

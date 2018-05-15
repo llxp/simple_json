@@ -40,3 +40,8 @@
 *.idb
 *.ipdb
 *.log
+
+*.txt
+*.enc
+*.tlog
+*.xdc

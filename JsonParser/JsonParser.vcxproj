@@ -193,6 +193,7 @@
     <ClInclude Include="KeyVaultSecrets.h" />
     <ClInclude Include="Number.h" />
     <ClInclude Include="Serializable.h" />
+    <ClInclude Include="SerializableData.h" />
     <ClInclude Include="SerializationMapping.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -206,6 +207,7 @@
     <ClCompile Include="Serializable.cpp">
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
+    <ClCompile Include="SerializableData.cpp" />
     <ClCompile Include="SerializationMapping.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

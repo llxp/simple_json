@@ -18,10 +18,13 @@ bool JsonParser::Serializable::fromString()
 	return true;
 }
 
-bool JsonParser::Serializable::fromString(const std::string & str)
+bool JsonParser::Serializable::fromString(std::string * const str)
 {
-	this->m_fullString = new std::string(str);
-	return fromString();
+	/*if (this->fullString() != nullptr) {
+		delete this->fullString();
+	}*/
+	this->setFullString(str);
+	return this->fromString();
 }
 
 size_t JsonParser::Serializable::fromString(const size_t &pos)
@@ -135,16 +138,13 @@ size_t JsonParser::Serializable::parseStringArray(const size_t &pos)
 }
 
 
-JsonParser::Serializable::Serializable(JsonParser::Serializable* parent) : m_parent(parent)
+JsonParser::Serializable::Serializable()
 {
 }
 
 
 JsonParser::Serializable::~Serializable()
 {
-	if (this->m_parent == nullptr && this->m_fullString != nullptr) {
-		delete this->m_fullString;
-	}
 }
 
 
@@ -357,28 +357,10 @@ bool JsonParser::Serializable::isNull(const size_t &pos) const
 }
 
 
-size_t JsonParser::Serializable::strLen() const
-{
-	if (this->m_fullString != nullptr) {
-		return this->m_fullString->length();
-	}
-	return 0;
-}
-
-
-char JsonParser::Serializable::getChar(const size_t &pos) const
-{
-	if (this->m_fullString != nullptr) {
-		return this->m_fullString->at(pos);
-	}
-	return 0;
-}
-
-
 size_t JsonParser::Serializable::addStringValue(const size_t &pos, const std::string &name)
 {
 	size_t i = pos;
-	std::string value = std::string();
+	std::string value;
 	if ((i = this->getName(i, value)) <= 0) {
 		return 0;
 	}
@@ -394,11 +376,13 @@ size_t JsonParser::Serializable::addObjectValue(const size_t &pos, const std::st
 	}
 	size_t i = pos;
 	if (pos > 0 && strLen() > 0 && strLen() > pos && getChar(pos) == '{') {
-		JsonParser::Serializable *child = new JsonParser::Serializable(this);
-		child->m_fullString = this->m_fullString;
-		m_kvPairObjects[name] = child;
+		auto child = std::make_shared<JsonParser::Serializable>();
+		child->setFullString(this->fullString());
 		if ((i = child->fromString(i)) <= 0) {
 			return 0;
+		}
+		if (m_kvPairObjects.find(name) == m_kvPairObjects.end()) {
+			m_kvPairObjects[name] = child;
 		}
 	}
 	return i;
@@ -412,11 +396,13 @@ size_t JsonParser::Serializable::addArrayValue(const size_t &pos, const std::str
 	}
 	size_t pos_ = pos;
 	if (pos_ > 0 && strLen() > 0 && strLen() > pos_ && getChar(pos_) == '[') {
-		JsonParser::Serializable *child = new JsonParser::Serializable(this);
-		child->m_fullString = this->m_fullString;
-		m_kvPairArrays[name] = child;
+		auto child = std::make_shared<JsonParser::Serializable>();
+		child->setFullString(this->fullString());
 		if ((pos_ = child->fromStringArray(pos_)) <= 0) {
 			return 0;
+		}
+		if (m_kvPairArrays.find(name) == m_kvPairArrays.end()) {
+			m_kvPairArrays[name] = child;
 		}
 	}
 	return pos_;
@@ -429,7 +415,7 @@ size_t JsonParser::Serializable::addIntegerValue(const size_t &pos, const std::s
 		return 0;
 	}
 	size_t i = 0;
-	std::string numberStr = std::string();
+	std::string numberStr;
 	if (pos > 0 && strLen() > 0 && strLen() > pos) {
 		for (i = pos; i < strLen(); i++) {
 			if (isNumber(i)) {
@@ -477,8 +463,8 @@ size_t JsonParser::Serializable::addArray(const size_t &pos)
 {
 	size_t i = pos;
 	if (pos > 0 && strLen() > 0 && strLen() > pos && getChar(pos) == '{') {
-		JsonParser::Serializable *child = new JsonParser::Serializable(this);
-		child->m_fullString = this->m_fullString;
+		auto child = std::make_shared<JsonParser::Serializable>();
+		child->setFullString(this->fullString());
 		if ((i = child->fromString(i)) <= 0) {
 			return 0;
 		}
@@ -504,8 +490,8 @@ size_t JsonParser::Serializable::addObject(const size_t &pos)
 {
 	size_t i = pos;
 	if (pos > 0 && strLen() > 0 && strLen() > pos && getChar(pos) == '{') {
-		JsonParser::Serializable *child = new JsonParser::Serializable(this);
-		child->m_fullString = this->m_fullString;
+		auto child = std::make_shared<JsonParser::Serializable>();
+		child->setFullString(this->fullString());
 		if ((i = child->fromString(i)) <= 0) {
 			return 0;
 		}
@@ -540,25 +526,15 @@ size_t JsonParser::Serializable::addInteger(const size_t &pos)
 size_t JsonParser::Serializable::addBool(const size_t &pos)
 {
 	if (tolower(getChar(pos)) == 't') {
-		bool *True = new bool(true);
-		m_arrayBools.push_back(True);
+		//bool *True = new bool(true);
+		m_arrayBools.push_back(true);
 		return pos + constLength("True");
 	} else if (tolower(getChar(pos)) == 'f') {
-		bool *False = new bool(false);
-		m_arrayBools.push_back(False);
+		//bool *False = new bool(false);
+		m_arrayBools.push_back(false);
 		return pos + constLength("False");
 	}
 	return 0;
-}
-
-void JsonParser::Serializable::setType(const JsonTypes & type)
-{
-	this->m_type = type;
-}
-
-JsonTypes JsonParser::Serializable::type() const
-{
-	return this->m_type;
 }
 
 #endif  // JSONPARSER_SERIALIZABLE_CPP_
