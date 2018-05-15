@@ -18,7 +18,7 @@ bool JsonParser::Serializable::fromString()
 	return true;
 }
 
-bool JsonParser::Serializable::fromString(std::string * const str)
+bool JsonParser::Serializable::fromString(std::shared_ptr<std::string> str)
 {
 	/*if (this->fullString() != nullptr) {
 		delete this->fullString();
@@ -526,11 +526,9 @@ size_t JsonParser::Serializable::addInteger(const size_t &pos)
 size_t JsonParser::Serializable::addBool(const size_t &pos)
 {
 	if (tolower(getChar(pos)) == 't') {
-		//bool *True = new bool(true);
 		m_arrayBools.push_back(true);
 		return pos + constLength("True");
 	} else if (tolower(getChar(pos)) == 'f') {
-		//bool *False = new bool(false);
 		m_arrayBools.push_back(false);
 		return pos + constLength("False");
 	}

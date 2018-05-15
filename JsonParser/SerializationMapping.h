@@ -25,7 +25,7 @@ namespace JsonParser {
 		public:
 			bool fromString() override;
 			bool fromStringArray();
-			bool fromString(std::string * const str) override;
+			bool fromString(std::shared_ptr<std::string> str) override;
 
 			virtual std::string toString() const override;
 			virtual std::string toStringArray() const override;
@@ -37,7 +37,6 @@ namespace JsonParser {
 			template<typename T>
 			T DataContract(std::string name, T &value, const T &defaultValue)
 			{
-				//T* newObj = new T(value);
 				addMember(name, value);
 				return T(defaultValue);
 			}
@@ -81,11 +80,11 @@ namespace JsonParser {
 				return outputStr;
 			}
 			template<typename T1, typename T2>
-			std::string makeStr3(const T2 *vec, const std::function<std::string(T1 * element)> &lambda) const
+			std::string makeStr3(const T2 *vec, const std::function<std::string(std::shared_ptr<T1> element)> &lambda) const
 			{
 				std::string outputStr("[");
 				for (auto it = vec->begin(); it != vec->end(); it++) {
-					T1 *currentElement = static_cast<T1 *>(*it);
+					auto currentElement = std::static_pointer_cast<T1>(*it);
 					if (currentElement != nullptr) {
 						outputStr += lambda(currentElement);
 						if (it + 1 != vec->end()) {

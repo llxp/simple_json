@@ -18,14 +18,14 @@ namespace JsonParser {
 		protected:
 			virtual void clear() {};
 			virtual void addNew() {};
-			void *lastAddedElement() const
+			std::shared_ptr<void> lastAddedElement() const
 			{
 				return this->m_lastAddedElement;
 			}
-			virtual std::vector<void *>getElements() const = 0;
+			virtual std::vector<std::shared_ptr<void>> getElements() const = 0;
 
 		protected:
-			void *m_lastAddedElement{ nullptr };
+			std::shared_ptr<void> m_lastAddedElement{ nullptr };
 	};
 
 	template <typename B, typename D>
@@ -42,63 +42,58 @@ namespace JsonParser {
 	}
 
 	template<class T2>
-	class Vector : public std::vector<T2 *>, public VectorBase
+	class Vector : public std::vector<std::shared_ptr<T2>>, public VectorBase
 	{
 		public:
-			explicit Vector(Vector *parent = nullptr) : m_parent(parent) {}
+			explicit Vector(){}
 			~Vector()
 			{
-				this->clearPointers();
 			}
 			T2 &operator[](size_t index)
 			{
-				T2 *ptr = this->at(index);
+				std::shared_ptr<T2> ptr = this->at(index);
 				return *ptr;
 			}
 			void assign(const std::vector<T2> &other)
 			{
 				this->clear();
 				for (auto it = other.begin(); it != other.end(); it++) {
-					this->push_back(new T2(*it));
+					this->push_back(std::make_shared<T2>(*it));
 				}
 				//std::vector<T2 *>::operator=(other);
 			}
 			void clear() override
 			{
-				this->clearPointers();
-				std::vector<T2 *>::clear();
+				std::vector<std::shared_ptr<T2>>::clear();
 			}
 			void addNew() override
 			{
-				T2 *newElement = new T2();
+				auto newElement = std::make_shared<T2>();
 				this->push_back(newElement);
-				m_lastAddedElement = newElement;
+				m_lastAddedElement = std::static_pointer_cast<void>(newElement);
 			}
-			std::vector<void *> getElements() const
+			std::vector<std::shared_ptr<void>> getElements() const override
 			{
-				std::vector<void *> elements;
+				std::vector<std::shared_ptr<void>> elements;
 				for (auto it = this->begin(); it != this->end(); it++) {
-					elements.push_back((void *)*it);
+					elements.push_back(std::static_pointer_cast<void>(*it));
 				}
 				return elements;
 			}
 
 		private:
-			void clearPointers()
+			/*void clearPointers()
 			{
 				if (this->size() <= 0) {
 					return;
 				}
 				for (auto it = this->begin(); it != this->end(); it++) {
-					T2 *currentElement = *it;
+					auto currentElement = *it;
 					if (currentElement != nullptr) {
 						delete currentElement;
 					}
 				}
-			}
-
-		private:
-			Vector * m_parent{ nullptr };
+			}*/
 	};
 }
 

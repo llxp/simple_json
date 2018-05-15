@@ -26,8 +26,8 @@ namespace JsonParser {
 	public:
 		void setType(const JsonTypes &type);
 		JsonTypes type() const;
-		void setFullString(std::string *str);
-		std::string * const fullString() const;
+		void setFullString(std::shared_ptr<std::string> str);
+		std::shared_ptr<std::string> fullString() const;
 		char getChar(const size_t &pos) const;
 		size_t strLen() const;
 
@@ -64,7 +64,7 @@ namespace JsonParser {
 		std::vector<std::string> m_arrayStrings;
 
 	private:
-		std::string * m_fullString{ nullptr };
+		std::shared_ptr<std::string> m_fullString{ nullptr };
 		JsonTypes m_type{ JsonTypes::Object };
 	};
 }

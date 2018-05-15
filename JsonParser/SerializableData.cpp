@@ -18,15 +18,15 @@ JsonTypes JsonParser::SerializableData::type() const
 	return this->m_type;
 }
 
-void JsonParser::SerializableData::setFullString(std::string * str)
+void JsonParser::SerializableData::setFullString(std::shared_ptr<std::string> str)
 {
 	this->m_fullString = str;
 }
 
-std::string * const JsonParser::SerializableData::fullString() const
+std::shared_ptr<std::string> JsonParser::SerializableData::fullString() const
 {
 	return this->m_fullString;
-}
+} 
 
 char JsonParser::SerializableData::getChar(const size_t & pos) const
 {

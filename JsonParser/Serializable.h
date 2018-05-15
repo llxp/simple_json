@@ -30,7 +30,7 @@ namespace JsonParser {
 			virtual ~Serializable();
 			virtual std::string toString() const;
 			virtual std::string toStringArray() const;
-			virtual bool fromString(std::string * const str);
+			virtual bool fromString(std::shared_ptr<std::string> str);
 			virtual bool fromString() override;
 
 		protected:
