@@ -17,9 +17,10 @@ namespace JsonParser {
 			__int64 toNumber() const;
 			std::string toString() const;
 			bool isDefault() const;
+			void setNumberRefValue(const Number &value);
 
 		private:
-			std::string m_numberStr{ "0" };
+			std::string m_numberStr{ "" };
 			__int64 * m_numberRef{ nullptr };
 			bool m_default{ true };
 	};

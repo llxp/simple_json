@@ -38,12 +38,22 @@ std::string JsonParser::Number::toString() const
 	if (m_numberStr.length() > 0) {
 		return this->m_numberStr;
 	}
+	if (this->m_numberRef != nullptr) {
+		return std::to_string(*this->m_numberRef);
+	}
 	return "0";
 }
 
 bool JsonParser::Number::isDefault() const
 {
 	return this->m_default;
+}
+
+void JsonParser::Number::setNumberRefValue(const Number & value)
+{
+	if (this->m_numberRef != nullptr) {
+		(*this->m_numberRef) = value.toNumber();
+	}
 }
 
 #endif  // JSONPARSER_NUMBER_CPP_

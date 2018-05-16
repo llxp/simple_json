@@ -8,15 +8,14 @@
 #include <iterator>
 #include <functional>
 
-#include "Serializable.h"
-#include "Vector.h"
+#include "SerializationMappingData.h"
 
 #define ADD(MEMBER) addMember(#MEMBER, MEMBER);
 
 namespace JsonParser {
 
 	class SerializationMapping :
-		private JsonParser::Serializable
+		public JsonParser::SerializationMappingData
 	{
 		public:
 			explicit SerializationMapping();
@@ -24,7 +23,6 @@ namespace JsonParser {
 
 		public:
 			bool fromString() override;
-			bool fromStringArray();
 			bool fromString(std::shared_ptr<std::string> str) override;
 
 			virtual std::string toString() const override;
@@ -32,6 +30,9 @@ namespace JsonParser {
 
 	private:
 		bool fromString2();
+		bool fromStringArray() override;
+		bool fromStringArrayObjects();
+		bool fromStringArrayArrays();
 
 		protected:
 			template<typename T>
@@ -59,28 +60,11 @@ namespace JsonParser {
 			void addMember(const std::string &name,
 				JsonParser::Vector<bool> &memberVariable, bool optional = false);
 			void addMember(const std::string &name,
-				JsonParser::VectorBase *memberVariable, bool optional = false);
+				JsonParser::VectorBase &memberVariable, bool optional = false);
 
 		private:
 			template<typename T1, typename T2>
-			std::string makeStr2(const T2 &vec, const std::function<std::string(T1 element)> &lambda) const
-			{
-				std::string outputStr("[");
-				for (auto it = vec.begin(); it != vec.end(); it++) {
-					std::string outputStr;
-					T1 currentElement = static_cast<T1>(*it);
-					if (currentElement != nullptr) {
-						outputStr += lambda(currentElement);
-						if (it + 1 != vec.end()) {
-							outputStr += ',';
-						}
-					}
-				}
-				outputStr += ']';
-				return outputStr;
-			}
-			template<typename T1, typename T2>
-			std::string makeStr3(const T2 *vec, const std::function<std::string(std::shared_ptr<T1> element)> &lambda) const
+			std::string makeStr3(const T2 *vec, const std::function<std::string(const std::shared_ptr<T1> & element)> &lambda) const
 			{
 				std::string outputStr("[");
 				for (auto it = vec->begin(); it != vec->end(); it++) {
@@ -97,15 +81,15 @@ namespace JsonParser {
 			}
 			std::string makeString(const std::string &str) const;
 			std::string makeKvPairStrNumber(const std::string &name,
-				JsonParser::Number *value) const;
+				const JsonParser::Number &value) const;
 			std::string makeKvPairStrString(const std::string &name,
 				std::string *value) const;
 			std::string makeKvPairStrObject(const std::string &name,
-				SerializationMapping *value) const;
+				SerializationMappingData *value) const;
 			std::string makeKvPairStrBool(const std::string &name,
 				bool value) const;
 			std::string makeKvPairStrArray(const std::string &name,
-				SerializationMapping *value) const;
+				const std::shared_ptr<JsonParser::SerializationMapping> & value) const;
 
 			std::string makeStrObjectArray(
 				const JsonParser::VectorBase *value) const;
@@ -118,20 +102,12 @@ namespace JsonParser {
 			std::string makeStrArrayArray(
 				const JsonParser::VectorBase *value) const;
 
-	private:
-		std::map<std::string, JsonParser::Number *> m_kvPairMappingNumbers;
-		std::map<std::string, bool *> m_kvPairMappingBools;
-		std::map<std::string, std::string *> m_kvPairMappingStrings;
-		std::map<std::string, SerializationMapping *> m_kvPairMappingObjects;
-		std::map<std::string, SerializationMapping *> m_kvPairMappingArrays;
-
-		JsonParser::Vector<std::string> *m_mappingStringArrays{ nullptr };
-		JsonParser::Vector<bool> *m_mappingBoolArrays{ nullptr };
-		JsonParser::Vector<JsonParser::Number> *m_mappingNumberArrays{ nullptr };
-		JsonParser::VectorBase *m_mappingObjectArrays{ nullptr };
-		JsonParser::VectorBase *m_mappingArrayArrays{ nullptr };
-
-		std::vector<std::pair<std::string, std::pair<JsonTypes, bool>>> m_serializableMembers;
+		private:
+			void assignKvPairNumbers();
+			void assignKvPairBools();
+			void assignKvPairStrings();
+			bool assignKvPairObjects();
+			bool assignKvPairArrays();
 	};
 }
 

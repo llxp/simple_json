@@ -3,43 +3,11 @@
 #define JSONPARSER_VECTOR_H_
 
 //#include "Serializable.h"
-#include "Serializable.h"
+#include <memory>
+
+#include "VectorBase.h"
 
 namespace JsonParser {
-
-	class VectorBase
-	{
-		public:
-			virtual ~VectorBase() {}
-		private:
-			friend class SerializationMapping;
-			//std::vector<SerializationMapping<StringType> *> m_values;
-
-		protected:
-			virtual void clear() {};
-			virtual void addNew() {};
-			std::shared_ptr<void> lastAddedElement() const
-			{
-				return this->m_lastAddedElement;
-			}
-			virtual std::vector<std::shared_ptr<void>> getElements() const = 0;
-
-		protected:
-			std::shared_ptr<void> m_lastAddedElement{ nullptr };
-	};
-
-	template <typename B, typename D>
-	const B* is_unambiguous_public_base_of(const D* obj) {
-		try {
-			throw obj;
-		}
-		catch (const B* pb) {
-			return pb;
-		}
-		catch (...) {
-		}
-		return nullptr;
-	}
 
 	template<class T2>
 	class Vector : public std::vector<std::shared_ptr<T2>>, public VectorBase
@@ -80,20 +48,6 @@ namespace JsonParser {
 				}
 				return elements;
 			}
-
-		private:
-			/*void clearPointers()
-			{
-				if (this->size() <= 0) {
-					return;
-				}
-				for (auto it = this->begin(); it != this->end(); it++) {
-					auto currentElement = *it;
-					if (currentElement != nullptr) {
-						delete currentElement;
-					}
-				}
-			}*/
 	};
 }
 

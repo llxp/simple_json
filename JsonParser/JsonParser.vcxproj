@@ -120,6 +120,10 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>
+      </OptimizeReferences>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -183,32 +187,38 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <TurnOffAssemblyGeneration>false</TurnOffAssemblyGeneration>
+      <SetChecksum>true</SetChecksum>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Examples\DataMappingTest.h" />
     <ClInclude Include="JsonParser.h" />
     <ClInclude Include="JsonTypes.h" />
-    <ClInclude Include="KeyVaultSecrets.h" />
+    <ClInclude Include="..\Examples\KeyVaultSecrets.h" />
     <ClInclude Include="Number.h" />
-    <ClInclude Include="Serializable.h" />
-    <ClInclude Include="SerializableData.h" />
+    <ClInclude Include="DeSerialization.h" />
+    <ClInclude Include="SerializationData.h" />
     <ClInclude Include="SerializationMapping.h" />
+    <ClInclude Include="SerializationMappingData.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Vector.h" />
+    <ClInclude Include="VectorBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Examples\DataMappingTest.cpp" />
     <ClCompile Include="JsonParser.cpp" />
     <ClCompile Include="..\Examples\KeyVaultSecrets.cpp" />
     <ClCompile Include="Number.cpp" />
-    <ClCompile Include="Serializable.cpp">
+    <ClCompile Include="DeSerialization.cpp">
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="SerializableData.cpp" />
+    <ClCompile Include="SerializationData.cpp" />
     <ClCompile Include="SerializationMapping.cpp" />
+    <ClCompile Include="SerializationMappingData.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

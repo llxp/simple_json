@@ -7,7 +7,7 @@
 
 #include "JsonTypes.h"
 #include "Number.h"
-#include "SerializableData.h"
+#include "SerializationData.h"
 
 
 namespace JsonParser {
@@ -23,12 +23,12 @@ namespace JsonParser {
 		return (*str == 0) ? 0 : constLength(str + 1) + 1;
 	}
 
-	class Serializable : public SerializableData
+	class DeSerialization : public SerializationData
 	{
 		public:
-			explicit Serializable();
-			virtual ~Serializable();
-			virtual std::string toString() const;
+			explicit DeSerialization();
+			virtual ~DeSerialization();
+			virtual std::string toString() const override;
 			virtual std::string toStringArray() const;
 			virtual bool fromString(std::shared_ptr<std::string> str);
 			virtual bool fromString() override;
@@ -47,7 +47,6 @@ namespace JsonParser {
 			bool isNumber(const size_t &pos) const;
 			bool isBool(const size_t &pos) const;
 			bool isNull(const size_t &pos) const;
-			inline bool matchChar(char ch1, char ch2) const;
 			bool checkEscape(const size_t &pos) const;
 			size_t getName(const size_t &pos, std::string &name) const;
 

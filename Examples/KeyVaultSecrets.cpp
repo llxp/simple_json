@@ -4,7 +4,7 @@
 
 KeyVaultSecrets::KeyVaultSecrets()
 {
-	addMember("value", &m_value);
+	addMember("value", m_value);
 	addMember("nextLink", m_nextLink);
 }
 
