@@ -13,15 +13,8 @@ namespace JsonParser {
 			//std::vector<SerializationMapping<StringType> *> m_values;
 
 		public:
-			virtual void clear() {};
-			virtual void addNew() {};
-			std::shared_ptr<void> lastAddedElement() const
-			{
-				return this->m_lastAddedElement;
-			}
-			virtual std::vector<std::shared_ptr<void>> getElements() const = 0;
-
-		protected:
-			std::shared_ptr<void> m_lastAddedElement{ nullptr };
+			virtual void clear() = 0;
+			virtual void *addNew() = 0;
+			virtual std::vector<void *> getElements() const = 0;
 	};
 }

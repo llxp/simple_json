@@ -11,20 +11,22 @@
 namespace JsonParser {
 	class SerializationMappingData : public DeSerialization
 	{
+	private:
+		friend class SerializationMapping;
 	public:
 		SerializationMappingData();
 		~SerializationMappingData();
 
 	public:
-		virtual bool fromStringArray() = 0;
-		virtual bool fromString() = 0;
+		virtual bool __vectorcall fromStringArray() = 0;
+		virtual bool __vectorcall fromString() = 0;
 
 	protected:
 		std::map<std::string, JsonParser::Number> m_kvPairMappingNumbers;
 		std::map<std::string, bool *> m_kvPairMappingBools;
 		std::map<std::string, std::string *> m_kvPairMappingStrings;
 		std::map<std::string, SerializationMappingData *> m_kvPairMappingObjects;
-		std::map<std::string, std::shared_ptr<SerializationMappingData>> m_kvPairMappingArrays;
+		std::map<std::string, std::unique_ptr<SerializationMappingData>> m_kvPairMappingArrays;
 
 		JsonParser::Vector<std::string> *m_mappingStringArrays{ nullptr };
 		JsonParser::Vector<bool> *m_mappingBoolArrays{ nullptr };

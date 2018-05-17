@@ -1,6 +1,7 @@
 #pragma once
-#ifndef JSONPARSER_SERIALIZABLE_H_
-#define JSONPARSER_SERIALIZABLE_H_
+#ifndef JSONPARSER_DESERIALIZATION_H_
+#define JSONPARSER_DESERIALIZATION_H_
+
 #include <string>
 #include <map>
 #include <vector>
@@ -28,10 +29,10 @@ namespace JsonParser {
 		public:
 			explicit DeSerialization();
 			virtual ~DeSerialization();
-			virtual std::string toString() const override;
-			virtual std::string toStringArray() const;
-			virtual bool fromString(std::shared_ptr<std::string> str);
-			virtual bool fromString() override;
+			virtual std::string __vectorcall toString() const override;
+			virtual std::string __vectorcall toStringArray() const;
+			virtual bool __vectorcall fromString(std::shared_ptr<std::vector<char>> str);
+			virtual bool __vectorcall fromString() override;
 
 		protected:
 			size_t fromString(const size_t &pos);
@@ -68,4 +69,4 @@ namespace JsonParser {
 
 }
 
-#endif  // JSONPARSER_SERIALIZABLE_H_
+#endif  // JSONPARSER_DESERIALIZATION_H_

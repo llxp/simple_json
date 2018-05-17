@@ -169,7 +169,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <CallingConvention>FastCall</CallingConvention>
+      <CallingConvention>VectorCall</CallingConvention>
       <OmitFramePointers>true</OmitFramePointers>
       <FloatingPointExceptions>
       </FloatingPointExceptions>
@@ -195,6 +195,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Examples\DataMappingTest.h" />
+    <ClInclude Include="..\Examples\GeneratedJsonTestClass.h" />
     <ClInclude Include="JsonParser.h" />
     <ClInclude Include="JsonTypes.h" />
     <ClInclude Include="..\Examples\KeyVaultSecrets.h" />
@@ -203,13 +204,16 @@
     <ClInclude Include="SerializationData.h" />
     <ClInclude Include="SerializationMapping.h" />
     <ClInclude Include="SerializationMappingData.h" />
+    <ClInclude Include="SerializationUtils.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="String.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="VectorBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Examples\DataMappingTest.cpp" />
+    <ClCompile Include="..\Examples\GeneratedJsonTestClass.cpp" />
     <ClCompile Include="JsonParser.cpp" />
     <ClCompile Include="..\Examples\KeyVaultSecrets.cpp" />
     <ClCompile Include="Number.cpp" />
@@ -219,12 +223,14 @@
     <ClCompile Include="SerializationData.cpp" />
     <ClCompile Include="SerializationMapping.cpp" />
     <ClCompile Include="SerializationMappingData.cpp" />
+    <ClCompile Include="SerializationUtils.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="String.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
