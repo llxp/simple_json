@@ -91,7 +91,7 @@ bool JsonParser::SerializationMapping::fromStringArrayArrays()
 }
 
 bool JsonParser::SerializationMapping::fromString(
-	std::shared_ptr<std::vector<char>> str)
+	std::shared_ptr<std::string> str)
 {
 	this->setFullString(str.get());
 	return this->fromString();
@@ -227,7 +227,7 @@ void JsonParser::SerializationMapping::addMember(
 }
 
 void JsonParser::SerializationMapping::addMember(
-	const std::string & name, SerializationMapping& memberVariable, bool optional)
+	const std::string & name, SerializationMapping & memberVariable, bool optional)
 {
 	this->m_kvPairMappingObjects[name] = &memberVariable;
 	addSerializableMember(name, JsonTypes::Object, optional);
@@ -247,6 +247,7 @@ void JsonParser::SerializationMapping::addMember(
 	auto newObj = std::make_unique<SerializationMapping>();
 	if (newObj != nullptr) {
 		newObj->m_mappingStringArrays = &memberVariable;
+		newObj->setType(JsonTypes::StringArray);
 		m_kvPairMappingArrays[name] = std::unique_ptr<SerializationMappingData>(newObj.release());
 		addSerializableMember(name, JsonTypes::StringArray, optional);
 	}
@@ -259,6 +260,7 @@ void JsonParser::SerializationMapping::addMember(
 	auto newObj = std::make_unique<SerializationMapping>();
 	if (newObj != nullptr) {
 		newObj->m_mappingBoolArrays = &memberVariable;
+		newObj->setType(JsonTypes::BoolArray);
 		m_kvPairMappingArrays[name] = std::unique_ptr<SerializationMappingData>(newObj.release());
 		addSerializableMember(name, JsonTypes::BoolArray, optional);
 	}
@@ -271,6 +273,7 @@ void JsonParser::SerializationMapping::addMember(
 	auto newObj = std::make_unique<SerializationMapping>();
 	if (newObj != nullptr) {
 		newObj->m_mappingNumberArrays = &memberVariable;
+		newObj->setType(JsonTypes::NumberArray);
 		m_kvPairMappingArrays[name] = std::unique_ptr<SerializationMappingData>(newObj.release());
 		addSerializableMember(name, JsonTypes::NumberArray, optional);
 	}
@@ -283,6 +286,7 @@ void JsonParser::SerializationMapping::addMember(
 	auto newObj = std::make_unique<SerializationMapping>();
 	if (newObj != nullptr) {
 		newObj->m_mappingObjectArrays = &memberVariable;
+		newObj->setType(JsonTypes::ObjectArray);
 		m_kvPairMappingArrays[name] = std::unique_ptr<SerializationMappingData>(newObj.release());
 		addSerializableMember(name, JsonTypes::ObjectArray, optional);
 	}

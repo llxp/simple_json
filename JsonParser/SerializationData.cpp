@@ -18,12 +18,13 @@ JsonTypes JsonParser::SerializationData::type() const
 	return this->m_type;
 }
 
-void JsonParser::SerializationData::setFullString(std::vector<char> *str)
+void JsonParser::SerializationData::setFullString(std::string *str)
 {
 	this->m_fullString = str;
+	this->m_strLen = str->length();
 }
 
-std::vector<char> *JsonParser::SerializationData::fullString() const
+std::string *JsonParser::SerializationData::fullString() const
 {
 	return this->m_fullString;
 } 
@@ -46,7 +47,7 @@ void JsonParser::SerializationData::clearAll()
 void JsonParser::SerializationData::assign(const std::unique_ptr<SerializationData> &other)
 {
 	this->m_type = other->m_type;
-	this->m_fullString = other->m_fullString;
+	this->setFullString(other->fullString());
 
 	this->m_kvPairNumbers = std::move(other->m_kvPairNumbers);
 	this->m_kvPairStrings = std::move(other->m_kvPairStrings);

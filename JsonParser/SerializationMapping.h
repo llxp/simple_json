@@ -1,4 +1,3 @@
-#pragma once
 #ifndef JSONPARSER_SERIALIZATIONMAPPING_H_
 #define JSONPARSER_SERIALIZATIONMAPPING_H_
 
@@ -24,15 +23,15 @@ namespace JsonParser {
 			~SerializationMapping() {}
 
 		public:
-			bool __vectorcall fromString() override;
-			bool __vectorcall fromString(std::shared_ptr<std::vector<char>> str) override;
+			bool fromString() override;
+			bool fromString(std::shared_ptr<std::string> str) override;
 
-			virtual std::string __vectorcall toString() const override;
-			virtual std::string __vectorcall toStringArray() const override;
+			virtual std::string toString() const override;
+			virtual std::string toStringArray() const override;
 
 	private:
 		bool fromString2();
-		bool __vectorcall fromStringArray() override;
+		bool fromStringArray() override;
 		bool fromStringArrayObjects();
 		bool fromStringArrayArrays();
 

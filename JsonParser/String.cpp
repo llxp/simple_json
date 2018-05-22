@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <mmintrin.h>
 #include <emmintrin.h>
-#include <dvec.h>
+//#include <dvec.h>
 #include <memory>
 
 JsonParser::String::String()

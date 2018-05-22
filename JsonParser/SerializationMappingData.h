@@ -18,8 +18,8 @@ namespace JsonParser {
 		~SerializationMappingData();
 
 	public:
-		virtual bool __vectorcall fromStringArray() = 0;
-		virtual bool __vectorcall fromString() = 0;
+		virtual bool fromStringArray() = 0;
+		virtual bool fromString() = 0;
 
 	protected:
 		std::map<std::string, JsonParser::Number> m_kvPairMappingNumbers;

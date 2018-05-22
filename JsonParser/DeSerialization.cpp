@@ -20,7 +20,7 @@ bool JsonParser::DeSerialization::fromString()
 	return true;
 }
 
-bool JsonParser::DeSerialization::fromString(std::shared_ptr<std::vector<char>> str)
+bool JsonParser::DeSerialization::fromString(std::shared_ptr<std::string> str)
 {
 	this->setFullString(str.get());
 	return this->fromString();
@@ -426,18 +426,12 @@ size_t JsonParser::DeSerialization::addIntegerValue(
 		for (i = currentPos; i < tempLen; i++) {
 			if (isNumber(i)) {
 				numberStr += getChar(i);
-			} else if (matchChar(i, ' ')
-				|| matchChar(i, '\t')
-				|| matchChar(i, ',')
-				|| matchChar(i, 'L')
-				|| matchChar(i, 'l')) {
+			} else {
 				if (m_kvPairNumbers.find(name) == m_kvPairNumbers.end()) {
 					JsonParser::Number number(numberStr);
 					m_kvPairNumbers[name] = number;
 				}
 				return i;
-			} else {
-				return 0;
 			}
 		}
 	}
@@ -461,11 +455,8 @@ size_t JsonParser::DeSerialization::addBoolValue(
 size_t JsonParser::DeSerialization::addNullValue(
 	const size_t & currentPos, const std::string & name)
 {
-	if (tolower(getChar(currentPos)) == 'n') {
-		m_kvPairNullValues.push_back(name);
-		return currentPos + constLength("null");
-	}
-	return 0;
+	m_kvPairNullValues.push_back(name);
+	return currentPos + constLength("null");
 }
 
 
@@ -521,16 +512,10 @@ size_t JsonParser::DeSerialization::addInteger(const size_t &currentPos)
 	for (i = currentPos; i < tempLen; i++) {
 		if (isNumber(i)) {
 			numberStr += getChar(i);
-		} else if (matchChar(i, ' ')
-			|| matchChar(i, '\t')
-			|| matchChar(i, ',')
-			|| matchChar(i, 'L')
-			|| matchChar(i, 'l')) {
+		} else {
 			JsonParser::Number number(numberStr);
 			m_arrayNumbers.push_back(number);
 			return i;
-		} else {
-			return 0;
 		}
 	}
 	return i;

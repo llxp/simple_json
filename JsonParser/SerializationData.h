@@ -9,6 +9,10 @@
 #include "Number.h"
 #include "JsonTypes.h"
 
+#ifdef __linux__
+#define __int64 long long
+#endif
+
 namespace JsonParser {
 
 class SerializationMapping;
@@ -20,14 +24,14 @@ public:
 	~SerializationData();
 
 public:
-	virtual bool __vectorcall fromString() = 0;
-	virtual std::string __vectorcall toString() const = 0;
+	virtual bool fromString() = 0;
+	virtual std::string toString() const = 0;
 
 protected:
 	void setType(const JsonTypes &type);
 	JsonTypes type() const;
-	void setFullString(std::vector<char> *str);
-	std::vector<char> *fullString() const;
+	void setFullString(std::string *str);
+	std::string *fullString() const;
 	inline char getChar(const size_t &pos) const;
 	inline size_t strLen() const;
 	void clearAll();
@@ -50,7 +54,8 @@ protected:
 	std::vector<std::string> m_arrayStrings;
 
 private:
-	std::vector<char> *m_fullString;
+	std::string *m_fullString;
+	size_t m_strLen { 0 };
 	JsonTypes m_type{ JsonTypes::Object };
 };
 
@@ -64,7 +69,7 @@ inline char JsonParser::SerializationData::getChar(const size_t & pos) const
 
 inline size_t JsonParser::SerializationData::strLen() const
 {
-	return this->m_fullString->size();
+	return this->m_strLen;//this->m_fullString->size();
 }
 
 inline bool JsonParser::SerializationData::matchChar(const size_t &i, char ch) const

@@ -8,6 +8,8 @@
 #include "../JsonParser/SerializationMapping.h"
 //#include "..\SerializationMapping.cpp"
 
+//{std::string testJson = "{\"test\":{\"test\":{\"test2\":\"value2\"}},\"test2\":[{\"test\":\"value\"}]}"; }
+
 class DataMappingMemberTest : public JsonParser::SerializationMapping
 {
 	public:

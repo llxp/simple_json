@@ -1,4 +1,5 @@
-#pragma once
+#ifndef EXAMPLES_KEYVAULTSECRETS_H_
+#define EXAMPLES_KEYVAULTSECRETS_H_
 #include "../JsonParser/SerializationMapping.h"
 
 class KeyVaultAttributes : public JsonParser::SerializationMapping
@@ -74,3 +75,5 @@ public:
 	std::string m_nextLink;
 };
 
+
+#endif

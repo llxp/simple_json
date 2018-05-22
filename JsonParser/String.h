@@ -1,4 +1,9 @@
-#pragma once
+#ifndef JSONPARSER_STRING_H_
+#define JSONPARSER_STRING_H_
+
+#ifdef __linux__ 
+#include <stddef.h>
+#endif
 
 namespace JsonParser {
 	class String
@@ -23,3 +28,5 @@ namespace JsonParser {
 	};
 
 }
+
+#endif // JSONPARSER_STRING_H_

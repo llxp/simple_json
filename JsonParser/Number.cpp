@@ -2,6 +2,7 @@
 #define JSONPARSER_NUMBER_CPP_
 
 #include "Number.h"
+#include <cmath>
 
 JsonParser::Number::~Number()
 {

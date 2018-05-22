@@ -42,3 +42,14 @@ public:
 	JsonPair name;
 };
 
+class GeneratedJsonTestClasses : public JsonParser::SerializationMapping
+{
+	public:
+	GeneratedJsonTestClasses()
+	{
+		ADD(items);
+	}
+
+	public:
+	JsonParser::Vector<GeneratedJsonTestClass> items;
+};

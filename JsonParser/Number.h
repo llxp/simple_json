@@ -3,6 +3,10 @@
 #define JSONPARSER_NUMBER_H_
 
 #include <string>
+#include <inttypes.h>
+#ifdef __linux__
+#define __int64 long long
+#endif
 
 namespace JsonParser {
 
