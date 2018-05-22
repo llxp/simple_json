@@ -31,7 +31,7 @@ namespace JsonParser {
 			virtual ~DeSerialization();
 			virtual std::string toString() const override;
 			virtual std::string toStringArray() const;
-			virtual bool fromString(std::shared_ptr<std::string> str);
+			virtual bool fromString(const std::shared_ptr<std::string> &str);
 			virtual bool fromString() override;
 
 		protected:
@@ -66,7 +66,6 @@ namespace JsonParser {
 			size_t addInteger(const size_t &pos);
 			size_t addBool(const size_t &pos);
 	};
-
-}
+}   // namespace JsonParser
 
 #endif  // JSONPARSER_DESERIALIZATION_H_

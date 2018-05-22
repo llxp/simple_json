@@ -54,6 +54,6 @@ namespace JsonParser {
 				return elements;
 			}
 	};
-}
+}  // namespace JsonParser
 
 #endif  // JSONPARSER_VECTOR_H_

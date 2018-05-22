@@ -30,21 +30,21 @@ JsonParser::String & JsonParser::String::operator=(const String & other)
 				this->m_value[other.m_length] = '\0';
 				this->m_length = other.m_length;
 			} else {
-			this->m_value = (char *)malloc(sizeof(char) *other.m_length + 1);
+				this->m_value = (char *)malloc(sizeof(char) *other.m_length + 1);
 
-			size_t loops = int128Loops / CHUNK_SIZE;
-			size_t i2 = 0;
-			while (i2 < loops) {
-				copyToChunk(CHUNK_SIZE, other);
-				++i2;
-			}
-			if (loops * CHUNK_SIZE < other.m_length) {
-				copyToChunk(other.m_length - (loops * CHUNK_SIZE), other);
-			}
+				size_t loops = int128Loops / CHUNK_SIZE;
+				size_t i2 = 0;
+				while (i2 < loops) {
+					copyToChunk(CHUNK_SIZE, other);
+					++i2;
+				}
+				if (loops * CHUNK_SIZE < other.m_length) {
+					copyToChunk(other.m_length - (loops * CHUNK_SIZE), other);
+				}
 
-			this->m_value = this->m_chunk;
-			this->m_value[other.m_length] = '\0';
-			this->m_length = other.m_length;
+				this->m_value = this->m_chunk;
+				this->m_value[other.m_length] = '\0';
+				this->m_length = other.m_length;
 			}
 		}
 	}

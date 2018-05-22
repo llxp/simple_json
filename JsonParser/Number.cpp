@@ -1,6 +1,3 @@
-#ifndef JSONPARSER_NUMBER_CPP_
-#define JSONPARSER_NUMBER_CPP_
-
 #include "Number.h"
 #include <cmath>
 
@@ -20,7 +17,7 @@ __int64 JsonParser::Number::toNumber() const
 	size_t pos = 0;
 	for (size_t i = m_numberStr.length() - 1;
 		i >= 0 && i < m_numberStr.length();
-		i--) {
+		--i) {
 		char ch = m_numberStr.at(i);
 		if (ch == '-') {
 			result = -result;
@@ -56,5 +53,3 @@ void JsonParser::Number::setNumberRefValue(const Number & value)
 		(*this->m_numberRef) = value.toNumber();
 	}
 }
-
-#endif  // JSONPARSER_NUMBER_CPP_

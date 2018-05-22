@@ -1,6 +1,3 @@
-#ifndef JSONPARSER_SERIALIZATIONMAPPING_CPP_
-#define JSONPARSER_SERIALIZATIONMAPPING_CPP_
-
 #include <utility>
 #include <vector>
 #include <iostream>
@@ -91,7 +88,7 @@ bool JsonParser::SerializationMapping::fromStringArrayArrays()
 }
 
 bool JsonParser::SerializationMapping::fromString(
-	std::shared_ptr<std::string> str)
+	const std::shared_ptr<std::string> &str)
 {
 	this->setFullString(str.get());
 	return this->fromString();
@@ -159,6 +156,8 @@ std::string JsonParser::SerializationMapping::toString() const
 			}
 		}
 		break;
+		default:
+			break;
 		}
 
 		if (it + 1 != m_serializableMembers.end()) {
@@ -358,5 +357,3 @@ bool JsonParser::SerializationMapping::assignKvPairArrays()
 	}
 	return true;
 }
-
-#endif  // JSONPARSER_SERIALIZATIONMAPPING_CPP_

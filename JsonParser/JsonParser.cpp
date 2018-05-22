@@ -37,7 +37,7 @@ void do_something()
 	std::cout << __FUNCTION__ << std::endl;
 }*/
 
-int main()
+int __cdecl main()
 {
 	//Sleep(20000);
 	{
@@ -63,10 +63,12 @@ int main()
 					std::string keyVaultSecretString((std::istreambuf_iterator<char>(t3)),
 					std::istreambuf_iterator<char>());
 				std::cout << "size: " << keyVaultSecretString.size() << std::endl;
+				std::shared_ptr<std::string> strPtr = std::make_shared<std::string>(
+					keyVaultSecretString.begin(), keyVaultSecretString.end());
 				{
 					boost::timer::auto_cpu_timer t2(5, "%w seconds\n");
-					for (int i = 0; i < 50000; i++) {
-						if (!secrets.fromString(std::make_shared<std::string>(keyVaultSecretString.begin(), keyVaultSecretString.end()))) {
+					for (int i = 0; i < 50000; ++i) {
+						if (!secrets.fromString(strPtr)) {
 							std::cout << "parsing failed..." << std::endl;
 							return 0;
 						}
@@ -74,7 +76,7 @@ int main()
 				}
 				{
 					boost::timer::auto_cpu_timer t2(5, "%w seconds\n");
-					for (int i = 0; i < 50000; i++) {
+					for (int i = 0; i < 50000; ++i) {
 						secrets.toString();
 					}
 				}
@@ -82,7 +84,8 @@ int main()
 				std::cout << sizeof(secrets) << std::endl;
 				t3.close();
 				//}
-				if (keyVaultSecretString == secrets.toString() || secrets.toString().length() == keyVaultSecretString.length()) {
+				if (keyVaultSecretString == secrets.toString()
+					|| secrets.toString().length() == keyVaultSecretString.length()) {
 					std::cout << "test passed." << std::endl;
 					std::cout << "len1 : " << secrets.toString().length() << std::endl;
 					std::cout << "len2 : " << keyVaultSecretString.length() << std::endl;
@@ -112,11 +115,16 @@ int main()
 			std::string keyVaultSecretString2((std::istreambuf_iterator<char>(t4)),
 				std::istreambuf_iterator<char>());
 			GeneratedJsonTestClasses test;
-			boost::timer::auto_cpu_timer t2(5, "%w seconds\n");
-			test.fromString(std::make_shared<std::string>(keyVaultSecretString2.begin(), keyVaultSecretString2.end()));
+			std::shared_ptr<std::string> strPtr = std::make_shared<std::string>(
+				keyVaultSecretString2.begin(), keyVaultSecretString2.end());
+			{
+				boost::timer::auto_cpu_timer t2(5, "%w seconds\n");
+				test.fromString(strPtr);
+			}
 			std::cout << test.items.size() << std::endl;
 			//std::cout << test.toString() << std::endl;
 		}
+		Sleep(10000);
 	}
 	return 0;
 }

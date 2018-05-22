@@ -148,12 +148,12 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -162,14 +162,14 @@
       <StringPooling>true</StringPooling>
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableLanguageExtensions>
       </DisableLanguageExtensions>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <CallingConvention>VectorCall</CallingConvention>
+      <CallingConvention>Cdecl</CallingConvention>
       <OmitFramePointers>true</OmitFramePointers>
       <FloatingPointExceptions>
       </FloatingPointExceptions>
@@ -182,6 +182,11 @@
       </OpenMPSupport>
       <StructMemberAlignment>
       </StructMemberAlignment>
+      <StrictAliasing>true</StrictAliasing>
+      <EnableNeonCodegen>true</EnableNeonCodegen>
+      <FloatABI>soft</FloatABI>
+      <CLanguageStandard>gnu11</CLanguageStandard>
+      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -196,7 +201,6 @@
   <ItemGroup>
     <ClInclude Include="..\Examples\DataMappingTest.h" />
     <ClInclude Include="..\Examples\GeneratedJsonTestClass.h" />
-    <ClInclude Include="JsonParser.h" />
     <ClInclude Include="JsonTypes.h" />
     <ClInclude Include="..\Examples\KeyVaultSecrets.h" />
     <ClInclude Include="Number.h" />
@@ -205,7 +209,6 @@
     <ClInclude Include="SerializationMapping.h" />
     <ClInclude Include="SerializationMappingData.h" />
     <ClInclude Include="SerializationUtils.h" />
-    <ClInclude Include="stdafx.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Vector.h" />
@@ -224,12 +227,6 @@
     <ClCompile Include="SerializationMapping.cpp" />
     <ClCompile Include="SerializationMappingData.cpp" />
     <ClCompile Include="SerializationUtils.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="String.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

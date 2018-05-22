@@ -9,19 +9,18 @@
 #include "Number.h"
 #include "JsonTypes.h"
 
-#ifdef __linux__
+#ifdef __GNUC__
+#define __cdecl __attribute__((__cdecl__))
 #define __int64 long long
 #endif
 
 namespace JsonParser {
 
-class SerializationMapping;
-
 class SerializationData
 {
 public:
 	explicit SerializationData();
-	~SerializationData();
+	virtual ~SerializationData();
 
 public:
 	virtual bool fromString() = 0;
@@ -32,7 +31,7 @@ protected:
 	JsonTypes type() const;
 	void setFullString(std::string *str);
 	std::string *fullString() const;
-	inline char getChar(const size_t &pos) const;
+	inline std::string::const_iterator getChar(const size_t &pos) const;
 	inline size_t strLen() const;
 	void clearAll();
 	inline bool matchChar(const size_t &i, char ch) const;
@@ -59,22 +58,22 @@ private:
 	JsonTypes m_type{ JsonTypes::Object };
 };
 
-inline char JsonParser::SerializationData::getChar(const size_t & pos) const
+inline std::string::const_iterator JsonParser::SerializationData::getChar(const size_t & pos) const
 {
 	if (strLen() > 0) {
-		return this->m_fullString->at(pos);
+		return this->m_fullString->begin() + pos;
 	}
-	return 0;
+	return this->m_fullString->end();
 }
 
 inline size_t JsonParser::SerializationData::strLen() const
 {
-	return this->m_strLen;//this->m_fullString->size();
+	return this->m_strLen;
 }
 
 inline bool JsonParser::SerializationData::matchChar(const size_t &i, char ch) const
 {
-	return getChar(i) == ch;
+	return *getChar(i) == ch;
 }
 
 } // namespace JsonParser

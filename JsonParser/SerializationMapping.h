@@ -20,11 +20,11 @@ namespace JsonParser {
 		
 		public:
 			explicit SerializationMapping();
-			~SerializationMapping() {}
+			~SerializationMapping() override {}
 
 		public:
 			bool fromString() override;
-			bool fromString(std::shared_ptr<std::string> str) override;
+			bool fromString(const std::shared_ptr<std::string> &str) override;
 
 			virtual std::string toString() const override;
 			virtual std::string toStringArray() const override;
@@ -79,6 +79,6 @@ namespace JsonParser {
 			bool assignKvPairObjects();
 			bool assignKvPairArrays();
 	};
-}
+}  // namespace JsonParser
 
 #endif  // JSONPARSER_SERIALIZATIONMAPPING_H_
