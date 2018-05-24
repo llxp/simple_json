@@ -23,10 +23,13 @@ namespace JsonParser {
 			{
 				return *this->at(index);
 			}
-			void assign(const std::vector<T2> &other)
+			void assign(const std::vector<T2> *other)
 			{
 				this->clear();
-				for (auto it = other.begin(); it != other.end(); it++) {
+				if (other == nullptr) {
+					return;
+				}
+				for (auto it = other->begin(); it != other->end(); it++) {
 					this->push_back(std::make_unique<T2>(*it));
 				}
 				//std::vector<T2 *>::operator=(other);

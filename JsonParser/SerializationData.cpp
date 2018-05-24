@@ -31,20 +31,21 @@ std::string *JsonParser::SerializationData::fullString() const
 
 void JsonParser::SerializationData::clearAll()
 {
-	this->m_kvPairNumbers.clear();
-	this->m_kvPairStrings.clear();
-	this->m_kvPairBools.clear();
-	this->m_kvPairObjects.clear();
-	this->m_kvPairArrays.clear();
+	this->m_kvPairNumbers != nullptr ? this->m_kvPairNumbers->clear() : void();
+	this->m_kvPairStrings != nullptr ? this->m_kvPairStrings->clear() : void();
+	this->m_kvPairBools != nullptr ? this->m_kvPairBools->clear() : void();
+	this->m_kvPairObjects != nullptr ? this->m_kvPairObjects->clear() : void();
+	this->m_kvPairArrays != nullptr ? this->m_kvPairArrays->clear() : void();
 
-	this->m_arrayObjects.clear();
-	this->m_arrayArrays.clear();
-	this->m_arrayNumbers.clear();
-	this->m_arrayBools.clear();
-	this->m_arrayStrings.clear();
+	this->m_arrayObjects != nullptr ? this->m_arrayObjects->clear() : void();
+	this->m_arrayArrays != nullptr ? this->m_arrayArrays->clear() : void();
+	this->m_arrayNumbers != nullptr ? this->m_arrayNumbers->clear() : void();
+	this->m_arrayBools != nullptr ? this->m_arrayBools->clear() : void();
+	this->m_arrayStrings != nullptr ? this->m_arrayStrings->clear() : void();
 }
 
-void JsonParser::SerializationData::assign(const std::unique_ptr<SerializationData> &other)
+void JsonParser::SerializationData::assign(
+	const std::unique_ptr<SerializationData> &other)
 {
 	this->m_type = other->m_type;
 	this->setFullString(other->fullString());

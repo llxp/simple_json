@@ -17,4 +17,14 @@ enum JsonTypes
 	ArrayArray = 10
 };
 
+#define EmptyJsonArray "[]"
+#define EmptyJsonObject "{}"
+#define JsonKvSeparator ':'
+#define JsonEntrySeparator ','
+#define JsonObjectOpen '{'
+#define JsonObjectClose '}'
+#define JsonArrayOpen '['
+#define JsonArrayClose ']'
+#define JsonStringSeparator '"'
+
 #endif  // JSONPARSER_JSONTYPES_H_

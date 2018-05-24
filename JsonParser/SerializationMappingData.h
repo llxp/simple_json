@@ -11,13 +11,11 @@
 namespace JsonParser {
 	class SerializationMappingData : public DeSerialization
 	{
-	private:
-		friend class SerializationMapping;
 	public:
-		SerializationMappingData();
-		~SerializationMappingData();
+		explicit SerializationMappingData();
+		virtual ~SerializationMappingData();
 
-	public:
+	protected:
 		virtual bool fromStringArray() = 0;
 		virtual bool fromString() = 0;
 

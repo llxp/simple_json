@@ -32,8 +32,8 @@ namespace JsonParser {
 	private:
 		bool fromString2();
 		bool fromStringArray() override;
-		bool fromStringArrayObjects();
-		bool fromStringArrayArrays();
+		bool fromStringToArrayOfObjects();
+		bool fromStringToArrayOfArrays();
 
 		protected:
 			template<typename T>

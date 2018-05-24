@@ -7,7 +7,7 @@
 bool JsonParser::DeSerialization::fromString()
 {
 	if (strLen() > 0) {
-		this->clearAll();
+		//this->clearAll();
 		if (parseString()) {
 			return true;
 		} else {
@@ -31,9 +31,9 @@ size_t JsonParser::DeSerialization::fromString(const size_t &currentPos)
 	size_t closeCount = 0;
 	size_t tempLen = strLen();
 	for (i = currentPos; i < tempLen; ++i) {
-		if (*getChar(i) == '{') {
+		if (*getChar(i) == JsonObjectOpen) {
 			openingCount++;
-		} else if (*getChar(i) == '}') {
+		} else if (*getChar(i) == JsonObjectClose) {
 			closeCount++;
 		} else {
 			if ((i = addKVPair(i)) <= 0) {
@@ -55,13 +55,13 @@ size_t JsonParser::DeSerialization::fromStringArray(const size_t &currentPos)
 	size_t closeCount = 0;
 	size_t tempLen = strLen();
 	for (i = currentPos; i < tempLen; ++i) {
-		if (*getChar(i) == '[') {
+		if (*getChar(i) == JsonArrayOpen) {
 			openingCount++;
 			if ((i = parseStringArray(i + 1)) <= 0) {
 				return 0;
 			}
 			--i;
-		} else if (*getChar(i) == ']') {
+		} else if (*getChar(i) == JsonArrayClose) {
 			closeCount++;
 		}
 		if (openingCount == closeCount) {
@@ -80,10 +80,10 @@ size_t JsonParser::DeSerialization::parseStringArray(const size_t &currentPos)
 	if (currentPos > 0
 		&& tempLen > 0
 		&& tempLen > currentPos
-		&& *getChar(currentPos - 1) == '[') {
+		&& *getChar(currentPos - 1) == JsonArrayOpen) {
 		for (i = currentPos; i < tempLen; ++i) {
 			switch (*getChar(i)) {
-			case '{':
+			case JsonObjectOpen:
 			{
 				if ((i = addObject(i)) <= 0 || !commaFound) {
 					return 0;
@@ -92,7 +92,7 @@ size_t JsonParser::DeSerialization::parseStringArray(const size_t &currentPos)
 				commaFound = false;
 			}
 			break;
-			case '[':
+			case JsonArrayOpen:
 			{
 				if ((i = addArray(i)) <= 0 || !commaFound) {
 					return 0;
@@ -101,7 +101,7 @@ size_t JsonParser::DeSerialization::parseStringArray(const size_t &currentPos)
 				commaFound = false;
 			}
 			break;
-			case '"':
+			case JsonStringSeparator:
 			{
 				if ((i = addString(i)) <= 0 || !commaFound) {
 					return 0;
@@ -110,10 +110,10 @@ size_t JsonParser::DeSerialization::parseStringArray(const size_t &currentPos)
 				commaFound = false;
 			}
 			break;
-			case ',':
+			case JsonEntrySeparator:
 				commaFound = true;
 				break;
-			case ']':
+			case JsonArrayClose:
 				if (commaFound == false) {
 					return i;
 				}
@@ -168,9 +168,9 @@ bool JsonParser::DeSerialization::parseString()
 	size_t closeCount = 0;
 	size_t tempLen = strLen();
 	for (size_t i = 0; i < tempLen; ++i) {
-		if (matchChar(i, '{')) {
+		if (matchChar(i, JsonObjectOpen)) {
 			++openingCount;
-		} else if (matchChar(i, '}')) {
+		} else if (matchChar(i, JsonObjectClose)) {
 			++closeCount;
 		} else {
 			if ((i = addKVPair(i)) <= 0) {
@@ -203,12 +203,12 @@ size_t JsonParser::DeSerialization::addKVPair(const size_t &currentPos)
 		std::string name;
 		for (i = currentPos; i < tempLen; ++i) {
 			switch (*getChar(i)) {
-			case '"':
+			case JsonStringSeparator:
 				if ((i = this->getName(i + 1, name)) <= 0) {
 					return 0;
 				}
 				break;
-			case ':':
+			case JsonKvSeparator:
 				if ((i = addValue(i + 1, name)) <= 0) {
 					name = std::string();
 					return 0;
@@ -216,9 +216,9 @@ size_t JsonParser::DeSerialization::addKVPair(const size_t &currentPos)
 				--i;
 				name = std::string();
 				break;
-			case ']':
-			case '}':
-			// case ',':
+			case JsonArrayClose:
+			case JsonObjectClose:
+			// case JsonEntrySeparator:
 				return i;
 			}
 		}
@@ -234,7 +234,7 @@ size_t JsonParser::DeSerialization::getName(
 	size_t tempLen = strLen();
 	if (currentPos > 0 && tempLen > 0 && tempLen > currentPos) {
 		for (i = currentPos; i < tempLen; ++i) {
-			if (matchChar(i, '"') && !checkEscape(i)) {
+			if (matchChar(i, JsonStringSeparator) && !checkEscape(i)) {
 				return i;
 			}
 			name += *getChar(i);
@@ -257,34 +257,34 @@ size_t JsonParser::DeSerialization::addValue(
 	if (currentPos > 0 && tempLen > 0 && tempLen > currentPos) {
 		for (i = currentPos; i < tempLen; ++i) {
 			switch (*getChar(i)) {
-			case '"':
+			case JsonStringSeparator:
 				if ((i = addStringValue(i + 1, name)) <= 0 || commaFound == false) {
 					return 0;
 				}
 				valueSet = true;
 				commaFound = false;
 				break;
-			case '{':
+			case JsonObjectOpen:
 				if ((i = addObjectValue(i, name)) <= 0 || commaFound == false) {
 					return 0;
 				}
 				valueSet = true;
 				commaFound = false;
 				break;
-			case '[':
+			case JsonArrayOpen:
 				if ((i = addArrayValue(i, name)) <= 0 || commaFound == false) {
 					return 0;
 				}
 				valueSet = true;
 				commaFound = false;
 				break;
-			case ',':
+			case JsonEntrySeparator:
 				if (valueSet && !commaFound) {
 					return i;
 				}
 				commaFound = true;
 				break;
-			case '}':
+			case JsonObjectClose:
 				if (commaFound == false) {
 					return i;
 				}
@@ -375,7 +375,7 @@ size_t JsonParser::DeSerialization::addStringValue(
 	if ((i = this->getName(i, value)) <= 0) {
 		return 0;
 	}
-	this->m_kvPairStrings[name] = value;
+	this->kvPairStrings()->operator[](name) = value;
 	return i;
 }
 
@@ -385,14 +385,14 @@ size_t JsonParser::DeSerialization::addObjectValue(
 {
 	size_t i = currentPos;
 	size_t tempLen = strLen();
-	if (i > 0 && tempLen > 0 && tempLen > i && matchChar(i, '{')) {
+	if (i > 0 && tempLen > 0 && tempLen > i && matchChar(i, JsonObjectOpen)) {
 		auto child = std::make_unique<JsonParser::DeSerialization>();
 		child->setFullString(this->fullString());
 		if ((i = child->fromString(i)) <= 0) {
 			return 0;
 		}
-		if (m_kvPairObjects.find(name) == m_kvPairObjects.end()) {
-			m_kvPairObjects[name] = std::move(child);
+		if (this->kvPairObjects()->find(name) == this->kvPairObjects()->end()) {
+			this->kvPairObjects()->operator[](name) = std::move(child);
 		}
 	}
 	return i;
@@ -404,14 +404,14 @@ size_t JsonParser::DeSerialization::addArrayValue(
 {
 	size_t pos = currentPos;
 	size_t tempLen = strLen();
-	if (pos > 0 && tempLen > 0 && tempLen > pos && matchChar(pos, '[')) {
+	if (pos > 0 && tempLen > 0 && tempLen > pos && matchChar(pos, JsonArrayOpen)) {
 		auto child = std::make_unique<JsonParser::DeSerialization>();
 		child->setFullString(this->fullString());
 		if ((pos = child->fromStringArray(pos)) <= 0) {
 			return 0;
 		}
-		if (m_kvPairArrays.find(name) == m_kvPairArrays.end()) {
-			m_kvPairArrays[name] = std::move(child);
+		if (this->kvPairArrays()->find(name) == this->kvPairArrays()->end()) {
+			this->kvPairArrays()->operator[](name) = std::move(child);
 		}
 	}
 	return pos;
@@ -429,9 +429,9 @@ size_t JsonParser::DeSerialization::addIntegerValue(
 			if (isNumber(i)) {
 				numberStr += *getChar(i);
 			} else {
-				if (m_kvPairNumbers.find(name) == m_kvPairNumbers.end()) {
+				if (this->kvPairNumbers()->find(name) == this->kvPairNumbers()->end()) {
 					JsonParser::Number number(numberStr);
-					m_kvPairNumbers[name] = number;
+					this->kvPairNumbers()->operator[](name) = number;
 				}
 				return i;
 			}
@@ -445,10 +445,10 @@ size_t JsonParser::DeSerialization::addBoolValue(
 	const size_t &currentPos, const std::string & name)
 {
 	if (tolower(*getChar(currentPos)) == 't') {
-		m_kvPairBools[name] = true;
+		this->kvPairBools()->operator[](name) = true;
 		return currentPos + constLength("True");
 	} else if (tolower(*getChar(currentPos)) == 'f') {
-		m_kvPairBools[name] = false;
+		this->kvPairBools()->operator[](name) = false;
 		return currentPos + constLength("False");
 	}
 	return 0;
@@ -457,7 +457,7 @@ size_t JsonParser::DeSerialization::addBoolValue(
 size_t JsonParser::DeSerialization::addNullValue(
 	const size_t & currentPos, const std::string & name)
 {
-	m_kvPairNullValues.push_back(name);
+	this->kvPairNullValues()->push_back(name);
 	return currentPos + constLength("null");
 }
 
@@ -466,13 +466,13 @@ size_t JsonParser::DeSerialization::addArray(const size_t &currentPos)
 {
 	size_t i = currentPos;
 	size_t tempLen = strLen();
-	if (i > 0 && tempLen > 0 && tempLen > i && *getChar(i) == '{') {
+	if (i > 0 && tempLen > 0 && tempLen > i && *getChar(i) == JsonObjectOpen) {
 		auto child = std::make_unique<JsonParser::DeSerialization>();
 		child->setFullString(this->fullString());
 		if ((i = child->fromString(i)) <= 0) {
 			return 0;
 		}
-		m_arrayArrays.push_back(std::move(child));
+		this->arrayArrays()->push_back(std::move(child));
 	}
 	return i;
 }
@@ -485,7 +485,7 @@ size_t JsonParser::DeSerialization::addString(const size_t &currentPos)
 	if ((i = this->getName(i + 1, value)) <= 0) {
 		return 0;
 	}
-	m_arrayStrings.push_back(value);
+	this->arrayStrings()->push_back(value);
 	return i;
 }
 
@@ -494,13 +494,13 @@ size_t JsonParser::DeSerialization::addObject(const size_t &currentPos)
 {
 	size_t i = currentPos;
 	size_t tempLen = strLen();
-	if (i > 0 && tempLen > 0 && tempLen > i && *getChar(i) == '{') {
+	if (i > 0 && tempLen > 0 && tempLen > i && *getChar(i) == JsonObjectOpen) {
 		auto child = std::make_unique<JsonParser::DeSerialization>();
 		child->setFullString(this->fullString());
 		if ((i = child->fromString(i)) <= 0) {
 			return 0;
 		}
-		m_arrayObjects.push_back(std::move(child));
+		this->arrayObjects()->push_back(std::move(child));
 	}
 	return i;
 }
@@ -516,7 +516,7 @@ size_t JsonParser::DeSerialization::addInteger(const size_t &currentPos)
 			numberStr += *getChar(i);
 		} else {
 			JsonParser::Number number(numberStr);
-			m_arrayNumbers.push_back(number);
+			this->arrayNumbers()->push_back(number);
 			return i;
 		}
 	}
@@ -526,10 +526,10 @@ size_t JsonParser::DeSerialization::addInteger(const size_t &currentPos)
 size_t JsonParser::DeSerialization::addBool(const size_t &currentPos)
 {
 	if (tolower(*getChar(currentPos)) == 't') {
-		m_arrayBools.push_back(true);
+		this->arrayBools()->push_back(true);
 		return currentPos + constLength("True");
 	} else if (tolower(*getChar(currentPos)) == 'f') {
-		m_arrayBools.push_back(false);
+		this->arrayBools()->push_back(false);
 		return currentPos + constLength("False");
 	}
 	return 0;
