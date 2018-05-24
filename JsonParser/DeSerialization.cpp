@@ -8,7 +8,9 @@ bool JsonParser::DeSerialization::fromString()
 {
 	if (strLen() > 0) {
 		//this->clearAll();
-		if (parseString()) {
+		bool parsed = parseString();
+		//this->clearAll();
+		if(parsed == true) {
 			return true;
 		} else {
 			return false;

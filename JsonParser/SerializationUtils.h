@@ -31,7 +31,8 @@ namespace JsonParser {
 		}
 
 		static std::string makeStrVector(
-			const std::vector<void *> *vec, const std::function<std::string(SerializationMappingData *)> &lambda)
+			const std::vector<void *> *vec,
+			const std::function<std::string(SerializationMappingData *)> &lambda)
 		{
 			std::string outputStr;
 			outputStr += JsonArrayOpen;
