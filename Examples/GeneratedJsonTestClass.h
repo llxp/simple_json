@@ -1,5 +1,5 @@
 #pragma once
-#include "../simple_json/Serializable.h"
+#include "../include/simple_json/Serializable.h"
 
 class JsonPair : public simple_json::Serializable
 {

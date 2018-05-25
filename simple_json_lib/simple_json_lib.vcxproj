@@ -19,24 +19,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\simple_json\DeSerialization.cpp" />
-    <ClCompile Include="..\simple_json\Number.cpp" />
-    <ClCompile Include="..\simple_json\SerializationData.cpp" />
-    <ClCompile Include="..\simple_json\SerializationMapping.cpp" />
-    <ClCompile Include="..\simple_json\SerializationMappingData.cpp" />
-    <ClCompile Include="..\simple_json\SerializationUtils.cpp" />
-    <ClCompile Include="..\simple_json\Vector.cpp" />
+    <ClCompile Include="..\src\DeSerialization.cpp" />
+    <ClCompile Include="..\src\Number.cpp" />
+    <ClCompile Include="..\src\SerializationData.cpp" />
+    <ClCompile Include="..\src\SerializationMapping.cpp" />
+    <ClCompile Include="..\src\SerializationMappingData.cpp" />
+    <ClCompile Include="..\src\SerializationUtils.cpp" />
+    <ClCompile Include="..\src\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\simple_json\DeSerialization.h" />
-    <ClInclude Include="..\simple_json\JsonTypes.h" />
-    <ClInclude Include="..\simple_json\Number.h" />
-    <ClInclude Include="..\simple_json\SerializationData.h" />
-    <ClInclude Include="..\simple_json\SerializationMapping.h" />
-    <ClInclude Include="..\simple_json\SerializationMappingData.h" />
-    <ClInclude Include="..\simple_json\SerializationUtils.h" />
-    <ClInclude Include="..\simple_json\Vector.h" />
-    <ClInclude Include="..\simple_json\VectorBase.h" />
+    <ClInclude Include="..\src\DeSerialization.h" />
+    <ClInclude Include="..\src\JsonTypes.h" />
+    <ClInclude Include="..\src\Number.h" />
+    <ClInclude Include="..\src\SerializationData.h" />
+    <ClInclude Include="..\src\SerializationMapping.h" />
+    <ClInclude Include="..\src\SerializationMappingData.h" />
+    <ClInclude Include="..\src\SerializationUtils.h" />
+    <ClInclude Include="..\src\Vector.h" />
+    <ClInclude Include="..\src\VectorBase.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

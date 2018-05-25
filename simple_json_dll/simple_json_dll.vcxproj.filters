@@ -18,57 +18,63 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\simple_json\DeSerialization.cpp">
+    <ClCompile Include="..\src\DeSerialization.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\simple_json\Number.cpp">
+    <ClCompile Include="..\src\Number.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\simple_json\SerializationData.cpp">
+    <ClCompile Include="..\src\SerializationData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\simple_json\SerializationMapping.cpp">
+    <ClCompile Include="..\src\SerializationMapping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\simple_json\SerializationMappingData.cpp">
+    <ClCompile Include="..\src\SerializationMappingData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\simple_json\SerializationUtils.cpp">
+    <ClCompile Include="..\src\SerializationUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\simple_json\Vector.cpp">
+    <ClCompile Include="..\src\Vector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Serializable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\simple_json\DeSerialization.h">
+    <ClInclude Include="..\src\DeSerialization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simple_json\JsonTypes.h">
+    <ClInclude Include="..\src\dll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simple_json\Number.h">
+    <ClInclude Include="..\src\JsonTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simple_json\SerializationData.h">
+    <ClInclude Include="..\src\Number.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simple_json\SerializationMapping.h">
+    <ClInclude Include="..\src\SerializationData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simple_json\SerializationMappingData.h">
+    <ClInclude Include="..\src\SerializationMapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simple_json\SerializationUtils.h">
+    <ClInclude Include="..\src\SerializationMappingData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simple_json\Vector.h">
+    <ClInclude Include="..\src\SerializationUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simple_json\VectorBase.h">
+    <ClInclude Include="..\src\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simple_json\dll.h">
+    <ClInclude Include="..\src\VectorBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Serializable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

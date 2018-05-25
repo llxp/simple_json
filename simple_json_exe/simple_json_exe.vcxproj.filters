@@ -30,9 +30,6 @@
     <ClInclude Include="..\Examples\GeneratedJsonTestClass.h">
       <Filter>Header Files\Examples</Filter>
     </ClInclude>
-    <ClInclude Include="..\simple_json\Serializable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Examples\DataMappingTest.cpp">
@@ -45,9 +42,6 @@
       <Filter>Source Files\Examples</Filter>
     </ClCompile>
     <ClCompile Include="simple_json_exe.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\simple_json\Serializable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

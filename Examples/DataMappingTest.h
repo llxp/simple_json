@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../simple_json/Serializable.h"
+#include "../include/simple_json/Serializable.h"
 //#include "..\SerializationMapping.cpp"
 
 //{std::string testJson = "{\"test\":{\"test\":{\"test2\":\"value2\"}},\"test2\":[{\"test\":\"value\"}]}"; }

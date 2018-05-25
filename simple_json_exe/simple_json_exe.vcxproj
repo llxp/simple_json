@@ -210,13 +210,11 @@
     <ClInclude Include="..\Examples\DataMappingTest.h" />
     <ClInclude Include="..\Examples\GeneratedJsonTestClass.h" />
     <ClInclude Include="..\Examples\KeyVaultSecrets.h" />
-    <ClInclude Include="..\simple_json\Serializable.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Examples\DataMappingTest.cpp" />
     <ClCompile Include="..\Examples\GeneratedJsonTestClass.cpp" />
     <ClCompile Include="..\Examples\KeyVaultSecrets.cpp" />
-    <ClCompile Include="..\simple_json\Serializable.cpp" />
     <ClCompile Include="simple_json_exe.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

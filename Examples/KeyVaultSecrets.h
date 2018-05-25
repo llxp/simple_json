@@ -1,6 +1,6 @@
 #ifndef EXAMPLES_KEYVAULTSECRETS_H_
 #define EXAMPLES_KEYVAULTSECRETS_H_
-#include "../simple_json/Serializable.h"
+#include "../include/simple_json/Serializable.h"
 
 class KeyVaultAttributes : public simple_json::Serializable
 {
