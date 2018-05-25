@@ -1,5 +1,5 @@
 # simple_json
-Json string to class (De-)Serializer without macros or rtti
+Json string to class (De-)Serializer without macros or rtti<br/>
 Templates only used for the custom vector class
 
 # USAGE:
