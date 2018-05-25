@@ -1,8 +1,8 @@
 #ifndef EXAMPLES_KEYVAULTSECRETS_H_
 #define EXAMPLES_KEYVAULTSECRETS_H_
-#include "../JsonParser/SerializationMapping.h"
+#include "../simple_json/Serializable.h"
 
-class KeyVaultAttributes : public JsonParser::SerializationMapping
+class KeyVaultAttributes : public simple_json::Serializable
 {
 public:
 	KeyVaultAttributes()
@@ -24,7 +24,7 @@ public:
 	std::string m_recoveryLevel;
 };
 
-class KeyVaultTags : public JsonParser::SerializationMapping
+class KeyVaultTags : public simple_json::Serializable
 {
 public:
 	KeyVaultTags()

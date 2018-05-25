@@ -5,12 +5,12 @@
 #include <string>
 #include <vector>
 
-#include "../JsonParser/SerializationMapping.h"
+#include "../simple_json/Serializable.h"
 //#include "..\SerializationMapping.cpp"
 
 //{std::string testJson = "{\"test\":{\"test\":{\"test2\":\"value2\"}},\"test2\":[{\"test\":\"value\"}]}"; }
 
-class DataMappingMemberTest : public JsonParser::SerializationMapping
+class DataMappingMemberTest : public simple_json::Serializable
 {
 	public:
 		DataMappingMemberTest()
@@ -28,7 +28,7 @@ class DataMappingMemberTest : public JsonParser::SerializationMapping
 };*/
 
 class DataMappingTest :
-	public JsonParser::SerializationMapping
+	public simple_json::Serializable
 {
 	public:
 		DataMappingTest();

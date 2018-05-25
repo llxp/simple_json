@@ -1,7 +1,7 @@
 #pragma once
-#include "../JsonParser/SerializationMapping.h"
+#include "../simple_json/Serializable.h"
 
-class JsonPair : public JsonParser::SerializationMapping
+class JsonPair : public simple_json::Serializable
 {
 public:
 	JsonPair()
@@ -14,7 +14,7 @@ private:
 	std::string last;
 };
 
-class GeneratedJsonTestClass : public JsonParser::SerializationMapping
+class GeneratedJsonTestClass : public simple_json::Serializable
 {
 public:
 	GeneratedJsonTestClass()
