@@ -2,8 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include <thread>
-#include <future>
+#include <memory>
 
 #include "SerializationMapping.h"
 #include "Vector.h"
@@ -25,13 +24,13 @@ bool JsonParser::SerializationMapping::fromStringArray()
 {
 	switch (type()) {
 	case JsonTypes::NumberArray:
-		m_mappingNumberArrays->assign(this->arrayNumbers());
+		m_mappingNumberArrays->assign(std::move(this->arrayNumbers()));
 		return true;
 	case JsonTypes::StringArray:
-		m_mappingStringArrays->assign(this->arrayStrings());
+		m_mappingStringArrays->assign(std::move(this->arrayStrings()));
 		return true;
 	case JsonTypes::BoolArray:
-		m_mappingBoolArrays->assign(this->arrayBools());
+		m_mappingBoolArrays->assign(std::move(this->arrayBools()));
 		return true;
 	case JsonTypes::ObjectArray:
 		return fromStringToArrayOfObjects();
@@ -54,7 +53,7 @@ bool JsonParser::SerializationMapping::fromStringToArrayOfObjects()
 				auto newElement = static_cast<SerializationMapping *>(
 					this->m_mappingObjectArrays->addNew());
 				if (*it != nullptr) {
-					newElement->assign(*it);
+					newElement->assign(std::move(*it));
 					if (!newElement->fromString2()) {
 						return false;
 					}
@@ -76,7 +75,7 @@ bool JsonParser::SerializationMapping::fromStringToArrayOfArrays()
 				auto newElement = static_cast<SerializationMapping *>(
 					this->m_mappingObjectArrays->addNew());
 				if (newElement != nullptr) {
-					newElement->assign(*it);
+					newElement->assign(std::move(*it));
 					if (!newElement->fromStringArray()) {
 						return false;
 					}
@@ -137,7 +136,8 @@ std::string JsonParser::SerializationMapping::toString() const
 			auto ptr = this->m_kvPairMappingObjects.at(index);
 			if (ptr != nullptr) {
 				auto str = SerializationUtils::makeKvPairStrObject(index, ptr);
-				if (str == SerializationUtils::makeString(index) + JsonKvSeparator + EmptyJsonObject) {
+				if (str == SerializationUtils::makeString(index)
+					+ JsonKvSeparator + EmptyJsonObject) {
 					continue;
 				}
 				outputStr += str;
@@ -151,7 +151,8 @@ std::string JsonParser::SerializationMapping::toString() const
 		case JsonTypes::NumberArray:
 		{
 			if (this->m_kvPairMappingArrays.at(index) != nullptr) {
-				auto ptr2 = static_cast<SerializationMappingData *>(this->m_kvPairMappingArrays.at(index).get());
+				auto ptr2 = static_cast<SerializationMappingData *>(
+					this->m_kvPairMappingArrays.at(index).get());
 				outputStr += SerializationUtils::makeKvPairStrArray(index, ptr2);
 			}
 		}
@@ -213,6 +214,13 @@ void JsonParser::SerializationMapping::addSerializableMember(
 
 void JsonParser::SerializationMapping::addMember(
 	const std::string & name, __int64 & memberVariable, bool optional)
+{
+	m_kvPairMappingNumbers[name] = JsonParser::Number(&memberVariable);
+	addSerializableMember(name, JsonTypes::Number, optional);
+}
+
+DLLEXPORT void JsonParser::SerializationMapping::addMember(
+	const std::string & name, double & memberVariable, bool optional)
 {
 	m_kvPairMappingNumbers[name] = JsonParser::Number(&memberVariable);
 	addSerializableMember(name, JsonTypes::Number, optional);
@@ -303,7 +311,7 @@ void JsonParser::SerializationMapping::assignKvPairNumbers()
 		it != this->kvPairNumbers()->end();
 		it++) {
 		if (m_kvPairMappingNumbers.count(it->first) > 0) {
-			m_kvPairMappingNumbers[it->first].setNumberRefValue(it->second);
+			m_kvPairMappingNumbers[it->first].setNumberRefValue(std::move(it->second));
 		}
 	}
 }
@@ -314,7 +322,7 @@ void JsonParser::SerializationMapping::assignKvPairBools()
 		it != this->kvPairBools()->end();
 		it++) {
 		if (m_kvPairMappingBools.count(it->first) > 0) {
-			(*m_kvPairMappingBools[it->first]) = it->second;
+			(*m_kvPairMappingBools[it->first]) = std::move(it->second);
 		}
 	}
 }
@@ -325,20 +333,19 @@ void JsonParser::SerializationMapping::assignKvPairStrings()
 		it != this->kvPairStrings()->end();
 		it++) {
 		if (m_kvPairMappingStrings.count(it->first) > 0) {
-			m_kvPairMappingStrings[it->first]->operator=(it->second);
+			(*m_kvPairMappingStrings[it->first]) = (std::move(it->second));
 		}
 	}
 }
 
 bool JsonParser::SerializationMapping::assignKvPairObjects()
 {
-	std::vector<std::thread> threads;
 	for (auto it = this->kvPairObjects()->begin();
 		it != this->kvPairObjects()->end(); it++) {
 		if (it->second != nullptr) {
 			if (m_kvPairMappingObjects.count(it->first) > 0) {
 				static_cast<SerializationMapping *>(
-					m_kvPairMappingObjects[it->first])->assign(it->second);
+					m_kvPairMappingObjects[it->first])->assign(std::move(it->second));
 				if (!static_cast<SerializationMapping *>(
 					m_kvPairMappingObjects[it->first])->fromString2()) {
 					return false;
@@ -357,7 +364,7 @@ bool JsonParser::SerializationMapping::assignKvPairArrays()
 		if (it->second != nullptr) {
 			if (m_kvPairMappingArrays.count(it->first) > 0) {
 				static_cast<SerializationMapping *>(
-					m_kvPairMappingArrays[it->first].get())->assign(it->second);
+					m_kvPairMappingArrays[it->first].get())->assign(std::move(it->second));
 				if (!static_cast<SerializationMapping *>(
 					m_kvPairMappingArrays[it->first].get())->fromStringArray()) {
 					return false;

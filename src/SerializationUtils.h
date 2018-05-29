@@ -1,14 +1,16 @@
-#pragma once
+#ifndef SRC_SERIALIZATIONUTILS_H_
+#define SRC_SERIALIZATIONUTILS_H_
 
 #include <string>
 #include <memory>
 #include <functional>
+#include <vector>
 
 #include "SerializationMappingData.h"
 
 namespace JsonParser {
-	class SerializationUtils
-	{
+class SerializationUtils
+{
 	public:
 		template<typename T1, typename T2>
 		static std::string makeStr3(
@@ -71,9 +73,8 @@ namespace JsonParser {
 			const JsonParser::Vector<std::string> *value);
 		static inline std::string makeStrArrayArray(
 			const JsonParser::VectorBase *value);
-	};
-
-}
+};
+}  // namespace JsonParser
 
 inline std::string JsonParser::SerializationUtils::makeString(
 	const std::string & str)
@@ -177,3 +178,4 @@ inline std::string JsonParser::SerializationUtils::makeStrArrayArray(
 		return currentElement->toStringArray();
 	});
 }
+#endif  // SRC_SERIALIZATIONUTILS_H_

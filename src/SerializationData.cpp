@@ -1,5 +1,9 @@
 #include "SerializationData.h"
 
+#include <utility>
+#include <memory>
+#include <string>
+
 JsonParser::SerializationData::SerializationData()
 {
 }
@@ -27,28 +31,22 @@ void JsonParser::SerializationData::setFullString(std::string *str)
 std::string *JsonParser::SerializationData::fullString() const
 {
 	return this->m_fullString;
-} 
+}
 
 void JsonParser::SerializationData::clearAll()
 {
-	this->m_kvPairNumbers.reset();// ? this->m_kvPairNumbers->clear() : void();
-	this->m_kvPairStrings.reset();// ? this->m_kvPairStrings->clear() : void();
-	this->m_kvPairBools.reset();// ? this->m_kvPairBools->clear() : void();
-	this->m_kvPairObjects.reset();// ? this->m_kvPairObjects->clear() : void();
-	this->m_kvPairArrays.reset();// ? this->m_kvPairArrays->clear() : void();
-
-	//this->m_arrayObjects.reset();// ? this->m_arrayObjects->clear() : void();
-	//this->m_arrayArrays.reset();// ? this->m_arrayArrays->clear() : void();
-	//this->m_arrayNumbers.reset();// ? this->m_arrayNumbers->clear() : void();
-	//this->m_arrayBools.reset();// ? this->m_arrayBools->clear() : void();
-	//this->m_arrayStrings.reset();// ? this->m_arrayStrings->clear() : void();
+	this->m_kvPairNumbers.reset();
+	this->m_kvPairStrings.reset();
+	this->m_kvPairBools.reset();
+	this->m_kvPairObjects.reset();
+	this->m_kvPairArrays.reset();
 }
 
 void JsonParser::SerializationData::assign(
 	const std::unique_ptr<SerializationData> &other)
 {
-	this->m_type = other->m_type;
-	this->setFullString(other->fullString());
+	this->m_type = std::move(other->m_type);
+	this->setFullString(std::move(other->fullString()));
 
 	this->m_kvPairNumbers = std::move(other->m_kvPairNumbers);
 	this->m_kvPairStrings = std::move(other->m_kvPairStrings);
