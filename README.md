@@ -14,4 +14,4 @@ to use the library, just perform the following steps:
 2. every mapped class needs to be derived from "simple_json::Serializable"
 
 # Contact:
-You can contact me in github or via my email address: ![alt text](https://raw.githubusercontent.com/llxp/simple_json/origin/email.png)
+You can contact me in github or via my email address: ![alt text](https://github.com/llxp/simple_json/blob/master/email.png?raw=true)
