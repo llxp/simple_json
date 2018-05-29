@@ -21,17 +21,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef SRC_DLL_H_
-#define SRC_DLL_H_
+#ifndef SRC_ERRORHANDLER_H_
+#define SRC_ERRORHANDLER_H_
 
-#ifdef _USRDLL
-	#ifndef DLLEXPORT
-	#define DLLEXPORT __declspec(dllexport)
-	#endif  // DLLEXPORT
-#else  // _USRDLL
-	#ifndef DLLEXPORT
-	#define DLLEXPORT
-	#endif  // DLLEXPORT
-#endif  // _USRDLL
+#include <stdexcept>
 
-#endif  // SRC_DLL_H_
+class NotImplemented : public std::logic_error
+{
+	public:
+		NotImplemented() : std::logic_error("Function not yet implemented") { }
+};
+
+#endif  // SRC_ERRORHANDLER_H_

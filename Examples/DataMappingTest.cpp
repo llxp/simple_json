@@ -3,12 +3,12 @@
 
 DataMappingTest::DataMappingTest()
 {
-	addMember("name", m_name);
-	addMember("nextLink", m_nextLink);
-	addMember("value", m_value);
-	addMember("array", m_array);
-	addMember("intVal", m_intVal);
-	addMember("testArray", m_testArray);//TEST if working or not!
+	addMember(Stringify(name), m_name);
+	addMember(Stringify(nextLink), m_nextLink);
+	addMember(Stringify(value), m_value);
+	addMember(Stringify(array), m_array);
+	addMember(Stringify(intVal), m_intVal);
+	addMember(Stringify(testArray), m_testArray);
 }
 
 

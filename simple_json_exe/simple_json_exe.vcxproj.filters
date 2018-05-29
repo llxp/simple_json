@@ -45,4 +45,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="simple_json_exe.licenseheader" />
+  </ItemGroup>
 </Project>

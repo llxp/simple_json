@@ -10,8 +10,8 @@ public:
 		ADD(last);
 	}
 private:
-	std::string first;
-	std::string last;
+	JsonString first;
+	JsonString last;
 };
 
 class GeneratedJsonTestClass : public simple_json::Serializable
@@ -31,14 +31,14 @@ public:
 	}
 
 public:
-	std::string _id;
-	std::string index;
-	std::string guid;
+	JsonString _id;
+	JsonString index;
+	JsonString guid;
 	bool isActive = false;
-	std::string balance;
-	std::string picture;
+	JsonString balance;
+	JsonString picture;
 	__int64 age = 0;
-	std::string eyeColor;
+	JsonString eyeColor;
 	JsonPair name;
 };
 

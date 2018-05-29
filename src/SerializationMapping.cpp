@@ -1,12 +1,37 @@
+/*
+MIT License
+
+Copyright (c) 2018 Lukas Lüdke
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include <simple_json/SerializationMapping.h>
+
 #include <utility>
 #include <vector>
 #include <iostream>
 #include <string>
 #include <memory>
 
-#include "SerializationMapping.h"
-#include "Vector.h"
-#include "SerializationUtils.h"
+#include <simple_json\Vector.h>
+#include <simple_json\SerializationUtils.h>
 
 JsonParser::SerializationMapping::SerializationMapping()
 {
@@ -87,20 +112,20 @@ bool JsonParser::SerializationMapping::fromStringToArrayOfArrays()
 }
 
 bool JsonParser::SerializationMapping::fromString(
-	const std::shared_ptr<std::string> &str)
+	const std::shared_ptr<JsonString> &str)
 {
 	this->setFullString(str.get());
 	return this->fromString();
 }
 
-std::string JsonParser::SerializationMapping::toString() const
+JsonString JsonParser::SerializationMapping::toString() const
 {
-	std::string outputStr("{");
+	JsonString outputStr(JsonObjectOpenStr);
 	for (auto it = this->m_serializableMembers.begin();
 		it != this->m_serializableMembers.end();
 		it++) {
 		auto currentElement = *it;
-		std::string index = currentElement.first;
+		JsonString index = currentElement.first;
 		switch (it->second.first) {
 		case JsonTypes::Number:
 		{
@@ -172,7 +197,7 @@ std::string JsonParser::SerializationMapping::toString() const
 	return outputStr;
 }
 
-std::string JsonParser::SerializationMapping::toStringArray() const
+JsonString JsonParser::SerializationMapping::toStringArray() const
 {
 	switch (type()) {
 	case JsonTypes::StringArray:
@@ -204,37 +229,37 @@ bool JsonParser::SerializationMapping::fromString2()
 }
 
 void JsonParser::SerializationMapping::addSerializableMember(
-	const std::string & name, JsonTypes type, bool optional)
+	const JsonString & name, JsonTypes type, bool optional)
 {
 	m_serializableMembers.push_back(
-		std::pair<std::string, std::pair<JsonTypes, bool>>(
+		std::pair<JsonString, std::pair<JsonTypes, bool>>(
 			name, std::pair<JsonTypes, bool>(type, optional))
 	);
 }
 
 void JsonParser::SerializationMapping::addMember(
-	const std::string & name, __int64 & memberVariable, bool optional)
+	const JsonString & name, __int64 & memberVariable, bool optional)
 {
 	m_kvPairMappingNumbers[name] = JsonParser::Number(&memberVariable);
 	addSerializableMember(name, JsonTypes::Number, optional);
 }
 
 DLLEXPORT void JsonParser::SerializationMapping::addMember(
-	const std::string & name, double & memberVariable, bool optional)
+	const JsonString & name, double & memberVariable, bool optional)
 {
 	m_kvPairMappingNumbers[name] = JsonParser::Number(&memberVariable);
 	addSerializableMember(name, JsonTypes::Number, optional);
 }
 
 void JsonParser::SerializationMapping::addMember(
-	const std::string & name, std::string & memberVariable, bool optional)
+	const JsonString & name, JsonString & memberVariable, bool optional)
 {
 	this->m_kvPairMappingStrings[name] = &memberVariable;
 	addSerializableMember(name, JsonTypes::String, optional);
 }
 
 void JsonParser::SerializationMapping::addMember(
-	const std::string & name,
+	const JsonString & name,
 	SerializationMapping & memberVariable,
 	bool optional)
 {
@@ -243,15 +268,15 @@ void JsonParser::SerializationMapping::addMember(
 }
 
 void JsonParser::SerializationMapping::addMember(
-	const std::string & name, bool & memberVariable, bool optional)
+	const JsonString & name, bool & memberVariable, bool optional)
 {
 	this->m_kvPairMappingBools[name] = &memberVariable;
 	addSerializableMember(name, JsonTypes::Bool, optional);
 }
 
 void JsonParser::SerializationMapping::addMember(
-	const std::string & name,
-	JsonParser::Vector<std::string>& memberVariable, bool optional)
+	const JsonString & name,
+	JsonParser::Vector<JsonString>& memberVariable, bool optional)
 {
 	auto newObj = std::make_unique<SerializationMapping>();
 	if (newObj != nullptr) {
@@ -264,7 +289,7 @@ void JsonParser::SerializationMapping::addMember(
 }
 
 void JsonParser::SerializationMapping::addMember(
-	const std::string & name,
+	const JsonString & name,
 	JsonParser::Vector<bool> & memberVariable, bool optional)
 {
 	auto newObj = std::make_unique<SerializationMapping>();
@@ -278,7 +303,7 @@ void JsonParser::SerializationMapping::addMember(
 }
 
 void JsonParser::SerializationMapping::addMember(
-	const std::string & name,
+	const JsonString & name,
 	JsonParser::Vector<JsonParser::Number> &memberVariable, bool optional)
 {
 	auto newObj = std::make_unique<SerializationMapping>();
@@ -292,7 +317,7 @@ void JsonParser::SerializationMapping::addMember(
 }
 
 void JsonParser::SerializationMapping::addMember(
-	const std::string & name,
+	const JsonString & name,
 	JsonParser::VectorBase &memberVariable, bool optional)
 {
 	auto newObj = std::make_unique<SerializationMapping>();

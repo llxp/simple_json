@@ -8,21 +8,21 @@
 #include "../include/simple_json/Serializable.h"
 //#include "..\SerializationMapping.cpp"
 
-//{std::string testJson = "{\"test\":{\"test\":{\"test2\":\"value2\"}},\"test2\":[{\"test\":\"value\"}]}"; }
+//{JsonString testJson = "{\"test\":{\"test\":{\"test2\":\"value2\"}},\"test2\":[{\"test\":\"value\"}]}"; }
 
 class DataMappingMemberTest : public simple_json::Serializable
 {
 	public:
 		DataMappingMemberTest()
 		{
-			addMember("str", m_str);
+			addMember(Stringify(str), m_str);
 		}
 
 	public:
-		std::string m_str{ "" };
+		JsonString m_str{ EmptyString };
 };
 
-/*class DataMappingMemberTestArray : public JsonParser::Vector<std::string, SerializationMapping<std::string>>
+/*class DataMappingMemberTestArray : public JsonParser::Vector<JsonString, SerializationMapping<JsonString>>
 {
 
 };*/
@@ -35,12 +35,12 @@ class DataMappingTest :
 		~DataMappingTest();
 
 	public:
-		std::string m_name{ "" };
-		std::string m_nextLink{ "" };
+		JsonString m_name{ EmptyString };
+		JsonString m_nextLink{ EmptyString };
 		DataMappingMemberTest m_value;
-		JsonParser::Vector<std::string> m_array;
-		//JsonParser::Vector<std::string, DataMappingMemberTest *> m_objectArray;
-		/*JsonParser::Vector<std::string, DataMappingMemberTest *> m_testArray;*/
+		JsonParser::Vector<JsonString> m_array;
+		//JsonParser::Vector<JsonString, DataMappingMemberTest *> m_objectArray;
+		/*JsonParser::Vector<JsonString, DataMappingMemberTest *> m_testArray;*/
 		JsonParser::Vector<DataMappingMemberTest> m_testArray;
 		__int64 m_intVal = 123;
 };

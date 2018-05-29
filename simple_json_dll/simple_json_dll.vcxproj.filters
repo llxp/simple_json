@@ -33,51 +33,48 @@
     <ClCompile Include="..\src\SerializationMappingData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SerializationUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Vector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Serializable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\DeSerialization.h">
+    <None Include="simple_json_dll.licenseheader" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\DeSerialization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\dll.h">
+    <ClInclude Include="..\include\dll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\JsonTypes.h">
+    <ClInclude Include="..\include\ErrorHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Number.h">
+    <ClInclude Include="..\include\JsonTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SerializationData.h">
+    <ClInclude Include="..\include\Number.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SerializationMapping.h">
+    <ClInclude Include="..\include\Serializable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SerializationMappingData.h">
+    <ClInclude Include="..\include\SerializationData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SerializationUtils.h">
+    <ClInclude Include="..\include\SerializationMapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Vector.h">
+    <ClInclude Include="..\include\SerializationMappingData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\VectorBase.h">
+    <ClInclude Include="..\include\SerializationUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Serializable.h">
+    <ClInclude Include="..\include\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ErrorHandler.h">
+    <ClInclude Include="..\include\VectorBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -24,20 +24,23 @@
     <ClCompile Include="..\src\SerializationData.cpp" />
     <ClCompile Include="..\src\SerializationMapping.cpp" />
     <ClCompile Include="..\src\SerializationMappingData.cpp" />
-    <ClCompile Include="..\src\SerializationUtils.cpp" />
-    <ClCompile Include="..\src\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\DeSerialization.h" />
-    <ClInclude Include="..\src\ErrorHandler.h" />
-    <ClInclude Include="..\src\JsonTypes.h" />
-    <ClInclude Include="..\src\Number.h" />
-    <ClInclude Include="..\src\SerializationData.h" />
-    <ClInclude Include="..\src\SerializationMapping.h" />
-    <ClInclude Include="..\src\SerializationMappingData.h" />
-    <ClInclude Include="..\src\SerializationUtils.h" />
-    <ClInclude Include="..\src\Vector.h" />
-    <ClInclude Include="..\src\VectorBase.h" />
+    <None Include="simple_json_lib.licenseheader" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\simple_json\DeSerialization.h" />
+    <ClInclude Include="..\include\simple_json\dll.h" />
+    <ClInclude Include="..\include\simple_json\ErrorHandler.h" />
+    <ClInclude Include="..\include\simple_json\JsonTypes.h" />
+    <ClInclude Include="..\include\simple_json\Number.h" />
+    <ClInclude Include="..\include\simple_json\Serializable.h" />
+    <ClInclude Include="..\include\simple_json\SerializationData.h" />
+    <ClInclude Include="..\include\simple_json\SerializationMapping.h" />
+    <ClInclude Include="..\include\simple_json\SerializationMappingData.h" />
+    <ClInclude Include="..\include\simple_json\SerializationUtils.h" />
+    <ClInclude Include="..\include\simple_json\Vector.h" />
+    <ClInclude Include="..\include\simple_json\VectorBase.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -96,6 +99,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)output\$(Platform)\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>

@@ -75,6 +75,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)output\$(Platform)\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -176,23 +177,24 @@
     <ClCompile Include="..\src\SerializationData.cpp" />
     <ClCompile Include="..\src\SerializationMapping.cpp" />
     <ClCompile Include="..\src\SerializationMappingData.cpp" />
-    <ClCompile Include="..\src\SerializationUtils.cpp" />
-    <ClCompile Include="..\src\Vector.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\DeSerialization.h" />
-    <ClInclude Include="..\src\ErrorHandler.h" />
-    <ClInclude Include="..\src\JsonTypes.h" />
-    <ClInclude Include="..\src\Number.h" />
-    <ClInclude Include="..\src\Serializable.h" />
-    <ClInclude Include="..\src\SerializationData.h" />
-    <ClInclude Include="..\src\SerializationMapping.h" />
-    <ClInclude Include="..\src\SerializationMappingData.h" />
-    <ClInclude Include="..\src\SerializationUtils.h" />
-    <ClInclude Include="..\src\Vector.h" />
-    <ClInclude Include="..\src\VectorBase.h" />
-    <ClInclude Include="..\src\dll.h" />
+    <None Include="simple_json_dll.licenseheader" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\DeSerialization.h" />
+    <ClInclude Include="..\include\dll.h" />
+    <ClInclude Include="..\include\ErrorHandler.h" />
+    <ClInclude Include="..\include\JsonTypes.h" />
+    <ClInclude Include="..\include\Number.h" />
+    <ClInclude Include="..\include\Serializable.h" />
+    <ClInclude Include="..\include\SerializationData.h" />
+    <ClInclude Include="..\include\SerializationMapping.h" />
+    <ClInclude Include="..\include\SerializationMappingData.h" />
+    <ClInclude Include="..\include\SerializationUtils.h" />
+    <ClInclude Include="..\include\Vector.h" />
+    <ClInclude Include="..\include\VectorBase.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

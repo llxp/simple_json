@@ -1,4 +1,28 @@
-#include "DeSerialization.h"
+/*
+MIT License
+
+Copyright (c) 2018 Lukas Lüdke
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include <simple_json\DeSerialization.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <iostream>
@@ -21,7 +45,7 @@ bool JsonParser::DeSerialization::fromString()
 }
 
 bool JsonParser::DeSerialization::fromString(
-	const std::shared_ptr<std::string> &str)
+	const std::shared_ptr<JsonString> &str)
 {
 	this->setFullString(str.get());
 	return this->fromString();
@@ -154,14 +178,14 @@ JsonParser::DeSerialization::~DeSerialization()
 }
 
 
-std::string JsonParser::DeSerialization::toString() const
+JsonString JsonParser::DeSerialization::toString() const
 {
-	return std::string();
+	return JsonString();
 }
 
-std::string JsonParser::DeSerialization::toStringArray() const
+JsonString JsonParser::DeSerialization::toStringArray() const
 {
-	return std::string();
+	return JsonString();
 }
 
 
@@ -203,21 +227,21 @@ size_t JsonParser::DeSerialization::addKVPair(const size_t &currentPos)
 	size_t i = 0;
 	size_t tempLen = strLen();
 	if (currentPos > 0 && tempLen > 0 && tempLen > currentPos) {
-		std::string name;
+		JsonString name;
 		for (i = currentPos; i < tempLen; ++i) {
 			switch (getChar(i)) {
 			case JsonStringSeparator:
-				if ((i = this->getName(i + 1, name)) <= 0) {
+				if ((i = this->getName(i + 1, &name)) <= 0) {
 					return 0;
 				}
 				break;
 			case JsonKvSeparator:
 				if ((i = addValue(i + 1, name)) <= 0) {
-					name = std::string();
+					name = JsonString();
 					return 0;
 				}
 				--i;
-				name = std::string();
+				name = JsonString();
 				break;
 			case JsonArrayClose:
 			case JsonObjectClose:
@@ -231,14 +255,17 @@ size_t JsonParser::DeSerialization::addKVPair(const size_t &currentPos)
 
 
 size_t JsonParser::DeSerialization::getName(
-	const size_t &currentPos, std::string &name) const
+	const size_t &currentPos, JsonString *name) const
 {
+	if (name == nullptr) {
+		return 0;
+	}
 	size_t i = 0;
 	size_t tempLen = strLen();
 	if (currentPos > 0 && tempLen > 0 && tempLen > currentPos) {
 		for (i = currentPos; i < tempLen; ++i) {
 			if (getChar(i) == JsonStringSeparator && !checkEscape(i)) {
-				name = substr(currentPos, i - currentPos);
+				*name = substr(currentPos, i - currentPos);
 				return i;
 			}
 		}
@@ -248,7 +275,7 @@ size_t JsonParser::DeSerialization::getName(
 
 
 size_t JsonParser::DeSerialization::addValue(
-	const size_t &currentPos, const std::string &name)
+	const size_t &currentPos, const JsonString &name)
 {
 	if (name.length() <= 0) {
 		return 0;
@@ -373,11 +400,11 @@ bool JsonParser::DeSerialization::isNull(const size_t &currentPos) const
 
 
 size_t JsonParser::DeSerialization::addStringValue(
-	const size_t &currentPos, const std::string &name)
+	const size_t &currentPos, const JsonString &name)
 {
 	size_t i = currentPos;
-	std::string value;
-	if ((i = this->getName(i, value)) <= 0) {
+	JsonString value;
+	if ((i = this->getName(i, &value)) <= 0) {
 		return 0;
 	}
 	this->kvPairStrings()->operator[](name) = value;
@@ -386,7 +413,7 @@ size_t JsonParser::DeSerialization::addStringValue(
 
 
 size_t JsonParser::DeSerialization::addObjectValue(
-	const size_t &currentPos, const std::string &name)
+	const size_t &currentPos, const JsonString &name)
 {
 	size_t i = currentPos;
 	size_t tempLen = strLen();
@@ -405,7 +432,7 @@ size_t JsonParser::DeSerialization::addObjectValue(
 
 
 size_t JsonParser::DeSerialization::addArrayValue(
-	const size_t &currentPos, const std::string &name)
+	const size_t &currentPos, const JsonString &name)
 {
 	size_t pos = currentPos;
 	size_t tempLen = strLen();
@@ -424,7 +451,7 @@ size_t JsonParser::DeSerialization::addArrayValue(
 
 
 size_t JsonParser::DeSerialization::addIntegerValue(
-	const size_t &currentPos, const std::string & name)
+	const size_t &currentPos, const JsonString & name)
 {
 	size_t i = 0;
 	size_t tempLen = strLen();
@@ -444,7 +471,7 @@ size_t JsonParser::DeSerialization::addIntegerValue(
 
 
 size_t JsonParser::DeSerialization::addBoolValue(
-	const size_t &currentPos, const std::string & name)
+	const size_t &currentPos, const JsonString & name)
 {
 	if ((getChar(currentPos)) == 't') {
 		this->kvPairBools()->operator[](name) = true;
@@ -457,7 +484,7 @@ size_t JsonParser::DeSerialization::addBoolValue(
 }
 
 size_t JsonParser::DeSerialization::addNullValue(
-	const size_t & currentPos, const std::string & name)
+	const size_t & currentPos, const JsonString & name)
 {
 	this->kvPairNullValues()->push_back(name);
 	return currentPos + constLength("null");
@@ -483,8 +510,8 @@ size_t JsonParser::DeSerialization::addArrayToArray(const size_t &currentPos)
 size_t JsonParser::DeSerialization::addStringToArray(const size_t &currentPos)
 {
 	size_t i = currentPos;
-	std::string value;
-	if ((i = this->getName(i + 1, value)) <= 0) {
+	JsonString value;
+	if ((i = this->getName(i + 1, &value)) <= 0) {
 		return 0;
 	}
 	this->arrayStrings()->push_back(std::move(value));

@@ -30,42 +30,45 @@
     <ClCompile Include="..\src\SerializationMappingData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SerializationUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Vector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\DeSerialization.h">
+    <None Include="simple_json_lib.licenseheader" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\simple_json\DeSerialization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\JsonTypes.h">
+    <ClInclude Include="..\include\simple_json\dll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Number.h">
+    <ClInclude Include="..\include\simple_json\ErrorHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SerializationData.h">
+    <ClInclude Include="..\include\simple_json\JsonTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SerializationMapping.h">
+    <ClInclude Include="..\include\simple_json\Number.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SerializationMappingData.h">
+    <ClInclude Include="..\include\simple_json\Serializable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SerializationUtils.h">
+    <ClInclude Include="..\include\simple_json\SerializationData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Vector.h">
+    <ClInclude Include="..\include\simple_json\SerializationMapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\VectorBase.h">
+    <ClInclude Include="..\include\simple_json\SerializationMappingData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ErrorHandler.h">
+    <ClInclude Include="..\include\simple_json\SerializationUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\simple_json\Vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\simple_json\VectorBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

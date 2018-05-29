@@ -1,21 +1,47 @@
-#pragma once
+/*
+MIT License
+
+Copyright (c) 2018 Lukas Lüdke
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#ifndef SRC_SERIALIZATIONUTILS_H_
+#define SRC_SERIALIZATIONUTILS_H_
 
 #include <string>
 #include <memory>
 #include <functional>
+#include <vector>
 
 #include "SerializationMappingData.h"
 
 namespace JsonParser {
-	class SerializationUtils
-	{
+class SerializationUtils
+{
 	public:
 		template<typename T1, typename T2>
-		static std::string makeStr3(
+		static JsonString makeStr3(
 			const T2 *vec,
-			const std::function<std::string(T1 *)> &lambda)
+			const std::function<JsonString(T1 *)> &lambda)
 		{
-			std::string outputStr;
+			JsonString outputStr;
 			outputStr += JsonArrayOpen;
 			for (auto it = vec->begin(); it != vec->end(); it++) {
 				auto currentElement = static_cast<T1 *>((*it).get());
@@ -30,11 +56,11 @@ namespace JsonParser {
 			return outputStr;
 		}
 
-		static std::string makeStrVector(
+		static JsonString makeStrVector(
 			const std::vector<void *> *vec,
-			const std::function<std::string(SerializationMappingData *)> &lambda)
+			const std::function<JsonString(SerializationMappingData *)> &lambda)
 		{
-			std::string outputStr;
+			JsonString outputStr;
 			outputStr += JsonArrayOpen;
 			for (auto it = vec->begin(); it != vec->end(); it++) {
 				auto currentElement = static_cast<SerializationMappingData *>(*it);
@@ -49,74 +75,73 @@ namespace JsonParser {
 			return outputStr;
 		}
 
-		static inline std::string makeString(const std::string &str);
-		static inline std::string makeKvPairStrNumber(const std::string &name,
+		static inline JsonString makeString(const JsonString &str);
+		static inline JsonString makeKvPairStrNumber(const JsonString &name,
 			const JsonParser::Number &value);
-		static inline std::string makeKvPairStrString(const std::string &name,
-			std::string *value);
-		static inline std::string makeKvPairStrObject(const std::string &name,
+		static inline JsonString makeKvPairStrString(const JsonString &name,
+			JsonString *value);
+		static inline JsonString makeKvPairStrObject(const JsonString &name,
 			SerializationMappingData *value);
-		static inline std::string makeKvPairStrBool(const std::string &name,
+		static inline JsonString makeKvPairStrBool(const JsonString &name,
 			bool value);
-		static inline std::string makeKvPairStrArray(const std::string &name,
+		static inline JsonString makeKvPairStrArray(const JsonString &name,
 			JsonParser::SerializationMappingData *value);
 
-		static inline std::string makeStrObjectArray(
+		static inline JsonString makeStrObjectArray(
 			const JsonParser::VectorBase *value);
-		static inline std::string makeStrNumberArray(
+		static inline JsonString makeStrNumberArray(
 			const JsonParser::Vector<JsonParser::Number> *value);
-		static inline std::string makeStrBoolArray(
+		static inline JsonString makeStrBoolArray(
 			const JsonParser::Vector<bool> *value);
-		static inline std::string makeStrStringArray(
-			const JsonParser::Vector<std::string> *value);
-		static inline std::string makeStrArrayArray(
+		static inline JsonString makeStrStringArray(
+			const JsonParser::Vector<JsonString> *value);
+		static inline JsonString makeStrArrayArray(
 			const JsonParser::VectorBase *value);
-	};
+};
+}  // namespace JsonParser
 
-}
-
-inline std::string JsonParser::SerializationUtils::makeString(
-	const std::string & str)
+inline JsonString JsonParser::SerializationUtils::makeString(
+	const JsonString & str)
 {
 	return JsonStringSeparator + str + JsonStringSeparator;
 }
 
-inline std::string JsonParser::SerializationUtils::makeKvPairStrNumber(
-	const std::string & name, const JsonParser::Number & value)
+inline JsonString JsonParser::SerializationUtils::makeKvPairStrNumber(
+	const JsonString & name, const JsonParser::Number & value)
 {
 	return SerializationUtils::makeString(name) + JsonKvSeparator +
 		value.toString();
 }
 
-inline std::string JsonParser::SerializationUtils::makeKvPairStrString(
-	const std::string & name, std::string * value)
+inline JsonString JsonParser::SerializationUtils::makeKvPairStrString(
+	const JsonString & name, JsonString * value)
 {
 	return SerializationUtils::makeString(name) + JsonKvSeparator +
 		SerializationUtils::makeString(*value);
 }
 
-inline std::string JsonParser::SerializationUtils::makeKvPairStrObject(
-	const std::string & name, SerializationMappingData * value)
+inline JsonString JsonParser::SerializationUtils::makeKvPairStrObject(
+	const JsonString & name, SerializationMappingData * value)
 {
 	return SerializationUtils::makeString(name) + JsonKvSeparator +
 		value->toString();
 }
 
-inline std::string JsonParser::SerializationUtils::makeKvPairStrBool(
-	const std::string & name, bool value)
+inline JsonString JsonParser::SerializationUtils::makeKvPairStrBool(
+	const JsonString & name, bool value)
 {
 	return SerializationUtils::makeString(name) + JsonKvSeparator +
-		(value ? "true" : "false");
+		(value ? Stringify(true) : Stringify(false));
 }
 
-inline std::string JsonParser::SerializationUtils::makeKvPairStrArray(
-	const std::string & name, JsonParser::SerializationMappingData *value)
+inline JsonString JsonParser::SerializationUtils::makeKvPairStrArray(
+	const JsonString & name, JsonParser::SerializationMappingData *value)
 {
 	return SerializationUtils::makeString(name) + JsonKvSeparator +
 		value->toStringArray();
 }
 
-inline std::string JsonParser::SerializationUtils::makeStrObjectArray(
+inline JsonString JsonParser::SerializationUtils::makeStrObjectArray(
 	const JsonParser::VectorBase * value)
 {
 	if (value == nullptr) {
@@ -124,48 +149,48 @@ inline std::string JsonParser::SerializationUtils::makeStrObjectArray(
 	}
 	auto elements = value->getElements();
 	return JsonParser::SerializationUtils::makeStrVector(
-		&elements, [=](auto currentElement)->std::string {
+		&elements, [=](auto currentElement)->JsonString {
 		return currentElement->toString();
 	});
 }
 
-inline std::string JsonParser::SerializationUtils::makeStrNumberArray(
+inline JsonString JsonParser::SerializationUtils::makeStrNumberArray(
 	const JsonParser::Vector<JsonParser::Number>* value)
 {
 	if (value == nullptr) {
 		return EmptyJsonArray;
 	}
 	return makeStr3<JsonParser::Number, JsonParser::Vector<JsonParser::Number>>(
-		value, [=](auto currentElement)->std::string {
+		value, [=](auto currentElement)->JsonString {
 		return currentElement->toString();
 	});
 }
 
-inline std::string JsonParser::SerializationUtils::makeStrBoolArray(
+inline JsonString JsonParser::SerializationUtils::makeStrBoolArray(
 	const JsonParser::Vector<bool>* value)
 {
 	if (value == nullptr) {
 		return EmptyJsonArray;
 	}
 	return makeStr3<bool, JsonParser::Vector<bool>>(
-		value, [=](auto currentElement)->std::string {
-		return std::to_string(*currentElement);
+		value, [=](auto currentElement)->JsonString {
+		return ToString(*currentElement);
 	});
 }
 
-inline std::string JsonParser::SerializationUtils::makeStrStringArray(
-	const JsonParser::Vector<std::string>* value)
+inline JsonString JsonParser::SerializationUtils::makeStrStringArray(
+	const JsonParser::Vector<JsonString>* value)
 {
 	if (value == nullptr) {
 		return EmptyJsonArray;
 	}
-	return makeStr3<std::string, JsonParser::Vector<std::string>>
-		(value, [=](auto currentElement)->std::string {
+	return makeStr3<JsonString, JsonParser::Vector<JsonString>>
+		(value, [=](auto currentElement)->JsonString {
 		return SerializationUtils::makeString(*currentElement);
 	});
 }
 
-inline std::string JsonParser::SerializationUtils::makeStrArrayArray(
+inline JsonString JsonParser::SerializationUtils::makeStrArrayArray(
 	const JsonParser::VectorBase * value)
 {
 	if (value == nullptr) {
@@ -173,7 +198,8 @@ inline std::string JsonParser::SerializationUtils::makeStrArrayArray(
 	}
 	auto elements = value->getElements();
 	return JsonParser::SerializationUtils::makeStrVector(
-		&elements, [=](auto currentElement)->std::string {
+		&elements, [=](auto currentElement)->JsonString {
 		return currentElement->toStringArray();
 	});
 }
+#endif  // SRC_SERIALIZATIONUTILS_H_

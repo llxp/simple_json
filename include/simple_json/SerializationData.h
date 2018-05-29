@@ -1,10 +1,33 @@
-#pragma once
-#ifndef JSONPARSER_SERIALIZATIONDATA_H_
-#define JSONPARSER_SERIALIZATIONDATA_H_
+/*
+MIT License
+
+Copyright (c) 2018 Lukas Lüdke
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+#ifndef SRC_SERIALIZATIONDATA_H_
+#define SRC_SERIALIZATIONDATA_H_
 
 #include <vector>
 #include <map>
 #include <memory>
+#include <string>
 
 #include "Number.h"
 #include "JsonTypes.h"
@@ -14,82 +37,133 @@
 #define __int64 long long
 #endif
 
-#define lazyInit(var, type) if(var == nullptr) { var = new type(); } return var;
+#define lazyInit(var, type)\
+if (var == nullptr)\
+{ var = new type(); }\
+return var;
 
 namespace JsonParser {
 
 class SerializationData
 {
-public:
-	explicit SerializationData();
-	virtual ~SerializationData();
+	public:
+		SerializationData();
+		virtual ~SerializationData();
 
-protected:
-	virtual bool fromString() = 0;
-	virtual std::string toString() const = 0;
-	virtual std::string toStringArray() const = 0;
-	void assign(const std::unique_ptr<SerializationData> &other);
+	protected:
+		virtual bool fromString() = 0;
+		virtual JsonString toString() const = 0;
+		virtual JsonString toStringArray() const = 0;
+		void assign(const std::unique_ptr<SerializationData> &other);
 
-protected:
-	void setType(const JsonTypes &type);
-	JsonTypes type() const;
-	void setFullString(std::string *str);
-	std::string *fullString() const;
-	inline std::string::const_iterator getChar(const size_t &pos) const;
-	inline size_t strLen() const;
-	void clearAll();
-	inline bool matchChar(const size_t &i, char ch) const;
+	protected:
+		void setType(const JsonTypes &type);
+		JsonTypes type() const;
+		void setFullString(JsonString *str);
+		JsonString *fullString() const;
+		inline JsonChar getChar(const size_t &pos) const;
+		inline size_t strLen() const;
+		void clearAll();
+		inline bool matchChar(const size_t &i, JsonChar ch) const;
+		inline JsonString substr(const size_t &start, const size_t &stop) const;
 
-private:
-	template<typename T>
-	T* lazyInit2(std::unique_ptr<T> &var)
-	{
-		if (var == nullptr) {
-			var = std::make_unique<T>();
+	private:
+		template<typename T>
+		T* lazyInit2(std::unique_ptr<T> &var)
+		{
+			if (var == nullptr) {
+				var = std::make_unique<T>();
+			}
+			return var.get();
 		}
-		return var.get();
-	}
 
-protected:
-	std::map<std::string, JsonParser::Number> *kvPairNumbers() { return lazyInit2<std::map<std::string, JsonParser::Number>>(m_kvPairNumbers); };
-	std::map<std::string, bool> *kvPairBools() { return lazyInit2<std::map<std::string, bool>>(m_kvPairBools); };
-	std::map<std::string, std::string> *kvPairStrings() { return lazyInit2<std::map<std::string, std::string>>(m_kvPairStrings); };
-	std::map<std::string, std::unique_ptr<SerializationData>> *kvPairObjects() { return lazyInit2<std::map<std::string, std::unique_ptr<SerializationData>>>(m_kvPairObjects); };
-	std::map<std::string, std::unique_ptr<SerializationData>> *kvPairArrays() { return lazyInit2<std::map<std::string, std::unique_ptr<SerializationData>>>(m_kvPairArrays); };
-	std::vector<std::string> *kvPairNullValues() { return lazyInit2<std::vector<std::string>>(m_kvPairNullValues); };
+	protected:
+		std::map<JsonString, JsonParser::Number> *kvPairNumbers()
+		{
+			return lazyInit2<std::map<JsonString, JsonParser::Number>>(m_kvPairNumbers);
+		};
+		std::map<JsonString, bool> *kvPairBools()
+		{
+			return lazyInit2<std::map<JsonString, bool>>(m_kvPairBools);
+		};
+		std::map<JsonString, JsonString> *kvPairStrings()
+		{
+			return lazyInit2<
+				std::map<JsonString, JsonString>
+			>(m_kvPairStrings);
+		};
+		std::map<JsonString, std::unique_ptr<SerializationData>> *kvPairObjects()
+		{
+			return lazyInit2<
+				std::map<JsonString, std::unique_ptr<SerializationData>>
+			>(m_kvPairObjects);
+		};
+		std::map<JsonString, std::unique_ptr<SerializationData>> *kvPairArrays()
+		{
+			return lazyInit2<
+				std::map<JsonString, std::unique_ptr<SerializationData>>
+			>(m_kvPairArrays);
+		};
+		std::vector<JsonString> *kvPairNullValues()
+		{
+			return lazyInit2<std::vector<JsonString>>(m_kvPairNullValues);
+		};
 
-	std::vector<std::unique_ptr<SerializationData>> *arrayObjects() { return lazyInit2<std::vector<std::unique_ptr<SerializationData>>>(m_arrayObjects); };
-	std::vector<std::unique_ptr<SerializationData>> *arrayArrays() { return lazyInit2<std::vector<std::unique_ptr<SerializationData>>>(m_arrayArrays); };
-	std::vector<JsonParser::Number> *arrayNumbers() { return lazyInit2<std::vector<JsonParser::Number>>(m_arrayNumbers); };
-	std::vector<bool> *arrayBools() { return lazyInit2<std::vector<bool>>(m_arrayBools); };
-	std::vector<std::string> *arrayStrings() { return lazyInit2<std::vector<std::string>>(m_arrayStrings); };
+		std::vector<std::unique_ptr<SerializationData>> *arrayObjects()
+		{
+			return lazyInit2<
+				std::vector<std::unique_ptr<SerializationData>>
+			>(m_arrayObjects);
+		};
+		std::vector<std::unique_ptr<SerializationData>> *arrayArrays()
+		{
+			return lazyInit2<
+				std::vector<std::unique_ptr<SerializationData>>
+			>(m_arrayArrays);
+		};
+		std::vector<JsonParser::Number> *arrayNumbers()
+		{
+			return lazyInit2<std::vector<JsonParser::Number>>(m_arrayNumbers);
+		};
+		std::vector<bool> *arrayBools()
+		{
+			return lazyInit2<std::vector<bool>>(m_arrayBools);
+		};
+		std::vector<JsonString> *arrayStrings()
+		{
+			return lazyInit2<std::vector<JsonString>>(m_arrayStrings);
+		};
 
-private:
-	std::unique_ptr<std::map<std::string, JsonParser::Number>> m_kvPairNumbers;
-	std::unique_ptr<std::map<std::string, bool>> m_kvPairBools;
-	std::unique_ptr<std::map<std::string, std::string>> m_kvPairStrings;
-	std::unique_ptr<std::map<std::string, std::unique_ptr<SerializationData>>> m_kvPairObjects;
-	std::unique_ptr<std::map<std::string, std::unique_ptr<SerializationData>>> m_kvPairArrays;
-	std::unique_ptr<std::vector<std::string>> m_kvPairNullValues;
+	private:
+		std::unique_ptr<std::map<JsonString, JsonParser::Number>> m_kvPairNumbers;
+		std::unique_ptr<std::map<JsonString, bool>> m_kvPairBools;
+		std::unique_ptr<std::map<JsonString, JsonString>> m_kvPairStrings;
+		std::unique_ptr<
+			std::map<JsonString, std::unique_ptr<SerializationData>>> m_kvPairObjects;
+		std::unique_ptr<
+			std::map<JsonString, std::unique_ptr<SerializationData>>> m_kvPairArrays;
+		std::unique_ptr<std::vector<JsonString>> m_kvPairNullValues;
 
-	std::unique_ptr<std::vector<std::unique_ptr<SerializationData>>> m_arrayObjects;
-	std::unique_ptr<std::vector<std::unique_ptr<SerializationData>>> m_arrayArrays;
-	std::unique_ptr<std::vector<JsonParser::Number>> m_arrayNumbers;
-	std::unique_ptr<std::vector<bool>> m_arrayBools;
-	std::unique_ptr<std::vector<std::string>> m_arrayStrings;
+		std::unique_ptr<
+			std::vector<std::unique_ptr<SerializationData>>> m_arrayObjects;
+		std::unique_ptr<
+			std::vector<std::unique_ptr<SerializationData>>> m_arrayArrays;
+		std::unique_ptr<std::vector<JsonParser::Number>> m_arrayNumbers;
+		std::unique_ptr<std::vector<bool>> m_arrayBools;
+		std::unique_ptr<std::vector<JsonString>> m_arrayStrings;
 
-private:
-	std::string *m_fullString;
-	size_t m_strLen { 0 };
-	JsonTypes m_type{ JsonTypes::Object };
+	private:
+		JsonString *m_fullString;
+		size_t m_strLen { 0 };
+		JsonTypes m_type{ JsonTypes::Object };
 };
 
-inline std::string::const_iterator JsonParser::SerializationData::getChar(const size_t & pos) const
+inline JsonChar JsonParser::SerializationData::getChar(const size_t & pos) const
 {
 	if (strLen() > 0) {
-		return this->m_fullString->begin() + pos;
+		return this->m_fullString->at(pos);
 	}
-	return this->m_fullString->end();
+	return 0;
 }
 
 inline size_t JsonParser::SerializationData::strLen() const
@@ -97,11 +171,18 @@ inline size_t JsonParser::SerializationData::strLen() const
 	return this->m_strLen;
 }
 
-inline bool JsonParser::SerializationData::matchChar(const size_t &i, char ch) const
+inline bool JsonParser::SerializationData::matchChar(
+	const size_t &i, JsonChar ch) const
 {
-	return *getChar(i) == ch;
+	return this->m_fullString->at(i) == ch;
 }
 
-} // namespace JsonParser
+inline JsonString SerializationData::substr(
+	const size_t & start, const size_t & stop) const
+{
+	return this->m_fullString->substr(start, stop);
+}
 
-#endif // JSONPARSER_SERIALIZATIONDATA_H_
+}  // namespace JsonParser
+
+#endif  // SRC_SERIALIZATIONDATA_H_
