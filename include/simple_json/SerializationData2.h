@@ -137,6 +137,9 @@ namespace JsonParser {
 		std::istream *m_fullString;
 		size_t m_strLen{ 0 };
 		JsonTypes m_type{ JsonTypes::Object };
+
+	public:
+		bool m_isDynamicallyCreatedStream{ false };
 	};
 
 }  // namespace JsonParser

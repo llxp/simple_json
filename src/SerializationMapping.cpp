@@ -116,6 +116,7 @@ bool JsonParser::SerializationMapping::fromString(
 	const std::shared_ptr<JsonString> &str)
 {
 	this->setFullString(new std::istringstream(*(str.get())));
+	this->m_isDynamicallyCreatedStream = true;
 	return this->fromString();
 }
 

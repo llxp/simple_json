@@ -34,6 +34,10 @@ JsonParser::SerializationData2::SerializationData2()
 
 JsonParser::SerializationData2::~SerializationData2()
 {
+	if (this->m_isDynamicallyCreatedStream && this->m_fullString != nullptr) {
+		delete this->m_fullString;
+		this->m_fullString = nullptr;
+	}
 }
 
 void JsonParser::SerializationData2::setType(const JsonTypes & type)

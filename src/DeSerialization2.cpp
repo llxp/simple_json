@@ -44,6 +44,7 @@ JsonString JsonParser::DeSerialization2::toStringArray() const
 bool JsonParser::DeSerialization2::fromString(const std::shared_ptr<JsonString>& str)
 {
 	this->setFullString(new std::istringstream(*(str.get())));
+	this->m_isDynamicallyCreatedStream = true;
 	return this->fromString();
 }
 
@@ -60,7 +61,7 @@ bool JsonParser::DeSerialization2::fromString(char c)
 		if (c == JsonObjectOpen) {
 			openingCount++;
 		}
-		if (c != JsonObjectOpen && c != JsonObjectClose) {
+		if (c != JsonObjectOpen && c != JsonObjectClose && c != -1) {
 			if ((c = addKVPair(c)) <= 0) {
 				return false;
 			}
@@ -68,7 +69,7 @@ bool JsonParser::DeSerialization2::fromString(char c)
 		if (c == JsonObjectClose) {
 			closeCount++;
 		}
-		if (openingCount == closeCount) {
+		if (openingCount > 0 && openingCount == closeCount) {
 			return true;
 		}
 	} while ((c = getNextChar()) >= 0);
@@ -122,7 +123,7 @@ char JsonParser::DeSerialization2::addValue(const JsonString &name)
 			commaFound = false;
 			break;
 		case JsonArrayOpen:
-			if (!addArrayValue(name) || commaFound == false) {
+			if (!addArrayValue(c, name) || commaFound == false) {
 				return 0;
 			}
 			valueSet = true;
@@ -140,7 +141,7 @@ char JsonParser::DeSerialization2::addValue(const JsonString &name)
 			}
 			break;
 		default:
-			if (!isNumber(c)) {
+			if (isNumber(c)) {
 				if ((c = addNumberValue(c, name)) <= 0
 					|| commaFound == false) {
 					return 0;
@@ -151,14 +152,14 @@ char JsonParser::DeSerialization2::addValue(const JsonString &name)
 					return c;
 				}
 			}
-			else if (!isBool(c)) {
-				if (addBoolValue(c, name) || commaFound == false) {
+			else if (isBool(c)) {
+				if (!addBoolValue(c, name) || commaFound == false) {
 					return 0;
 				}
 				valueSet = true;
 				commaFound = false;
 			}
-			else if (!isNull(c)) {
+			else if (isNull(c)) {
 				if (commaFound == false) {
 					return 0;
 				}
@@ -244,11 +245,11 @@ bool JsonParser::DeSerialization2::addObjectValue(
 	return true;
 }
 
-bool JsonParser::DeSerialization2::addArrayValue(const JsonString &name)
+bool JsonParser::DeSerialization2::addArrayValue(char c, const JsonString &name)
 {
 	auto child = std::make_unique<JsonParser::DeSerialization2>();
 	child->setFullString(this->fullString());
-	if (!child->fromStringArray()) {
+	if (!child->fromStringArray(c)) {
 		return false;
 	}
 	if (this->kvPairArrays()->find(name) == this->kvPairArrays()->end()) {
@@ -321,7 +322,7 @@ bool JsonParser::DeSerialization2::fromStringArray(char c)
 		if (c == JsonArrayClose) {
 			++closeCount;
 		}
-		if (openingCount == closeCount) {
+		if (openingCount > 0 && openingCount == closeCount) {
 			return true;
 		}
 	} while ((c = getNextChar()) >= 0);
@@ -336,7 +337,7 @@ char JsonParser::DeSerialization2::parseStringArray()
 		switch (c) {
 		case JsonObjectOpen:
 		{
-			if (!addObjectToArray() || !commaFound) {
+			if (!addObjectToArray(c) || !commaFound) {
 				return 0;
 			}
 			setType(JsonTypes::ObjectArray);
@@ -345,7 +346,7 @@ char JsonParser::DeSerialization2::parseStringArray()
 		break;
 		case JsonArrayOpen:
 		{
-			if (!addArrayToArray() || !commaFound) {
+			if (!addArrayToArray(c) || !commaFound) {
 				return 0;
 			}
 			setType(JsonTypes::ArrayArray);
@@ -432,22 +433,22 @@ bool JsonParser::DeSerialization2::addStringToArray()
 }
 
 
-bool JsonParser::DeSerialization2::addObjectToArray()
+bool JsonParser::DeSerialization2::addObjectToArray(char c)
 {
 	auto child = std::make_unique<JsonParser::DeSerialization2>();
 	child->setFullString(this->fullString());
-	if (!child->fromString()) {
+	if (!child->fromString(c)) {
 		return false;
 	}
 	this->arrayObjects()->push_back(std::move(child));
 	return true;
 }
 
-bool JsonParser::DeSerialization2::addArrayToArray()
+bool JsonParser::DeSerialization2::addArrayToArray(char c)
 {
 	auto child = std::make_unique<JsonParser::DeSerialization2>();
 	child->setFullString(this->fullString());
-	if (!child->fromStringArray()) {
+	if (!child->fromStringArray(c)) {
 		return false;
 	}
 	this->arrayArrays()->push_back(std::move(child));

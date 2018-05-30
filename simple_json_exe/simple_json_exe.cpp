@@ -120,14 +120,14 @@ int __cdecl main()
 			std::cout << "the file \"abc.txt\" could not be opened." << std::endl;
 			return 0;
 		}
-		JsonString keyVaultSecretString2((std::istreambuf_iterator<char>(t4)),
-			std::istreambuf_iterator<char>());
+		/*JsonString keyVaultSecretString2((std::istreambuf_iterator<char>(t4)),
+			std::istreambuf_iterator<char>());*/
 		GeneratedJsonTestClasses test;
-		std::shared_ptr<JsonString> strPtr = std::make_shared<JsonString>(
-			keyVaultSecretString2.begin(), keyVaultSecretString2.end());
+		/*std::shared_ptr<JsonString> strPtr = std::make_shared<JsonString>(
+			keyVaultSecretString2.begin(), keyVaultSecretString2.end());*/
 		{
 			boost::timer::auto_cpu_timer t2(5, "%w seconds\n");
-			test.fromString(strPtr);
+			test.fromString(&t4);
 		}
 		std::cout << test.items.size() << std::endl;
 	}

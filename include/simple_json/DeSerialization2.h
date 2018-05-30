@@ -72,15 +72,15 @@ namespace JsonParser {
 	private:
 		bool addStringValue(const JsonString &name);
 		bool addObjectValue(char c, const JsonString &name);
-		bool addArrayValue(const JsonString &name);
+		bool addArrayValue(char c, const JsonString &name);
 		char addNumberValue(char c, const JsonString & name);
 		bool addBoolValue(char c, const JsonString & name);
 		void addNullValue(const JsonString & name);
 
 	private:
-		bool addArrayToArray();
+		bool addArrayToArray(char c);
 		bool addStringToArray();
-		bool addObjectToArray();
+		bool addObjectToArray(char c);
 		char addNumberToArray(char c);
 		bool addBoolToArray(char c);
 	};
