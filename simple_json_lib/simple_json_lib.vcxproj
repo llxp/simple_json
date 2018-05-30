@@ -20,8 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\DeSerialization.cpp" />
+    <ClCompile Include="..\src\DeSerialization2.cpp" />
     <ClCompile Include="..\src\Number.cpp" />
     <ClCompile Include="..\src\SerializationData.cpp" />
+    <ClCompile Include="..\src\SerializationData2.cpp" />
     <ClCompile Include="..\src\SerializationMapping.cpp" />
     <ClCompile Include="..\src\SerializationMappingData.cpp" />
   </ItemGroup>
@@ -30,12 +32,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\simple_json\DeSerialization.h" />
+    <ClInclude Include="..\include\simple_json\DeSerialization2.h" />
     <ClInclude Include="..\include\simple_json\dll.h" />
     <ClInclude Include="..\include\simple_json\ErrorHandler.h" />
     <ClInclude Include="..\include\simple_json\JsonTypes.h" />
     <ClInclude Include="..\include\simple_json\Number.h" />
     <ClInclude Include="..\include\simple_json\Serializable.h" />
     <ClInclude Include="..\include\simple_json\SerializationData.h" />
+    <ClInclude Include="..\include\simple_json\SerializationData2.h" />
     <ClInclude Include="..\include\simple_json\SerializationMapping.h" />
     <ClInclude Include="..\include\simple_json\SerializationMappingData.h" />
     <ClInclude Include="..\include\simple_json\SerializationUtils.h" />
@@ -108,6 +112,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)output\$(Platform)\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

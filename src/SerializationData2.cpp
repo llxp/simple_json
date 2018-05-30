@@ -22,42 +22,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <simple_json\SerializationData.h>
+#include <simple_json\SerializationData2.h>
 
 #include <utility>
 #include <memory>
 #include <string>
 
-JsonParser::SerializationData::SerializationData()
+JsonParser::SerializationData2::SerializationData2()
 {
 }
 
-JsonParser::SerializationData::~SerializationData()
+JsonParser::SerializationData2::~SerializationData2()
 {
 }
 
-void JsonParser::SerializationData::setType(const JsonTypes & type)
+void JsonParser::SerializationData2::setType(const JsonTypes & type)
 {
 	this->m_type = type;
 }
 
-JsonTypes JsonParser::SerializationData::type() const
+JsonTypes JsonParser::SerializationData2::type() const
 {
 	return this->m_type;
 }
 
-void JsonParser::SerializationData::setFullString(JsonString *str)
+void JsonParser::SerializationData2::setFullString(std::istream *str)
 {
 	this->m_fullString = str;
-	this->m_strLen = str->length();
 }
 
-JsonString *JsonParser::SerializationData::fullString() const
+std::istream *JsonParser::SerializationData2::fullString() const
 {
 	return this->m_fullString;
 }
 
-void JsonParser::SerializationData::clearAll()
+JsonChar JsonParser::SerializationData2::getNextChar() const
+{
+	char c = 0;
+	this->m_fullString->get(c);
+	return c;
+}
+
+void JsonParser::SerializationData2::clearAll()
 {
 	this->m_kvPairNumbers.reset();
 	this->m_kvPairStrings.reset();
@@ -66,8 +72,8 @@ void JsonParser::SerializationData::clearAll()
 	this->m_kvPairArrays.reset();
 }
 
-void JsonParser::SerializationData::assign(
-	const std::unique_ptr<SerializationData> &other)
+void JsonParser::SerializationData2::assign(
+	const std::unique_ptr<SerializationData2> &other)
 {
 	this->m_type = std::move(other->m_type);
 	this->setFullString(std::move(other->fullString()));
@@ -86,26 +92,26 @@ void JsonParser::SerializationData::assign(
 }
 
 std::map<JsonString, JsonParser::Number> *
-JsonParser::SerializationData::kvPairNumbers()
+JsonParser::SerializationData2::kvPairNumbers()
 {
 	return lazyInit2<std::map<JsonString, JsonParser::Number>>(m_kvPairNumbers);
 }
 
 std::map<JsonString, bool> *
-JsonParser::SerializationData::kvPairBools()
+JsonParser::SerializationData2::kvPairBools()
 {
 	return lazyInit2<std::map<JsonString, bool>>(m_kvPairBools);
 }
 
 std::map<JsonString, JsonString> *
-JsonParser::SerializationData::kvPairStrings()
+JsonParser::SerializationData2::kvPairStrings()
 {
 	return lazyInit2<std::map<JsonString, JsonString>>(m_kvPairStrings);
 }
 
-std::map<JsonString, std::unique_ptr<JsonParser::SerializationData>> *JsonParser::SerializationData::kvPairObjects()
+std::map<JsonString, std::unique_ptr<JsonParser::SerializationData2>> *JsonParser::SerializationData2::kvPairObjects()
 {
 	return lazyInit2<
-		std::map<JsonString, std::unique_ptr<SerializationData>>
+		std::map<JsonString, std::unique_ptr<SerializationData2>>
 	>(m_kvPairObjects);
 }

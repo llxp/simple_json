@@ -46,6 +46,7 @@ class SerializationMapping :
 	public:
 		DLLEXPORT bool fromString() override;
 		DLLEXPORT bool fromString(const std::shared_ptr<JsonString> &str) override;
+		DLLEXPORT bool fromString(std::istream *str) override;
 
 		DLLEXPORT JsonString toString() const override;
 		DLLEXPORT JsonString toStringArray() const override;

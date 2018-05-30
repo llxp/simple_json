@@ -51,6 +51,11 @@ bool JsonParser::DeSerialization::fromString(
 	return this->fromString();
 }
 
+bool JsonParser::DeSerialization::fromString(const std::istream *str)
+{
+	return false;
+}
+
 size_t JsonParser::DeSerialization::fromString(const size_t &currentPos)
 {
 	size_t i = 0;
@@ -59,9 +64,9 @@ size_t JsonParser::DeSerialization::fromString(const size_t &currentPos)
 	size_t tempLen = strLen();
 	for (i = currentPos; i < tempLen; ++i) {
 		if (getChar(i) == JsonObjectOpen) {
-			openingCount++;
+			++openingCount;
 		} else if (getChar(i) == JsonObjectClose) {
-			closeCount++;
+			++closeCount;
 		} else {
 			if ((i = addKVPair(i)) <= 0) {
 				return 0;
@@ -83,13 +88,13 @@ size_t JsonParser::DeSerialization::fromStringArray(const size_t &currentPos)
 	size_t tempLen = strLen();
 	for (i = currentPos; i < tempLen; ++i) {
 		if (getChar(i) == JsonArrayOpen) {
-			openingCount++;
+			++openingCount;
 			if ((i = parseStringArray(i + 1)) <= 0) {
 				return 0;
 			}
 			--i;
 		} else if (getChar(i) == JsonArrayClose) {
-			closeCount++;
+			++closeCount;
 		}
 		if (openingCount == closeCount) {
 			break;
@@ -147,7 +152,7 @@ size_t JsonParser::DeSerialization::parseStringArray(const size_t &currentPos)
 				break;
 			default:
 				if (isNumber(i)) {
-					if ((i = addIntegerToArray(i)) <= 0 || !commaFound) {
+					if ((i = addNumberToArray(i)) <= 0 || !commaFound) {
 						return 0;
 					}
 					--i;
@@ -321,7 +326,7 @@ size_t JsonParser::DeSerialization::addValue(
 				break;
 			default:
 				if (isNumber(i)) {
-					if ((i = addIntegerValue(i, name)) <= 0 || commaFound == false) {
+					if ((i = addNumberValue(i, name)) <= 0 || commaFound == false) {
 						return 0;
 					}
 					--i;
@@ -450,7 +455,7 @@ size_t JsonParser::DeSerialization::addArrayValue(
 }
 
 
-size_t JsonParser::DeSerialization::addIntegerValue(
+size_t JsonParser::DeSerialization::addNumberValue(
 	const size_t &currentPos, const JsonString & name)
 {
 	size_t i = 0;
@@ -498,7 +503,7 @@ size_t JsonParser::DeSerialization::addArrayToArray(const size_t &currentPos)
 	if (i > 0 && tempLen > 0 && tempLen > i && getChar(i) == JsonObjectOpen) {
 		auto child = std::make_unique<JsonParser::DeSerialization>();
 		child->setFullString(this->fullString());
-		if ((i = child->fromString(i)) <= 0) {
+		if ((i = child->fromStringArray(i)) <= 0) {
 			return 0;
 		}
 		this->arrayArrays()->push_back(std::move(child));
@@ -535,7 +540,7 @@ size_t JsonParser::DeSerialization::addObjectToArray(const size_t &currentPos)
 }
 
 
-size_t JsonParser::DeSerialization::addIntegerToArray(const size_t &currentPos)
+size_t JsonParser::DeSerialization::addNumberToArray(const size_t &currentPos)
 {
 	size_t i = 0;
 	size_t tempLen = strLen();

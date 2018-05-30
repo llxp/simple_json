@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef SIMPLE_JSON_DESERIALIZATION_H_
-#define SIMPLE_JSON_DESERIALIZATION_H_
+#ifndef SIMPLE_JSON_DESERIALIZATION2_H_
+#define SIMPLE_JSON_DESERIALIZATION2_H_
 
 #include <string>
 #include <map>
@@ -33,7 +33,7 @@ SOFTWARE.
 #include "JsonTypes.h"
 #include "Number.h"
 #include "ErrorHandler.h"
-#include "SerializationData.h"
+#include "SerializationData2.h"
 
 
 namespace JsonParser {
@@ -43,50 +43,47 @@ namespace JsonParser {
 		return (*str == 0) ? 0 : constLength(str + 1) + 1;
 	}
 
-class DeSerialization : public SerializationData
-{
+	class DeSerialization2 : public SerializationData2
+	{
 	public:
-		DeSerialization();
-		virtual ~DeSerialization();
+		DeSerialization2() {}
+		virtual ~DeSerialization2() {}
 		JsonString toString() const override;
 		JsonString toStringArray() const override;
 
 		virtual bool fromString(const std::shared_ptr<JsonString> &str);
-		virtual bool fromString(const std::istream *str);
-		bool fromString() override;
+		virtual bool fromString(std::istream *str);
 
-	protected:
-		size_t fromString(const size_t &pos);
+		DLLEXPORT virtual bool fromString(char c = -1) override;
 
 	private:
-		size_t fromStringArray(const size_t &pos);
-		size_t parseStringArray(const size_t &pos);
-		bool parseString();
-		size_t addKVPair(const size_t &pos);
-		size_t addValue(const size_t &pos, const JsonString &name);
+		bool fromStringArray(char c = -1);
+		char parseStringArray();
+		char addKVPair(char c);
+		char addValue(const JsonString &name);
 
 	private:
-		bool isNumber(const size_t &pos) const;
-		bool isBool(const size_t &pos) const;
-		bool isNull(const size_t &pos) const;
-		bool checkEscape(const size_t &pos) const;
-		size_t getName(const size_t &pos, JsonString *name) const;
+		bool isNumber(char c) const;
+		bool isBool(char c) const;
+		bool isNull(char c) const;
+		bool checkEscape(char ch1, char ch2) const;
+		bool getName(JsonString *name) const;
 
 	private:
-		size_t addStringValue(const size_t &pos, const JsonString &name);
-		size_t addObjectValue(const size_t &pos, const JsonString &name);
-		size_t addArrayValue(const size_t &pos, const JsonString &name);
-		size_t addNumberValue(const size_t &pos, const JsonString &name);
-		size_t addBoolValue(const size_t &pos, const JsonString &name);
-		size_t addNullValue(const size_t &pos, const JsonString &name);
+		bool addStringValue(const JsonString &name);
+		bool addObjectValue(char c, const JsonString &name);
+		bool addArrayValue(const JsonString &name);
+		char addNumberValue(char c, const JsonString & name);
+		bool addBoolValue(char c, const JsonString & name);
+		void addNullValue(const JsonString & name);
 
 	private:
-		size_t addArrayToArray(const size_t &pos);
-		size_t addStringToArray(const size_t &pos);
-		size_t addObjectToArray(const size_t &pos);
-		size_t addNumberToArray(const size_t &pos);
-		size_t addBoolToArray(const size_t &pos);
-};
+		bool addArrayToArray();
+		bool addStringToArray();
+		bool addObjectToArray();
+		char addNumberToArray(char c);
+		bool addBoolToArray(char c);
+	};
 }  // namespace JsonParser
 
 #endif  // SIMPLE_JSON_DESERIALIZATION_H_

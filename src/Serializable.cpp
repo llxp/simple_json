@@ -38,6 +38,11 @@ DLLEXPORT bool simple_json::Serializable::fromString(
 	return JsonParser::SerializationMapping::fromString(str);
 }
 
+DLLEXPORT bool simple_json::Serializable::fromString(std::istream *str)
+{
+	return JsonParser::SerializationMapping::fromString(str);
+}
+
 DLLEXPORT JsonString simple_json::Serializable::toString() const
 {
 	return JsonParser::SerializationMapping::toString();

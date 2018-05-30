@@ -67,4 +67,6 @@ enum JsonTypes
 #define ADD(MEMBER) addMember(#MEMBER, MEMBER);
 #define ADD2(MEMBERNAME, MEMBER, OPT) addMember(MEMBERNAME, MEMBER, OPT)
 
+#define MAX_JSON_NUMBER_LENGTH 325
+
 #endif  // SRC_JSONTYPES_H_

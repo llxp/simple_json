@@ -29,6 +29,7 @@ SOFTWARE.
 #include <iostream>
 #include <string>
 #include <memory>
+#include <sstream>
 
 #include <simple_json\Vector.h>
 #include <simple_json\SerializationUtils.h>
@@ -39,7 +40,7 @@ JsonParser::SerializationMapping::SerializationMapping()
 
 bool JsonParser::SerializationMapping::fromString()
 {
-	if (DeSerialization::fromString()) {
+	if (DeSerialization2::fromString()) {
 		return this->fromString2();
 	}
 	return false;
@@ -114,7 +115,13 @@ bool JsonParser::SerializationMapping::fromStringToArrayOfArrays()
 bool JsonParser::SerializationMapping::fromString(
 	const std::shared_ptr<JsonString> &str)
 {
-	this->setFullString(str.get());
+	this->setFullString(new std::istringstream(*(str.get())));
+	return this->fromString();
+}
+
+DLLEXPORT bool JsonParser::SerializationMapping::fromString(std::istream *str)
+{
+	this->setFullString(str);
 	return this->fromString();
 }
 

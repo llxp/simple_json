@@ -32,10 +32,10 @@ SOFTWARE.
 #include "JsonTypes.h"
 #include "Vector.h"
 #include "Number.h"
-#include "DeSerialization.h"
+#include "DeSerialization2.h"
 
 namespace JsonParser {
-class SerializationMappingData : public DeSerialization
+class SerializationMappingData : public DeSerialization2
 {
 	public:
 		explicit SerializationMappingData();
