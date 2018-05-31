@@ -132,11 +132,12 @@ class SerializationData
 
 inline JsonChar JsonParser::SerializationData::getChar(const size_t & pos) const
 {
-	if (strLen() > 0) {
+	if (pos > 0 && strLen() > 0 && pos < strLen()) {
 		return this->m_fullString->at(pos);
 	}
 	return 0;
 }
+}  // namespace JsonParser
 
 inline size_t JsonParser::SerializationData::strLen() const
 {
@@ -149,12 +150,10 @@ inline bool JsonParser::SerializationData::matchChar(
 	return this->m_fullString->at(i) == ch;
 }
 
-inline JsonString SerializationData::substr(
+inline JsonString JsonParser::SerializationData::substr(
 	const size_t & start, const size_t & stop) const
 {
 	return this->m_fullString->substr(start, stop);
 }
-
-}  // namespace JsonParser
 
 #endif  // JSON_SERIALIZATIONDATA_H_
