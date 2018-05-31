@@ -1,5 +1,5 @@
 # simple_json
-Json string to class (De-)Serializer without macros or rtti
+easy to implement/use Json string to class (De-)Serializer
 
 # USAGE:
 to use the library, just perform the following steps:
