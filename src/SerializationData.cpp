@@ -27,6 +27,7 @@ SOFTWARE.
 #include <utility>
 #include <memory>
 #include <string>
+#include <map>
 
 JsonParser::SerializationData::SerializationData()
 {
@@ -103,9 +104,29 @@ JsonParser::SerializationData::kvPairStrings()
 	return lazyInit2<std::map<JsonString, JsonString>>(m_kvPairStrings);
 }
 
-std::map<JsonString, std::unique_ptr<JsonParser::SerializationData>> *JsonParser::SerializationData::kvPairObjects()
+std::map<JsonString, std::unique_ptr<JsonParser::SerializationData>> *
+JsonParser::SerializationData::kvPairObjects()
 {
 	return lazyInit2<
 		std::map<JsonString, std::unique_ptr<SerializationData>>
 	>(m_kvPairObjects);
+}
+
+std::map<JsonString, std::unique_ptr<JsonParser::SerializationData>>* JsonParser::SerializationData::kvPairArrays()
+{
+	return lazyInit2<
+		std::map<JsonString, std::unique_ptr<SerializationData>>
+	>(m_kvPairArrays);
+}
+
+std::vector<JsonString>* JsonParser::SerializationData::kvPairNullValues()
+{
+	return lazyInit2<std::vector<JsonString>>(m_kvPairNullValues);
+}
+
+std::vector<std::unique_ptr<JsonParser::SerializationData>>* JsonParser::SerializationData::arrayObjects()
+{
+	return lazyInit2<
+		std::vector<std::unique_ptr<SerializationData>>
+	>(m_arrayObjects);
 }

@@ -22,23 +22,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef SRC_SERIALIZATIONMAPPINGDATA_H_
-#define SRC_SERIALIZATIONMAPPINGDATA_H_
+#ifndef SIMPLE_JSON_SERIALIZATIONMAPPINGDATA_H_
+#define SIMPLE_JSON_SERIALIZATIONMAPPINGDATA_H_
 
 #include <map>
 #include <string>
 #include <vector>
+#include <utility>
+#include <memory>
 
 #include "JsonTypes.h"
 #include "Vector.h"
 #include "Number.h"
-#include "DeSerialization2.h"
+#include "DeSerialization.h"
 
 namespace JsonParser {
-class SerializationMappingData : public DeSerialization2
+class SerializationMappingData : public DeSerialization
 {
 	public:
-		explicit SerializationMappingData();
+		SerializationMappingData();
 		DLLEXPORT virtual ~SerializationMappingData();
 
 	protected:
@@ -50,7 +52,8 @@ class SerializationMappingData : public DeSerialization2
 		std::map<JsonString, bool *> m_kvPairMappingBools;
 		std::map<JsonString, JsonString *> m_kvPairMappingStrings;
 		std::map<JsonString, SerializationMappingData *> m_kvPairMappingObjects;
-		std::map<JsonString, std::unique_ptr<SerializationMappingData>> m_kvPairMappingArrays;
+		std::map<JsonString,
+			std::unique_ptr<SerializationMappingData>> m_kvPairMappingArrays;
 
 		JsonParser::Vector<JsonString> *m_mappingStringArrays{ nullptr };
 		JsonParser::Vector<bool> *m_mappingBoolArrays{ nullptr };
@@ -58,8 +61,9 @@ class SerializationMappingData : public DeSerialization2
 		JsonParser::VectorBase *m_mappingObjectArrays{ nullptr };
 		JsonParser::VectorBase *m_mappingArrayArrays{ nullptr };
 
-		std::vector<std::pair<JsonString, std::pair<JsonTypes, bool>>> m_serializableMembers;
+		std::vector<std::pair<JsonString,
+			std::pair<JsonTypes, bool>>> m_serializableMembers;
 };
 }  // namespace JsonParser
 
-#endif  // SRC_SERIALIZATIONMAPPINGDATA_H_
+#endif  // SIMPLE_JSON_SERIALIZATIONMAPPINGDATA_H_

@@ -30,6 +30,7 @@ SOFTWARE.
 #include <utility>
 #include <string>
 #include <sstream>
+#include <iterator>
 
 JsonString JsonParser::DeSerialization2::toString() const
 {
@@ -43,58 +44,68 @@ JsonString JsonParser::DeSerialization2::toStringArray() const
 
 bool JsonParser::DeSerialization2::fromString(const std::shared_ptr<JsonString>& str)
 {
-	this->setFullString(new std::istringstream(*(str.get())));
-	this->m_isDynamicallyCreatedStream = true;
+	std::unique_ptr<std::istringstream> streamPtr = std::make_unique<std::istringstream>(*(str.get()));
+	std::unique_ptr<std::istreambuf_iterator<char>> streambufPtr = std::make_unique<std::istreambuf_iterator<char>>(*streamPtr);
+	this->setFullString(streambufPtr.get());
 	return this->fromString();
+	//return false;
 }
 
-bool JsonParser::DeSerialization2::fromString(std::istream * str)
+/*bool JsonParser::DeSerialization2::fromString(std::istreambuf_iterator<char> * str)
 {
 	this->setFullString(str);
 	return this->fromString();
-}
+}*/
+
 bool JsonParser::DeSerialization2::fromString(char c)
 {
 	size_t openingCount = 0;
 	size_t closeCount = 0;
 	do {
-		if (c == JsonObjectOpen) {
-			openingCount++;
-		}
-		if (c != JsonObjectOpen && c != JsonObjectClose && c != -1) {
-			if ((c = addKVPair(c)) <= 0) {
+		switch(c) {
+		case JsonObjectOpen:
+			++openingCount;
+			if ((c = addKVPair()) <= 0) {
 				return false;
 			}
+			break;
 		}
-		if (c == JsonObjectClose) {
-			closeCount++;
+		switch(c) {
+		case JsonObjectClose:
+			++closeCount;
+			break;
 		}
 		if (openingCount > 0 && openingCount == closeCount) {
 			return true;
 		}
-	} while ((c = getNextChar()) >= 0);
+	} while ((c = getNextChar()) > 0);
 	return false;
 }
 
-char JsonParser::DeSerialization2::addKVPair(char c)
+char JsonParser::DeSerialization2::addKVPair()
 {
 	JsonString name;
-	do {
-		if (c == JsonStringSeparator) {
+	char c = 0;
+	while ((c = getNextChar()) > 0) {
+		switch (c) {
+		case JsonStringSeparator:
 			name = JsonString();
-			if (!this->getName(&name)) {
+			if (!this->getString(&name)) {
 				return 0;
 			}
-		}
-		else if (c == JsonKvSeparator) {
+			break;
+		case JsonKvSeparator:
 			if ((c = addValue(name)) <= 0) {
 				return 0;
 			}
+			break;
 		}
-		if (c == JsonArrayClose || c == JsonObjectClose) {
+		switch(c) {
+		case JsonArrayClose:
+		case JsonObjectClose:
 			return c;
 		}
-	} while ((c = getNextChar()) >= 0);
+	};
 	return c;
 }
 
@@ -106,7 +117,7 @@ char JsonParser::DeSerialization2::addValue(const JsonString &name)
 	char c = 0;
 	bool commaFound = true;
 	bool valueSet = false;
-	while ((c = getNextChar()) >= 0) {
+	while ((c = getNextChar()) > 0) {
 		switch (c) {
 		case JsonStringSeparator:
 			if (!addStringValue(name) || commaFound == false) {
@@ -143,7 +154,7 @@ char JsonParser::DeSerialization2::addValue(const JsonString &name)
 		default:
 			if (isNumber(c)) {
 				if ((c = addNumberValue(c, name)) <= 0
-					|| commaFound == false) {
+					|| !commaFound) {
 					return 0;
 				}
 				valueSet = true;
@@ -153,14 +164,15 @@ char JsonParser::DeSerialization2::addValue(const JsonString &name)
 				}
 			}
 			else if (isBool(c)) {
-				if (!addBoolValue(c, name) || commaFound == false) {
+				if (!addBoolValue(c, name)
+					|| !commaFound) {
 					return 0;
 				}
 				valueSet = true;
 				commaFound = false;
 			}
 			else if (isNull(c)) {
-				if (commaFound == false) {
+				if (!commaFound) {
 					return 0;
 				}
 				addNullValue(name);
@@ -169,11 +181,16 @@ char JsonParser::DeSerialization2::addValue(const JsonString &name)
 			}
 		}
 	}
+	return 0;
 }
 
 bool JsonParser::DeSerialization2::isBool(char c) const
 {
-	if (c == 't' || c == 'T' || c == 'f' || c == 'F') {
+	switch (c) {
+	case 't':
+	case 'T':
+	case 'f':
+	case 'F':
 		return true;
 	}
 	return false;
@@ -189,7 +206,9 @@ bool JsonParser::DeSerialization2::isNumber(char c) const
 
 bool JsonParser::DeSerialization2::isNull(char c) const
 {
-	if (c == 'n' || c == 'N') {
+	switch (c) {
+	case 'n':
+	case 'N':
 		return true;
 	}
 	return false;
@@ -198,14 +217,14 @@ bool JsonParser::DeSerialization2::isNull(char c) const
 bool JsonParser::DeSerialization2::addStringValue(const JsonString &name)
 {
 	JsonString value;
-	if (!this->getName(&value)) {
+	if (!this->getString(&value)) {
 		return false;
 	}
 	(*this->kvPairStrings())[name] = std::move(value);
 	return true;
 }
 
-bool JsonParser::DeSerialization2::getName(JsonString *name) const
+bool JsonParser::DeSerialization2::getString(JsonString *name) const
 {
 	if (name == nullptr) {
 		return false;
@@ -213,20 +232,17 @@ bool JsonParser::DeSerialization2::getName(JsonString *name) const
 	char c = 0;
 	char ch1 = -1;
 	char ch2 = -1;
-	while ((c = getNextChar()) >= 0) {
+	std::string tempStr;
+	while ((c = getNextChar()) > 0) {
 		if (c != JsonStringSeparator || checkEscape(ch1, ch2)) {
-			*name += c;
+			tempStr += c;
 		}
 		else {
+			*name = std::move(tempStr);
 			return true;
 		}
-		if (ch1 == -1) {
-			ch1 = c;
-		}
-		else {
-			ch2 = ch1;
-			ch1 = c;
-		}
+		ch2 = ch1;
+		ch1 = c;
 	}
 	return false;
 }
@@ -239,9 +255,9 @@ bool JsonParser::DeSerialization2::addObjectValue(
 	if (!child->fromString(c)) {
 		return false;
 	}
-	if (this->kvPairObjects()->find(name) == this->kvPairObjects()->end()) {
+	//if (this->kvPairObjects()->find(name) == this->kvPairObjects()->end()) {
 		(*this->kvPairObjects())[name] = std::move(child);
-	}
+	//}
 	return true;
 }
 
@@ -252,9 +268,9 @@ bool JsonParser::DeSerialization2::addArrayValue(char c, const JsonString &name)
 	if (!child->fromStringArray(c)) {
 		return false;
 	}
-	if (this->kvPairArrays()->find(name) == this->kvPairArrays()->end()) {
+	//if (this->kvPairArrays()->find(name) == this->kvPairArrays()->end()) {
 		(*this->kvPairArrays())[name] = std::move(child);
-	}
+	//}
 	return true;
 }
 
@@ -275,7 +291,7 @@ char JsonParser::DeSerialization2::addNumberValue(
 			}
 			return c;
 		}
-	} while ((c = getNextChar()) >= 0);
+	} while ((c = getNextChar()) > 0);
 	return c;
 }
 
@@ -302,7 +318,7 @@ bool JsonParser::DeSerialization2::checkEscape(char ch1, char ch2) const
 {
 	bool currentPosIsEscaped = ch1 == '\\';
 	if (currentPosIsEscaped) {
-		bool previousPosIsEscaped = ch2 != -1 && ch2 == '\\';
+		bool previousPosIsEscaped = ch2 == '\\';
 		return !previousPosIsEscaped;
 	}
 	return currentPosIsEscaped;
@@ -325,7 +341,7 @@ bool JsonParser::DeSerialization2::fromStringArray(char c)
 		if (openingCount > 0 && openingCount == closeCount) {
 			return true;
 		}
-	} while ((c = getNextChar()) >= 0);
+	} while ((c = getNextChar()) > 0);
 	return false;
 }
 
@@ -333,7 +349,7 @@ char JsonParser::DeSerialization2::parseStringArray()
 {
 	bool commaFound = true;
 	char c = 0;
-	while ((c = getNextChar()) >= 0) {
+	while ((c = getNextChar()) > 0) {
 		switch (c) {
 		case JsonObjectOpen:
 		{
@@ -405,7 +421,7 @@ char JsonParser::DeSerialization2::addNumberToArray(char c)
 			this->arrayNumbers()->push_back(std::move(number));
 			return c;
 		}
-	} while ((c = getNextChar()) >= 0);
+	} while ((c = getNextChar()) > 0);
 	return c;
 }
 
@@ -425,7 +441,7 @@ bool JsonParser::DeSerialization2::addBoolToArray(char c)
 bool JsonParser::DeSerialization2::addStringToArray()
 {
 	JsonString value;
-	if (!this->getName(&value)) {
+	if (!this->getString(&value)) {
 		return false;
 	}
 	this->arrayStrings()->push_back(std::move(value));

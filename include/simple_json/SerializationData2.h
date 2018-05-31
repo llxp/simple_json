@@ -28,6 +28,7 @@ SOFTWARE.
 #include <map>
 #include <memory>
 #include <string>
+#include <iterator>
 
 #include "Number.h"
 #include "JsonTypes.h"
@@ -59,9 +60,9 @@ namespace JsonParser {
 	protected:
 		void setType(const JsonTypes &type);
 		JsonTypes type() const;
-		void setFullString(std::istream *str);
-		std::istream *fullString() const;
-		JsonChar getNextChar() const;
+		void setFullString(std::istreambuf_iterator<char> *str);
+		std::istreambuf_iterator<char> *fullString() const;
+		char getNextChar() const;
 		void clearAll();
 
 	private:
@@ -134,12 +135,8 @@ namespace JsonParser {
 		std::unique_ptr<std::vector<JsonString>> m_arrayStrings;
 
 	private:
-		std::istream *m_fullString;
-		size_t m_strLen{ 0 };
+		std::istreambuf_iterator<char> *m_fullString{ nullptr };
 		JsonTypes m_type{ JsonTypes::Object };
-
-	public:
-		bool m_isDynamicallyCreatedStream{ false };
 	};
 
 }  // namespace JsonParser

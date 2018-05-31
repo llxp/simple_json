@@ -27,6 +27,8 @@ SOFTWARE.
 #include <utility>
 #include <memory>
 #include <string>
+#include <istream>
+#include <iterator>
 
 JsonParser::SerializationData2::SerializationData2()
 {
@@ -34,10 +36,6 @@ JsonParser::SerializationData2::SerializationData2()
 
 JsonParser::SerializationData2::~SerializationData2()
 {
-	if (this->m_isDynamicallyCreatedStream && this->m_fullString != nullptr) {
-		delete this->m_fullString;
-		this->m_fullString = nullptr;
-	}
 }
 
 void JsonParser::SerializationData2::setType(const JsonTypes & type)
@@ -50,20 +48,23 @@ JsonTypes JsonParser::SerializationData2::type() const
 	return this->m_type;
 }
 
-void JsonParser::SerializationData2::setFullString(std::istream *str)
+void JsonParser::SerializationData2::setFullString(std::istreambuf_iterator<char> *str)
 {
 	this->m_fullString = str;
 }
 
-std::istream *JsonParser::SerializationData2::fullString() const
+std::istreambuf_iterator<char> *JsonParser::SerializationData2::fullString() const
 {
 	return this->m_fullString;
 }
 
-JsonChar JsonParser::SerializationData2::getNextChar() const
+char JsonParser::SerializationData2::getNextChar() const
 {
-	char c = 0;
-	this->m_fullString->get(c);
+	if (this->m_fullString == nullptr || (*this->m_fullString) == std::istreambuf_iterator<char>()) {
+		return 0;
+	}
+	char c = **this->m_fullString;
+	(*this->m_fullString)++;
 	return c;
 }
 

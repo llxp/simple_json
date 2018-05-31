@@ -21,8 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef SRC_SERIALIZATIONDATA_H_
-#define SRC_SERIALIZATIONDATA_H_
+
+#ifndef JSON_SERIALIZATIONDATA_H_
+#define JSON_SERIALIZATIONDATA_H_
 
 #include <vector>
 #include <map>
@@ -69,7 +70,7 @@ class SerializationData
 
 	private:
 		template<typename T>
-		T* lazyInit2(std::unique_ptr<T> &var)
+		auto lazyInit2(std::unique_ptr<T> &var)
 		{
 			if (var == nullptr) {
 				var = std::make_unique<T>();
@@ -82,23 +83,10 @@ class SerializationData
 		std::map<JsonString, bool> *kvPairBools();
 		std::map<JsonString, JsonString> *kvPairStrings();
 		std::map<JsonString, std::unique_ptr<SerializationData>> *kvPairObjects();
-		std::map<JsonString, std::unique_ptr<SerializationData>> *kvPairArrays()
-		{
-			return lazyInit2<
-				std::map<JsonString, std::unique_ptr<SerializationData>>
-			>(m_kvPairArrays);
-		};
-		std::vector<JsonString> *kvPairNullValues()
-		{
-			return lazyInit2<std::vector<JsonString>>(m_kvPairNullValues);
-		};
+		std::map<JsonString, std::unique_ptr<SerializationData>> *kvPairArrays();
+		std::vector<JsonString> *kvPairNullValues();
 
-		std::vector<std::unique_ptr<SerializationData>> *arrayObjects()
-		{
-			return lazyInit2<
-				std::vector<std::unique_ptr<SerializationData>>
-			>(m_arrayObjects);
-		};
+		std::vector<std::unique_ptr<SerializationData>> *arrayObjects();
 		std::vector<std::unique_ptr<SerializationData>> *arrayArrays()
 		{
 			return lazyInit2<
@@ -169,4 +157,4 @@ inline JsonString SerializationData::substr(
 
 }  // namespace JsonParser
 
-#endif  // SRC_SERIALIZATIONDATA_H_
+#endif  // JSON_SERIALIZATIONDATA_H_

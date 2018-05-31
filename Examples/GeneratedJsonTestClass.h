@@ -42,7 +42,7 @@ public:
 	JsonPair name;
 };
 
-class GeneratedJsonTestClasses : public JsonParser::SerializationMapping
+class GeneratedJsonTestClasses : public simple_json::Serializable
 {
 	public:
 	GeneratedJsonTestClasses()

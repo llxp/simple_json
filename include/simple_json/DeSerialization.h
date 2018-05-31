@@ -46,13 +46,13 @@ namespace JsonParser {
 class DeSerialization : public SerializationData
 {
 	public:
-		DeSerialization();
-		virtual ~DeSerialization();
-		JsonString toString() const override;
-		JsonString toStringArray() const override;
+		DeSerialization() {}
+		virtual ~DeSerialization() {}
+		JsonString toString() const override { return JsonString(); }
+		JsonString toStringArray() const override { return JsonString(); }
 
 		virtual bool fromString(const std::shared_ptr<JsonString> &str);
-		virtual bool fromString(const std::istream *str);
+		//virtual bool fromString(const std::istream *str);
 		bool fromString() override;
 
 	protected:
@@ -60,8 +60,7 @@ class DeSerialization : public SerializationData
 
 	private:
 		size_t fromStringArray(const size_t &pos);
-		size_t parseStringArray(const size_t &pos);
-		bool parseString();
+		size_t addArrayValues(const size_t &pos);
 		size_t addKVPair(const size_t &pos);
 		size_t addValue(const size_t &pos, const JsonString &name);
 
@@ -70,7 +69,7 @@ class DeSerialization : public SerializationData
 		bool isBool(const size_t &pos) const;
 		bool isNull(const size_t &pos) const;
 		bool checkEscape(const size_t &pos) const;
-		size_t getName(const size_t &pos, JsonString *name) const;
+		size_t getString(const size_t &pos, JsonString *name) const;
 
 	private:
 		size_t addStringValue(const size_t &pos, const JsonString &name);
@@ -78,7 +77,7 @@ class DeSerialization : public SerializationData
 		size_t addArrayValue(const size_t &pos, const JsonString &name);
 		size_t addNumberValue(const size_t &pos, const JsonString &name);
 		size_t addBoolValue(const size_t &pos, const JsonString &name);
-		size_t addNullValue(const size_t &pos, const JsonString &name);
+		void addNullValue(const JsonString &name);
 
 	private:
 		size_t addArrayToArray(const size_t &pos);

@@ -5,6 +5,7 @@ VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_json_exe", "simple_json_exe\simple_json_exe.vcxproj", "{91931403-0E1F-4F5C-88B4-924ACC2FC6F9}"
 	ProjectSection(ProjectDependencies) = postProject
+		{18CAFA23-509F-43D2-A6B1-E35A1434FAE5} = {18CAFA23-509F-43D2-A6B1-E35A1434FAE5}
 		{2D4E7136-24A0-4616-8120-793910C9F7EC} = {2D4E7136-24A0-4616-8120-793910C9F7EC}
 	EndProjectSection
 EndProject

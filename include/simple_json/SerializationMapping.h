@@ -21,8 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef SRC_SERIALIZATIONMAPPING_H_
-#define SRC_SERIALIZATIONMAPPING_H_
+#ifndef SIMPLE_JSON_SERIALIZATIONMAPPING_H_
+#define SIMPLE_JSON_SERIALIZATIONMAPPING_H_
 
 #include <map>
 #include <utility>
@@ -46,13 +46,12 @@ class SerializationMapping :
 	public:
 		DLLEXPORT bool fromString() override;
 		DLLEXPORT bool fromString(const std::shared_ptr<JsonString> &str) override;
-		DLLEXPORT bool fromString(std::istream *str) override;
 
 		DLLEXPORT JsonString toString() const override;
 		DLLEXPORT JsonString toStringArray() const override;
 
 	private:
-		bool fromString2();
+		bool assignValues();
 		DLLEXPORT bool fromStringArray() override;
 		bool fromStringToArrayOfObjects();
 		bool fromStringToArrayOfArrays();
@@ -106,4 +105,4 @@ class SerializationMapping :
 };
 }  // namespace JsonParser
 
-#endif  // SRC_SERIALIZATIONMAPPING_H_
+#endif  // SIMPLE_JSON_SERIALIZATIONMAPPING_H_

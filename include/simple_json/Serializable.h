@@ -36,7 +36,6 @@ class Serializable : public JsonParser::SerializationMapping
 	public:
 		DLLEXPORT bool fromString();
 		DLLEXPORT bool fromString(const std::shared_ptr<JsonString> &str);
-		DLLEXPORT bool fromString(std::istream *str);
 
 		DLLEXPORT virtual JsonString toString() const;
 		DLLEXPORT virtual JsonString toStringArray() const;

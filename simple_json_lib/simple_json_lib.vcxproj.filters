@@ -36,6 +36,9 @@
     <ClCompile Include="..\src\SerializationData2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Serializable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="simple_json_lib.licenseheader" />

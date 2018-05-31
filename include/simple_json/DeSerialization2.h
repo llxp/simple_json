@@ -52,14 +52,14 @@ namespace JsonParser {
 		JsonString toStringArray() const override;
 
 		virtual bool fromString(const std::shared_ptr<JsonString> &str);
-		virtual bool fromString(std::istream *str);
+		/*virtual bool fromString(std::istreambuf_iterator<char> *str);*/
 
 		DLLEXPORT virtual bool fromString(char c = -1) override;
 
 	private:
 		bool fromStringArray(char c = -1);
 		char parseStringArray();
-		char addKVPair(char c);
+		char addKVPair();
 		char addValue(const JsonString &name);
 
 	private:
@@ -67,7 +67,7 @@ namespace JsonParser {
 		bool isBool(char c) const;
 		bool isNull(char c) const;
 		bool checkEscape(char ch1, char ch2) const;
-		bool getName(JsonString *name) const;
+		bool getString(JsonString *name) const;
 
 	private:
 		bool addStringValue(const JsonString &name);

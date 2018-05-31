@@ -31,6 +31,7 @@ SOFTWARE.
 #else  // _USRDLL
 	#ifndef DLLEXPORT
 	#define DLLEXPORT
+//__declspec(dllexport)
 	#endif  // DLLEXPORT
 #endif  // _USRDLL
 
