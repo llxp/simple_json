@@ -132,7 +132,7 @@ class SerializationData
 
 inline JsonChar JsonParser::SerializationData::getChar(const size_t & pos) const
 {
-	if (pos > 0 && strLen() > 0 && pos < strLen()) {
+	if (pos >= 0 && strLen() > 0 && pos < strLen()) {
 		return this->m_fullString->at(pos);
 	}
 	return 0;

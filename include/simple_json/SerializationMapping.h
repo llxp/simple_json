@@ -37,10 +37,10 @@ SOFTWARE.
 
 namespace JsonParser {
 class SerializationMapping :
-	private JsonParser::SerializationMappingData
+	public JsonParser::SerializationMappingData
 {
 	public:
-		DLLEXPORT explicit SerializationMapping();
+		DLLEXPORT SerializationMapping();
 		DLLEXPORT ~SerializationMapping() override {}
 
 	public:

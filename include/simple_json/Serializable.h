@@ -24,6 +24,52 @@ SOFTWARE.
 #ifndef SRC_SERIALIZABLE_H_
 #define SRC_SERIALIZABLE_H_
 
+#define MEMBER(TYPE, NAME)\
+    private:\
+        TYPE m_##NAME;\
+    public:\
+        TYPE NAME(void) const\
+        {\
+            return m_##NAME;\
+        }\
+        void set##NAME(const TYPE &value)\
+        {\
+        m_##NAME = value;\
+        }
+
+#define MEMBERDEFAULT(TYPE, NAME, DEFAULT)\
+    private:\
+        TYPE m_##NAME = { DEFAULT };\
+    public:\
+        TYPE NAME(void) const\
+        {\
+            return m_##NAME;\
+        }\
+        void set##NAME(const TYPE &value)\
+        {\
+            m_##NAME = value;\
+        }
+#define PROTMEMBERDEFAULT(TYPE, NAME, DEFAULT)\
+    protected:\
+        TYPE m_##NAME { DEFAULT };\
+    public:\
+        TYPE NAME(void) const\
+        {\
+            return m_##NAME;\
+        }\
+        void set##NAME(const TYPE &value)\
+        {\
+            m_##NAME = value;\
+        }
+
+#define PUBMEMBER(TYPE, NAME) public: TYPE m_##NAME; TYPE NAME(void) const { return m_##NAME; } void set##NAME(const TYPE &value) { m_##NAME = value; }
+#define PMEMBER(TYPE, NAME) private: TYPE m_##NAME; TYPE NAME(void) const { return m_##NAME; } void set##NAME(const TYPE &value) { m_##NAME = value; }
+#define PSMEMBER(TYPE, NAME) private: TYPE m_##NAME; TYPE NAME(void) const { return m_##NAME; } private: void set##NAME(const TYPE &value) { m_##NAME = value; }
+#define PGMEMBER(TYPE, NAME) private: TYPE m_##NAME; private: TYPE NAME(void) const { return m_##NAME; } public: void set##NAME(const TYPE &value) { m_##NAME = value; }
+#define PROTMEMBER(TYPE, NAME) protected: TYPE m_##NAME; public: TYPE NAME(void) const { return m_##NAME; } void set##NAME(const TYPE &value) { m_##NAME = value; }
+#define NVP(NAME) ar( cereal::make_nvp(#NAME, m_##NAME) );
+#define RESTCLASS(NAME, ...) class NAME : public simple_json::Serializable { __VA_ARGS__ };
+
 #include "SerializationMapping.h"
 
 namespace simple_json {

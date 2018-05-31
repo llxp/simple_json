@@ -69,7 +69,7 @@ size_t JsonParser::DeSerialization::fromString(const size_t &currentPos)
 			++closeCount;
 			break;
 		}
-		if (openingCount == closeCount) {
+		if (openingCount > 0 && openingCount == closeCount) {
 			return i;
 		}
 	}
