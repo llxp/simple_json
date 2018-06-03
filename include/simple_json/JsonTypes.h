@@ -59,14 +59,15 @@ enum JsonTypes
 #define JsonArrayCloseStr "]"
 #define JsonStringSeparatorStr "\""
 
-#define JsonString std::string
-#define JsonChar char
+typedef std::string JsonString;
+typedef char JsonChar;
+
 #define EmptyString ""
 #define ToString std::to_string
 
-#define ADD(MEMBER) addMember(#MEMBER, MEMBER);
+#define ADD(MEMBER) addMember(std::move(#MEMBER), MEMBER);
 #define ADD2(MEMBERNAME, MEMBER, OPT) addMember(MEMBERNAME, MEMBER, OPT)
 
-#define MAX_JSON_NUMBER_LENGTH 325
+constexpr short MAX_JSON_NUMBER_LENGTH = 325;
 
 #endif  // SRC_JSONTYPES_H_

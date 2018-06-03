@@ -29,14 +29,6 @@ SOFTWARE.
 #include <string>
 #include <map>
 
-JsonParser::SerializationData::SerializationData()
-{
-}
-
-JsonParser::SerializationData::~SerializationData()
-{
-}
-
 void JsonParser::SerializationData::setType(const JsonTypes & type)
 {
 	this->m_type = type;
@@ -58,75 +50,56 @@ JsonString *JsonParser::SerializationData::fullString() const
 	return this->m_fullString;
 }
 
-void JsonParser::SerializationData::clearAll()
+/*void JsonParser::SerializationData::addNumberValue(std::string &&name, std::string &&numberStr)
 {
-	this->m_kvPairNumbers.reset();
-	this->m_kvPairStrings.reset();
-	this->m_kvPairBools.reset();
-	this->m_kvPairObjects.reset();
-	this->m_kvPairArrays.reset();
+	JsonParser::Number number(numberStr);
+	if (this->m_kvPairMappingNumbers.find(name) != this->m_kvPairMappingNumbers.end()) {
+		(this->m_kvPairMappingNumbers)[name].setNumberRefValue(std::move(number));
+	}
 }
 
-void JsonParser::SerializationData::assign(
-	const std::unique_ptr<SerializationData> &other)
+void JsonParser::SerializationData::addBoolValue(std::string && name, bool value)
 {
-	this->m_type = std::move(other->m_type);
-	this->setFullString(std::move(other->fullString()));
-
-	this->m_kvPairNumbers = std::move(other->m_kvPairNumbers);
-	this->m_kvPairStrings = std::move(other->m_kvPairStrings);
-	this->m_kvPairBools = std::move(other->m_kvPairBools);
-	this->m_kvPairObjects = std::move(other->m_kvPairObjects);
-	this->m_kvPairArrays = std::move(other->m_kvPairArrays);
-
-	this->m_arrayObjects = std::move(other->m_arrayObjects);
-	this->m_arrayArrays = std::move(other->m_arrayArrays);
-	this->m_arrayNumbers = std::move(other->m_arrayNumbers);
-	this->m_arrayBools = std::move(other->m_arrayBools);
-	this->m_arrayStrings = std::move(other->m_arrayStrings);
+	if (this->m_kvPairMappingBools.find(name) != this->m_kvPairMappingBools.end()) {
+		(*this->m_kvPairMappingBools[name]) = value;
+	}
 }
 
-std::map<JsonString, JsonParser::Number> *
-JsonParser::SerializationData::kvPairNumbers()
+void JsonParser::SerializationData::addStringValue(std::string && name, std::string && str)
 {
-	return lazyInit2<std::map<JsonString, JsonParser::Number>>(m_kvPairNumbers);
+	if (this->m_kvPairMappingStrings.find(name) != this->m_kvPairMappingStrings.end()) {
+		(*this->m_kvPairMappingStrings[name]) = std::move(str);
+	}
 }
 
-std::map<JsonString, bool> *
-JsonParser::SerializationData::kvPairBools()
+bool JsonParser::SerializationData::objectIsMapped(const std::string & name) const
 {
-	return lazyInit2<std::map<JsonString, bool>>(m_kvPairBools);
+	if (this->m_kvPairMappingObjects.find(name) != this->m_kvPairMappingObjects.end()) {
+		return true;
+	}
+	return false;
 }
 
-std::map<JsonString, JsonString> *
-JsonParser::SerializationData::kvPairStrings()
+bool JsonParser::SerializationData::arrayIsMapped(const std::string & name) const
 {
-	return lazyInit2<std::map<JsonString, JsonString>>(m_kvPairStrings);
+	if (this->m_kvPairMappingArrays.find(name) != this->m_kvPairMappingArrays.end()) {
+		return true;
+	}
+	return false;
 }
 
-std::map<JsonString, std::unique_ptr<JsonParser::SerializationData>> *
-JsonParser::SerializationData::kvPairObjects()
+JsonParser::SerializationData * JsonParser::SerializationData::getPointerToObject(std::string && name) const
 {
-	return lazyInit2<
-		std::map<JsonString, std::unique_ptr<SerializationData>>
-	>(m_kvPairObjects);
+	if (!objectIsMapped(name)) {
+		return nullptr;
+	}
+	return this->m_kvPairMappingObjects.at(name);
 }
 
-std::map<JsonString, std::unique_ptr<JsonParser::SerializationData>>* JsonParser::SerializationData::kvPairArrays()
+JsonParser::SerializationData * JsonParser::SerializationData::getPointerToArray(std::string && name) const
 {
-	return lazyInit2<
-		std::map<JsonString, std::unique_ptr<SerializationData>>
-	>(m_kvPairArrays);
-}
-
-std::vector<JsonString>* JsonParser::SerializationData::kvPairNullValues()
-{
-	return lazyInit2<std::vector<JsonString>>(m_kvPairNullValues);
-}
-
-std::vector<std::unique_ptr<JsonParser::SerializationData>>* JsonParser::SerializationData::arrayObjects()
-{
-	return lazyInit2<
-		std::vector<std::unique_ptr<SerializationData>>
-	>(m_arrayObjects);
-}
+	if (!arrayIsMapped(name)) {
+		return nullptr;
+	}
+	return this->m_kvPairMappingArrays.at(name).get();
+}*/

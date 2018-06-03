@@ -40,8 +40,8 @@ namespace JsonParser {
 class SerializationMappingData : public DeSerialization
 {
 	public:
-		SerializationMappingData();
-		DLLEXPORT virtual ~SerializationMappingData();
+		DLLEXPORT SerializationMappingData();
+		DLLEXPORT ~SerializationMappingData();
 
 	protected:
 		virtual bool fromStringArray() = 0;
@@ -53,7 +53,7 @@ class SerializationMappingData : public DeSerialization
 		std::map<JsonString, JsonString *> m_kvPairMappingStrings;
 		std::map<JsonString, SerializationMappingData *> m_kvPairMappingObjects;
 		std::map<JsonString,
-			std::unique_ptr<SerializationMappingData>> m_kvPairMappingArrays;
+			std::shared_ptr<SerializationMappingData>> m_kvPairMappingArrays;
 
 		JsonParser::Vector<JsonString> *m_mappingStringArrays{ nullptr };
 		JsonParser::Vector<bool> *m_mappingBoolArrays{ nullptr };

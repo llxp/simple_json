@@ -22,82 +22,88 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <simple_json\Serializable.h>
+#include <simple_json/Serializable.h>
 
 #include <memory>
 #include <string>
 
 DLLEXPORT bool simple_json::Serializable::fromString()
 {
-	return JsonParser::SerializationMapping::fromString();
+	return JsonParser::DeSerialization::fromString();
 }
 
 DLLEXPORT bool simple_json::Serializable::fromString(
 	const std::shared_ptr<JsonString>& str)
 {
-	return JsonParser::SerializationMapping::fromString(str);
+	this->clearMapping();
+	this->serialize();
+	return JsonParser::DeSerialization::fromString(str);
 }
 
-DLLEXPORT JsonString simple_json::Serializable::toString() const
+DLLEXPORT JsonString simple_json::Serializable::toString()
 {
-	return JsonParser::SerializationMapping::toString();
+	this->clearMapping();
+	this->serialize();
+	return std::move(JsonParser::DeSerialization::toString());
 }
 
-DLLEXPORT JsonString simple_json::Serializable::toStringArray() const
+DLLEXPORT JsonString simple_json::Serializable::toStringArray()
 {
-	return JsonParser::SerializationMapping::toStringArray();
+	this->clearMapping();
+	this->serialize();
+	return std::move(JsonParser::DeSerialization::toStringArray());
 }
 
 void simple_json::Serializable::addMember(
-	const JsonString & name, __int64 & memberVariable, bool optional)
+	JsonString &&name, __int64 & memberVariable, bool optional)
 {
-	JsonParser::SerializationMapping::addMember(name, memberVariable, optional);
+	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
 }
 
 void simple_json::Serializable::addMember(
-	const JsonString & name, JsonString & memberVariable, bool optional)
+	JsonString &&name, JsonString & memberVariable, bool optional)
 {
-	JsonParser::SerializationMapping::addMember(name, memberVariable, optional);
+	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
 }
 
 void simple_json::Serializable::addMember(
-	const JsonString & name,
-	SerializationMapping & memberVariable,
+	JsonString &&name,
+	simple_json::Serializable & memberVariable,
 	bool optional)
 {
-	JsonParser::SerializationMapping::addMember(name, memberVariable, optional);
+	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
 }
 
 void simple_json::Serializable::addMember(
-	const JsonString & name, bool & memberVariable, bool optional)
+	JsonString &&name, bool & memberVariable, bool optional)
 {
-	JsonParser::SerializationMapping::addMember(name, memberVariable, optional);
+	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
 }
 
 void simple_json::Serializable::addMember(
-	const JsonString & name,
+	JsonString &&name,
 	JsonParser::Vector<JsonString>& memberVariable, bool optional)
 {
-	JsonParser::SerializationMapping::addMember(name, memberVariable, optional);
+	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
 }
 
 void simple_json::Serializable::addMember(
-	const JsonString & name,
+	JsonString &&name,
 	JsonParser::Vector<bool> & memberVariable, bool optional)
 {
-	JsonParser::SerializationMapping::addMember(name, memberVariable, optional);
+	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
 }
 
 void simple_json::Serializable::addMember(
-	const JsonString & name,
+	JsonString &&name,
 	JsonParser::Vector<JsonParser::Number> &memberVariable, bool optional)
 {
-	JsonParser::SerializationMapping::addMember(name, memberVariable, optional);
+	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
 }
 
 void simple_json::Serializable::addMember(
-	const JsonString & name,
+	JsonString &&name,
 	JsonParser::VectorBase &memberVariable, bool optional)
 {
-	JsonParser::SerializationMapping::addMember(name, memberVariable, optional);
+	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
 }

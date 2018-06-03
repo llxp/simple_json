@@ -32,6 +32,7 @@ SOFTWARE.
 
 #include "Number.h"
 #include "JsonTypes.h"
+#include "Vector.h"
 
 #ifdef __GNUC__
 #define __cdecl __attribute__((__cdecl__))
@@ -45,17 +46,13 @@ return var;
 
 namespace JsonParser {
 
-class SerializationData
-{
+	class SerializationData
+	{
 	public:
-		SerializationData();
-		virtual ~SerializationData();
-
-	protected:
+		virtual void serialize() = 0;
 		virtual bool fromString() = 0;
 		virtual JsonString toString() const = 0;
 		virtual JsonString toStringArray() const = 0;
-		void assign(const std::unique_ptr<SerializationData> &other);
 
 	protected:
 		void setType(const JsonTypes &type);
@@ -64,79 +61,52 @@ class SerializationData
 		JsonString *fullString() const;
 		inline JsonChar getChar(const size_t &pos) const;
 		inline size_t strLen() const;
-		void clearAll();
 		inline bool matchChar(const size_t &i, JsonChar ch) const;
 		inline JsonString substr(const size_t &start, const size_t &stop) const;
 
-	private:
-		template<typename T>
-		auto lazyInit2(std::unique_ptr<T> &var)
-		{
-			if (var == nullptr) {
-				var = std::make_unique<T>();
-			}
-			return var.get();
-		}
+	/*protected:
+		void addNumberValue(std::string &&name, std::string &&number);
+		void addStringValue(std::string &&name, std::string &&str);
+		void addBoolValue(std::string &&name, bool value);
 
 	protected:
-		std::map<JsonString, JsonParser::Number> *kvPairNumbers();
-		std::map<JsonString, bool> *kvPairBools();
-		std::map<JsonString, JsonString> *kvPairStrings();
-		std::map<JsonString, std::unique_ptr<SerializationData>> *kvPairObjects();
-		std::map<JsonString, std::unique_ptr<SerializationData>> *kvPairArrays();
-		std::vector<JsonString> *kvPairNullValues();
+		bool objectIsMapped(const std::string &name) const;
+		bool arrayIsMapped(const std::string &name) const;
 
-		std::vector<std::unique_ptr<SerializationData>> *arrayObjects();
-		std::vector<std::unique_ptr<SerializationData>> *arrayArrays()
-		{
-			return lazyInit2<
-				std::vector<std::unique_ptr<SerializationData>>
-			>(m_arrayArrays);
-		};
-		std::vector<JsonParser::Number> *arrayNumbers()
-		{
-			return lazyInit2<std::vector<JsonParser::Number>>(m_arrayNumbers);
-		};
-		std::vector<bool> *arrayBools()
-		{
-			return lazyInit2<std::vector<bool>>(m_arrayBools);
-		};
-		std::vector<JsonString> *arrayStrings()
-		{
-			return lazyInit2<std::vector<JsonString>>(m_arrayStrings);
-		};
+	protected:
+		SerializationData * getPointerToObject(std::string &&name) const;
+		SerializationData * getPointerToArray(std::string &&name) const;*/
+
+	protected:
+		std::map<JsonString, JsonParser::Number> m_kvPairMappingNumbers;
+		std::map<JsonString, bool *> m_kvPairMappingBools;
+		std::map<JsonString, JsonString *> m_kvPairMappingStrings;
+		std::map<JsonString, SerializationData *> m_kvPairMappingObjects;
+		std::map<JsonString,
+			std::shared_ptr<SerializationData>> m_kvPairMappingArrays;
+
+		JsonParser::Vector<JsonString> *m_mappingStringArrays{ nullptr };
+		JsonParser::Vector<bool> *m_mappingBoolArrays{ nullptr };
+		JsonParser::Vector<JsonParser::Number> *m_mappingNumberArrays{ nullptr };
+		JsonParser::VectorBase *m_mappingObjectArrays{ nullptr };
+		JsonParser::VectorBase *m_mappingArrayArrays{ nullptr };
+
+		std::vector<std::pair<JsonString,
+			std::pair<JsonTypes, bool>>> m_serializableMembers;
 
 	private:
-		std::unique_ptr<std::map<JsonString, JsonParser::Number>> m_kvPairNumbers;
-		std::unique_ptr<std::map<JsonString, bool>> m_kvPairBools;
-		std::unique_ptr<std::map<JsonString, JsonString>> m_kvPairStrings;
-		std::unique_ptr<
-			std::map<JsonString, std::unique_ptr<SerializationData>>> m_kvPairObjects;
-		std::unique_ptr<
-			std::map<JsonString, std::unique_ptr<SerializationData>>> m_kvPairArrays;
-		std::unique_ptr<std::vector<JsonString>> m_kvPairNullValues;
-
-		std::unique_ptr<
-			std::vector<std::unique_ptr<SerializationData>>> m_arrayObjects;
-		std::unique_ptr<
-			std::vector<std::unique_ptr<SerializationData>>> m_arrayArrays;
-		std::unique_ptr<std::vector<JsonParser::Number>> m_arrayNumbers;
-		std::unique_ptr<std::vector<bool>> m_arrayBools;
-		std::unique_ptr<std::vector<JsonString>> m_arrayStrings;
-
-	private:
-		JsonString *m_fullString;
-		size_t m_strLen { 0 };
+		JsonString * m_fullString;
+		size_t m_strLen{ 0 };
 		JsonTypes m_type{ JsonTypes::Object };
-};
+	};
 
-inline JsonChar JsonParser::SerializationData::getChar(const size_t & pos) const
-{
-	if (pos >= 0 && strLen() > 0 && pos < strLen()) {
-		return this->m_fullString->at(pos);
+	inline JsonChar JsonParser::SerializationData::getChar(const size_t & pos) const
+	{
+		if (pos >= 0 && strLen() > 0 && pos < strLen()) {
+			return this->m_fullString->at(pos);
+		}
+		return 0;
 	}
-	return 0;
-}
 }  // namespace JsonParser
 
 inline size_t JsonParser::SerializationData::strLen() const

@@ -25,9 +25,39 @@ SOFTWARE.
 #include <simple_json/Number.h>
 #include <cmath>
 #include <string>
+#include <simple_json/JsonTypes.h>
 
 JsonParser::Number::~Number()
 {
+}
+
+unsigned int fast_pow10(int exp)
+{
+	if (exp >= 15) { return std::pow(10, exp); }
+	static int pow10[15] = {
+		1,
+		10,
+		100,
+		1000,
+		10000,
+		100000,
+		1000000,
+		10000000,
+		100000000,
+		1000000000,
+		10000000000,
+		100000000000,
+		1000000000000,
+		10000000000000,
+		100000000000000/*,
+		1000000000000000,
+		10000000000000000,
+		100000000000000000,
+		1000000000000000000,
+		10000000000000000000*/
+	};
+
+	return pow10[exp];
 }
 
 __int64 JsonParser::Number::toNumber() const
@@ -55,8 +85,8 @@ __int64 JsonParser::Number::toNumber() const
 			continue;
 		}
 		unsigned int chValue = ((static_cast<unsigned int>(ch)) - 48);
-		tenCounter = static_cast<unsigned int>(std::pow(10, pos));
-		result += (tenCounter * chValue);
+		tenCounter = fast_pow10(pos);
+		result += std::move(tenCounter * chValue);
 		pos++;
 	}
 	if (negative) {
@@ -90,8 +120,8 @@ DLLEXPORT double JsonParser::Number::toNumberFP() const
 			continue;
 		}
 		unsigned int chValue = ((static_cast<unsigned int>(ch)) - 48);
-		tenCounter = static_cast<unsigned int>(std::pow(10, pos));
-		result += (tenCounter * chValue);
+		tenCounter = fast_pow10(pos);
+		result += std::move(tenCounter * chValue);
 		pos++;
 	}
 	if (negative) {

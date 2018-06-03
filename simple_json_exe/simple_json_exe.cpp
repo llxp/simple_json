@@ -22,9 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "../Examples/DataMappingTest.h"
-#include "../Examples/KeyVaultSecrets.h"
-#include "../Examples/GeneratedJsonTestClass.h"
 #include <fstream>
 #include <streambuf>
 #include <iostream>
@@ -33,10 +30,15 @@ SOFTWARE.
 #include <direct.h>
 #include <sstream>
 
+#include "../Examples/DataMappingTest.h"
+#include "../Examples/KeyVaultSecrets.h"
+#include "../Examples/GeneratedJsonTestClass.h"
+#include "../Examples/AzureToken.h"
+
 #include <boost/chrono.hpp>
 #include <boost/timer/timer.hpp>
 
-#pragma comment(lib, "simple_json_lib.lib")
+#pragma comment(lib, "simple_json_dll.lib")
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -44,6 +46,21 @@ SOFTWARE.
 #include <sys/time.h>
 #include <ctime>
 #endif
+
+AzureToken func()
+{
+	std::string json("{\"access_token\":\"test123\"}");
+	AzureToken token = AzureToken();
+	token.fromString(std::make_shared<std::string>(json));
+	return std::move(token);
+}
+
+template<typename T>
+T func2()
+{
+	T obj;
+	return obj;
+}
 
 int __cdecl main()
 {
@@ -144,5 +161,13 @@ int __cdecl main()
 			std::cout << test.items.size() << std::endl;
 		//}
 	}
+
+	AzureToken token = func();
+	AzureToken token2 = func2<AzureToken>();
+	std::cout << "token1:" << token.access_token << std::endl;
+	std::cout << "token2:" << token2.access_token << std::endl;
+	//((JsonParser::DeSerialization *)(&token))->clearMapping();
+	//((JsonParser::DeSerialization *)(&token))->serialize();
+	std::cout << "token1: deserialized: " << token.toString() << std::endl;
 	return 0;
 }

@@ -30,6 +30,9 @@
     <ClInclude Include="..\Examples\GeneratedJsonTestClass.h">
       <Filter>Header Files\Examples</Filter>
     </ClInclude>
+    <ClInclude Include="..\Examples\AzureToken.h">
+      <Filter>Header Files\Examples</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Examples\DataMappingTest.cpp">

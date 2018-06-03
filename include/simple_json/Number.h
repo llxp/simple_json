@@ -38,7 +38,7 @@ class Number
 {
 	public:
 		DLLEXPORT explicit Number(
-			const JsonString &numberStr) : m_numberStr(numberStr), m_default(false) {}
+			const JsonString &&numberStr) : m_numberStr(std::move(numberStr)), m_default(false) {}
 		DLLEXPORT explicit Number(
 			double number) : m_numberStr(ToString(number)), m_default(false) {}
 		DLLEXPORT explicit Number(

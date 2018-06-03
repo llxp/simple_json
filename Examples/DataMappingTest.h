@@ -12,10 +12,10 @@
 
 class DataMappingMemberTest : public simple_json::Serializable
 {
-	public:
-		DataMappingMemberTest()
+	private:
+		void serialize() override
 		{
-			addMember(Stringify(str), m_str);
+			addMember(std::move(Stringify(str)), m_str);
 		}
 
 	public:

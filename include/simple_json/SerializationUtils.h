@@ -30,11 +30,11 @@ SOFTWARE.
 #include <functional>
 #include <vector>
 
-#include "SerializationMappingData.h"
+#include "SerializationData.h"
 
 namespace JsonParser {
-class SerializationUtils
-{
+	class SerializationUtils
+	{
 	public:
 		template<typename T1, typename T2>
 		static JsonString makeStr3(
@@ -43,7 +43,8 @@ class SerializationUtils
 		{
 			JsonString outputStr;
 			outputStr += JsonArrayOpen;
-			for (auto it = vec->begin(); it != vec->end(); it++) {
+			auto endPos = vec->end();
+			for (auto it = vec->begin(); it != endPos; it++) {
 				auto currentElement = static_cast<T1 *>((*it).get());
 				if (currentElement != nullptr) {
 					outputStr += lambda(currentElement);
@@ -58,12 +59,13 @@ class SerializationUtils
 
 		static JsonString makeStrVector(
 			const std::vector<void *> *vec,
-			const std::function<JsonString(SerializationMappingData *)> &lambda)
+			const std::function<JsonString(SerializationData *)> &lambda)
 		{
 			JsonString outputStr;
 			outputStr += JsonArrayOpen;
-			for (auto it = vec->begin(); it != vec->end(); it++) {
-				auto currentElement = static_cast<SerializationMappingData *>(*it);
+			auto endPos = vec->end();
+			for (auto it = vec->begin(); it != endPos; it++) {
+				auto currentElement = static_cast<SerializationData *>(*it);
 				if (currentElement != nullptr) {
 					outputStr += lambda(currentElement);
 					if (it + 1 != vec->end()) {
@@ -81,11 +83,11 @@ class SerializationUtils
 		static inline JsonString makeKvPairStrString(const JsonString &name,
 			JsonString *value);
 		static inline JsonString makeKvPairStrObject(const JsonString &name,
-			SerializationMappingData *value);
+			SerializationData *value);
 		static inline JsonString makeKvPairStrBool(const JsonString &name,
 			bool value);
 		static inline JsonString makeKvPairStrArray(const JsonString &name,
-			JsonParser::SerializationMappingData *value);
+			JsonParser::SerializationData *value);
 
 		static inline JsonString makeStrObjectArray(
 			const JsonParser::VectorBase *value);
@@ -97,7 +99,7 @@ class SerializationUtils
 			const JsonParser::Vector<JsonString> *value);
 		static inline JsonString makeStrArrayArray(
 			const JsonParser::VectorBase *value);
-};
+	};
 }  // namespace JsonParser
 
 inline JsonString JsonParser::SerializationUtils::makeString(
@@ -121,7 +123,7 @@ inline JsonString JsonParser::SerializationUtils::makeKvPairStrString(
 }
 
 inline JsonString JsonParser::SerializationUtils::makeKvPairStrObject(
-	const JsonString & name, SerializationMappingData * value)
+	const JsonString & name, SerializationData * value)
 {
 	return SerializationUtils::makeString(name) + JsonKvSeparator +
 		value->toString();
@@ -135,7 +137,7 @@ inline JsonString JsonParser::SerializationUtils::makeKvPairStrBool(
 }
 
 inline JsonString JsonParser::SerializationUtils::makeKvPairStrArray(
-	const JsonString & name, JsonParser::SerializationMappingData *value)
+	const JsonString & name, JsonParser::SerializationData *value)
 {
 	return SerializationUtils::makeString(name) + JsonKvSeparator +
 		value->toStringArray();
@@ -147,7 +149,7 @@ inline JsonString JsonParser::SerializationUtils::makeStrObjectArray(
 	if (value == nullptr) {
 		return EmptyJsonArray;
 	}
-	auto elements = value->getElements();
+	std::vector<void *> elements = value->getElements();
 	return JsonParser::SerializationUtils::makeStrVector(
 		&elements, [=](auto currentElement)->JsonString {
 		return currentElement->toString();

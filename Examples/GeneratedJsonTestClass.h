@@ -6,12 +6,15 @@ class JsonPair : public simple_json::Serializable
 public:
 	JsonPair()
 	{
-		ADD(first);
-		ADD(last);
+		serialize();
 	}
 private:
 	JsonString first;
 	JsonString last;
+
+private:
+	// Inherited via Serializable
+	virtual DLLEXPORT void serialize() override;
 };
 
 class GeneratedJsonTestClass : public simple_json::Serializable
@@ -19,17 +22,8 @@ class GeneratedJsonTestClass : public simple_json::Serializable
 public:
 	GeneratedJsonTestClass()
 	{
-		ADD(_id);
-		ADD(index);
-		ADD(guid);
-		ADD(isActive);
-		ADD(balance);
-		ADD(picture);
-		ADD(age);
-		ADD(eyeColor);
-		ADD(name);
+		serialize();
 	}
-
 public:
 	JsonString _id;
 	JsonString index;
@@ -40,16 +34,28 @@ public:
 	__int64 age = 0;
 	JsonString eyeColor;
 	JsonPair name;
+	JsonParser::Vector<bool> bools;
+	JsonParser::Vector<std::string> strings;
+
+private:
+	// Inherited via Serializable
+	virtual DLLEXPORT void serialize() override;
+
 };
 
 class GeneratedJsonTestClasses : public simple_json::Serializable
 {
-	public:
+public:
 	GeneratedJsonTestClasses()
+	{
+		serialize();
+	}
+private:
+	void serialize() override
 	{
 		ADD(items);
 	}
 
-	public:
+public:
 	JsonParser::Vector<GeneratedJsonTestClass> items;
 };

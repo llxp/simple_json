@@ -27,19 +27,7 @@
     <ClCompile Include="..\src\SerializationData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SerializationMapping.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SerializationMappingData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Serializable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SerializationData2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\DeSerialization2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,12 +56,6 @@
     <ClInclude Include="..\include\simple_json\SerializationData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\simple_json\SerializationMapping.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\simple_json\SerializationMappingData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\simple_json\SerializationUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -81,9 +63,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\simple_json\VectorBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\simple_json\SerializationData2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

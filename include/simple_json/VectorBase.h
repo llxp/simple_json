@@ -29,8 +29,8 @@ SOFTWARE.
 #include <vector>
 
 namespace JsonParser {
-class VectorBase
-{
+	class VectorBase
+	{
 	public:
 		virtual ~VectorBase() {}
 
@@ -38,7 +38,8 @@ class VectorBase
 		virtual void clear() = 0;
 		virtual void *addNew() = 0;
 		virtual std::vector<void *> getElements() const = 0;
-};
+		virtual bool isEmpty() = 0;
+	};
 }  // namespace JsonParser
 
 #endif  // SRC_VECTORBASE_H_

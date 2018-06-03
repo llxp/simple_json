@@ -41,7 +41,19 @@ class SerializationMapping :
 {
 	public:
 		DLLEXPORT SerializationMapping();
-		DLLEXPORT ~SerializationMapping() override {}
+		DLLEXPORT ~SerializationMapping() {}
+
+		DLLEXPORT virtual void serialize() {}
+
+	private:
+		void clearMapping();
+
+	public:
+		DLLEXPORT SerializationMapping(const JsonParser::SerializationMapping &other)
+		{
+			clearMapping();
+			serialize();
+		}
 
 	public:
 		DLLEXPORT bool fromString() override;

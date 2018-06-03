@@ -220,6 +220,7 @@
     <ClInclude Include="..\Examples\DataMappingTest.h" />
     <ClInclude Include="..\Examples\GeneratedJsonTestClass.h" />
     <ClInclude Include="..\Examples\KeyVaultSecrets.h" />
+    <ClInclude Include="..\Examples\AzureToken.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Examples\DataMappingTest.cpp" />

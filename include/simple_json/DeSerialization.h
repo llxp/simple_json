@@ -34,50 +34,78 @@ SOFTWARE.
 #include "Number.h"
 #include "ErrorHandler.h"
 #include "SerializationData.h"
+#include "Vector.h"
 
 
 namespace JsonParser {
 
-	constexpr size_t constLength(const char* str)
+	class DeSerialization : public SerializationData
 	{
-		return (*str == 0) ? 0 : constLength(str + 1) + 1;
-	}
+	protected:
+		DLLEXPORT JsonString toString() const override;
+		DLLEXPORT JsonString toStringArray() const override;
 
-class DeSerialization : public SerializationData
-{
-	public:
-		DeSerialization() {}
-		virtual ~DeSerialization() {}
-		JsonString toString() const override { return JsonString(); }
-		JsonString toStringArray() const override { return JsonString(); }
-
-		virtual bool fromString(const std::shared_ptr<JsonString> &str);
-		//virtual bool fromString(const std::istream *str);
-		bool fromString() override;
+		DLLEXPORT virtual bool fromString(const std::shared_ptr<JsonString> &str);
+		DLLEXPORT bool fromString() override;
 
 	protected:
-		size_t fromString(const size_t &pos);
+		void clearMapping();
+		void serialize() override {}
+
+		void addMember(JsonString &&name,
+			__int64 &memberVariable,
+			bool optional = false);
+		void addMember(JsonString &&name,
+			double &memberVariable,
+			bool optional = false);
+		void addMember(JsonString &&name,
+			JsonString &memberVariable,
+			bool optional = false);
+		void addMember(JsonString &&name,
+			DeSerialization &memberVariable,
+			bool optional = false);
+		void addMember(JsonString &&name,
+			bool &memberVariable,
+			bool optional = false);
+
+		void addMember(JsonString &&name,
+			JsonParser::Vector<JsonString> &memberVariable,
+			bool optional = false);
+		void addMember(JsonString &&name,
+			JsonParser::Vector<JsonParser::Number> &memberVariable,
+			bool optional = false);
+		void addMember(JsonString &&name,
+			JsonParser::Vector<bool> &memberVariable, bool optional = false);
+		void addMember(JsonString &&name,
+			JsonParser::VectorBase &memberVariable, bool optional = false);
 
 	private:
+		void addSerializableMember(JsonString &&name,
+			JsonTypes type,
+			bool optional = false);
+		void clearValues();
+
+	private:
+		size_t fromString(const size_t &pos);
 		size_t fromStringArray(const size_t &pos);
 		size_t addArrayValues(const size_t &pos);
 		size_t addKVPair(const size_t &pos);
-		size_t addValue(const size_t &pos, const JsonString &name);
+		size_t addValue(const size_t &pos, JsonString &&name);
 
 	private:
-		bool isNumber(const size_t &pos) const;
-		bool isBool(const size_t &pos) const;
-		bool isNull(const size_t &pos) const;
-		bool checkEscape(const size_t &pos) const;
-		size_t getString(const size_t &pos, JsonString *name) const;
+		static inline bool isNumber(char number);
+		static inline bool isBool(char c);
+		static inline bool isNull(char c);
+		inline bool isEscape(const size_t &pos) const;
+		inline size_t getString(const size_t &pos, JsonString &name) const;
 
 	private:
-		size_t addStringValue(const size_t &pos, const JsonString &name);
-		size_t addObjectValue(const size_t &pos, const JsonString &name);
-		size_t addArrayValue(const size_t &pos, const JsonString &name);
+		size_t addStringValue(const size_t &pos, JsonString &&name);
+		size_t addObjectValue(const size_t &pos, JsonString &&name);
+		size_t addArrayValue(const size_t &pos, JsonString &&name);
 		size_t addNumberValue(const size_t &pos, const JsonString &name);
-		size_t addBoolValue(const size_t &pos, const JsonString &name);
-		void addNullValue(const JsonString &name);
+		size_t addBoolValue(const size_t &pos, JsonString &&name);
+		void addNullValue(JsonString &&name);
 
 	private:
 		size_t addArrayToArray(const size_t &pos);
@@ -85,7 +113,7 @@ class DeSerialization : public SerializationData
 		size_t addObjectToArray(const size_t &pos);
 		size_t addNumberToArray(const size_t &pos);
 		size_t addBoolToArray(const size_t &pos);
-};
+	};
 }  // namespace JsonParser
 
 #endif  // SIMPLE_JSON_DESERIALIZATION_H_

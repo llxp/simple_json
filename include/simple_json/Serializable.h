@@ -24,100 +24,46 @@ SOFTWARE.
 #ifndef SRC_SERIALIZABLE_H_
 #define SRC_SERIALIZABLE_H_
 
-#define MEMBER(TYPE, NAME)\
-    private:\
-        TYPE m_##NAME;\
-    public:\
-        TYPE NAME(void) const\
-        {\
-            return m_##NAME;\
-        }\
-        void set##NAME(const TYPE &value)\
-        {\
-        m_##NAME = value;\
-        }
-
-#define MEMBERDEFAULT(TYPE, NAME, DEFAULT)\
-    private:\
-        TYPE m_##NAME = { DEFAULT };\
-    public:\
-        TYPE NAME(void) const\
-        {\
-            return m_##NAME;\
-        }\
-        void set##NAME(const TYPE &value)\
-        {\
-            m_##NAME = value;\
-        }
-#define PROTMEMBERDEFAULT(TYPE, NAME, DEFAULT)\
-    protected:\
-        TYPE m_##NAME { DEFAULT };\
-    public:\
-        TYPE NAME(void) const\
-        {\
-            return m_##NAME;\
-        }\
-        void set##NAME(const TYPE &value)\
-        {\
-            m_##NAME = value;\
-        }
-
-#define PUBMEMBER(TYPE, NAME) public: TYPE m_##NAME; TYPE NAME(void) const { return m_##NAME; } void set##NAME(const TYPE &value) { m_##NAME = value; }
-#define PMEMBER(TYPE, NAME) private: TYPE m_##NAME; TYPE NAME(void) const { return m_##NAME; } void set##NAME(const TYPE &value) { m_##NAME = value; }
-#define PSMEMBER(TYPE, NAME) private: TYPE m_##NAME; TYPE NAME(void) const { return m_##NAME; } private: void set##NAME(const TYPE &value) { m_##NAME = value; }
-#define PGMEMBER(TYPE, NAME) private: TYPE m_##NAME; private: TYPE NAME(void) const { return m_##NAME; } public: void set##NAME(const TYPE &value) { m_##NAME = value; }
-#define PROTMEMBER(TYPE, NAME) protected: TYPE m_##NAME; public: TYPE NAME(void) const { return m_##NAME; } void set##NAME(const TYPE &value) { m_##NAME = value; }
-#define NVP(NAME) ar( cereal::make_nvp(#NAME, m_##NAME) );
-#define RESTCLASS(NAME, ...) class NAME : public simple_json::Serializable { __VA_ARGS__ };
-
-#include "SerializationMapping.h"
+#include "DeSerialization.h"
+#include <string>
+#include <simple_json\VectorBase.h>
+#include <simple_json\Vector.h>
 
 namespace simple_json {
-class Serializable : public JsonParser::SerializationMapping
-{
-	public:
-		Serializable() {}
-		~Serializable() {}
-
+	class Serializable : private JsonParser::DeSerialization
+	{
 	public:
 		DLLEXPORT bool fromString();
 		DLLEXPORT bool fromString(const std::shared_ptr<JsonString> &str);
 
-		DLLEXPORT virtual JsonString toString() const;
-		DLLEXPORT virtual JsonString toStringArray() const;
+		DLLEXPORT virtual JsonString toString();
+		DLLEXPORT virtual JsonString toStringArray();
 
 	protected:
-		DLLEXPORT void addMember(const JsonString &name,
+		DLLEXPORT void addMember(JsonString &&name,
 			__int64 &memberVariable,
 			bool optional = false);
-		DLLEXPORT void addMember(const JsonString &name,
+		DLLEXPORT void addMember(JsonString &&name,
 			JsonString &memberVariable,
 			bool optional = false);
-		DLLEXPORT void addMember(const JsonString &name,
-			SerializationMapping &memberVariable,
+		DLLEXPORT void addMember(JsonString &&name,
+			Serializable &memberVariable,
 			bool optional = false);
-		DLLEXPORT void addMember(const JsonString &name,
+		DLLEXPORT void addMember(JsonString &&name,
 			bool &memberVariable,
 			bool optional = false);
 
-		DLLEXPORT void addMember(const JsonString &name,
+		DLLEXPORT void addMember(JsonString &&name,
 			JsonParser::Vector<JsonString> &memberVariable,
 			bool optional = false);
-		DLLEXPORT void addMember(const JsonString &name,
+		DLLEXPORT void addMember(JsonString &&name,
 			JsonParser::Vector<JsonParser::Number> &memberVariable,
 			bool optional = false);
-		DLLEXPORT void addMember(const JsonString &name,
+		DLLEXPORT void addMember(JsonString &&name,
 			JsonParser::Vector<bool> &memberVariable, bool optional = false);
-		DLLEXPORT void addMember(const JsonString &name,
+		DLLEXPORT void addMember(JsonString &&name,
 			JsonParser::VectorBase &memberVariable, bool optional = false);
-
-		template<typename T>
-		DLLEXPORT T DataContract(JsonString name, T &value, const T &defaultValue)
-		{
-			addMember(name, value);
-			return T(defaultValue);
-		}
-};
+	};
 }  // namespace simple_json
 
 #endif  // SRC_SERIALIZABLE_H_

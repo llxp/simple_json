@@ -27,56 +27,102 @@ SOFTWARE.
 
 #include <memory>
 #include <vector>
-#include <iostream>
 
 #include "VectorBase.h"
 
 namespace JsonParser {
 
 	template<class T2>
-	class Vector : public std::vector<std::unique_ptr<T2>>, public VectorBase
+	class Vector : public std::vector<std::shared_ptr<T2>>, public VectorBase
 	{
-		public:
-			Vector(){}
-			~Vector()
-			{
+	public:
+		Vector() { std::vector<std::shared_ptr<T2>>::reserve(30); }
+		~Vector()
+		{
+		}
+
+		/*Vector<T2>&operator=(Vector<T2>&& other)
+		{
+			other.swap(*this);
+			return *this;
+		}*/
+
+		T2 &operator[](size_t index)
+		{
+			return *std::vector<std::shared_ptr<T2>>::operator[](index);
+		}
+
+		T2 &at(size_t index) const
+		{
+			return *std::vector<std::shared_ptr<T2>>::at(index);
+		}
+
+		T2 &at(size_t index)
+		{
+			return *std::vector<std::shared_ptr<T2>>::at(index);
+		}
+
+		void push_back(const T2 &element)
+		{
+			auto newElement = std::make_shared<T2>(element);
+			if (newElement != nullptr) {
+				size_t size = std::vector<std::shared_ptr<T2>>::size();
+				std::vector<std::shared_ptr<T2>>::resize(size + 1);
+				//std::vector<std::shared_ptr<T2>>::push_back(std::move(newElement));
+				std::vector<std::shared_ptr<T2>>::operator[](size) = std::move(newElement);
 			}
-			T2 &operator[](size_t index)
-			{
-				return *this->at(index);
+		}
+
+		void assign(const std::vector<T2> *other)
+		{
+			this->clear();
+			if (other == nullptr) {
+				return;
 			}
-			void assign(const std::vector<T2> *other)
-			{
-				this->clear();
-				if (other == nullptr) {
-					return;
-				}
-				for (auto it = other->begin(); it != other->end(); it++) {
-					this->push_back(std::make_unique<T2>(*it));
-				}
+			auto endPos = other->end();
+			std::vector<std::shared_ptr<T2>>::resize(other->size());
+			for (auto it = other->begin(); it != endPos; it++) {
+				std::vector<std::shared_ptr<T2>>::push_back(std::move(std::make_shared<T2>(*it)));
 			}
-			void clear() override
-			{
-				std::vector<std::unique_ptr<T2>>::clear();
+		}
+
+		// Inherited via VectorBase
+		void clear() override
+		{
+			std::vector<std::shared_ptr<T2>>::clear();
+		}
+
+		// Inherited via VectorBase
+		void *addNew() override
+		{
+			auto newElement = std::make_shared<T2>();
+			if (newElement != nullptr) {
+				void *rawPtr = newElement.get();
+				std::vector<std::shared_ptr<T2>>::push_back(std::move(newElement));
+				return rawPtr;
 			}
-			void *addNew() override
-			{
-				auto newElement = std::make_unique<T2>();
-				if (newElement != nullptr) {
-					void *rawPtr = newElement.get();
-					this->push_back(std::move(newElement));
-					return rawPtr;
-				}
-				return nullptr;
+			return nullptr;  // addNew() failed.
+		}
+
+		// Inherited via VectorBase
+		std::vector<void *> getElements() const override
+		{
+			std::vector<void *> elements;
+			auto endPos = this->end();
+			for (auto it = this->begin(); it != endPos; it++) {
+				elements.push_back(static_cast<void *>((*it).get()));
 			}
-			std::vector<void *> getElements() const override
-			{
-				std::vector<void *> elements;
-				for (auto it = this->begin(); it != this->end(); it++) {
-					elements.push_back(static_cast<void *>((*it).get()));
-				}
-				return elements;
+			return elements;
+		}
+
+		// Inherited via VectorBase
+		virtual bool isEmpty() override
+		{
+			if (std::vector<std::shared_ptr<T2>>::size() == 0) {
+				return true;
 			}
+			return false;
+		}
 	};
 }  // namespace JsonParser
 

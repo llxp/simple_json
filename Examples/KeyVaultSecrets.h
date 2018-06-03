@@ -7,8 +7,13 @@ class KeyVaultAttributes : public simple_json::Serializable
 public:
 	KeyVaultAttributes()
 	{
-		//addMember("enabled", m_enabled);
-		//addMember("nbf", m_nbf);
+		serialize();
+	}
+private:
+	void serialize() override
+	{
+		addMember("enabled", m_enabled);
+		addMember("nbf", m_nbf, true);
 		addMember(Stringify(exp), m_exp);
 		addMember(Stringify(created), m_created);
 		addMember(Stringify(updated), m_updated);
@@ -16,8 +21,8 @@ public:
 	}
 
 public:
-	bool m_enabled { [this]() {addMember(Stringify(enabled), m_enabled); return false;}() };
-	__int64 m_nbf{ [this]() {addMember(Stringify(nbf), m_nbf, true); return 0;}() };
+	bool m_enabled{ false };
+	__int64 m_nbf;
 	__int64 m_exp;
 	__int64 m_created;
 	__int64 m_updated;
@@ -26,8 +31,8 @@ public:
 
 class KeyVaultTags : public simple_json::Serializable
 {
-public:
-	KeyVaultTags()
+private:
+	void serialize() override
 	{
 		addMember(Stringify(r-rollover), m_rRollover, true);
 		addMember(Stringify(r-info), m_rInfo, true);
@@ -41,10 +46,15 @@ public:
 	JsonString m_originalName;
 };
 
-class KeyVaultSecret : public JsonParser::SerializationMapping
+class KeyVaultSecret : public simple_json::Serializable
 {
 public:
 	KeyVaultSecret()
+	{
+		serialize();
+	}
+private:
+	void serialize() override
 	{
 		//addMember("value", m_value);
 		addMember(Stringify(contentType), m_contentType, true);
@@ -52,7 +62,6 @@ public:
 		addMember(Stringify(attributes), m_attributes);
 		addMember(Stringify(tags), m_tags, true);
 	}
-	~KeyVaultSecret() {}
 
 public:
 	JsonString m_value;
@@ -64,11 +73,19 @@ public:
 
 
 
-class KeyVaultSecrets : public JsonParser::SerializationMapping
+class KeyVaultSecrets : public simple_json::Serializable
 {
 public:
-	KeyVaultSecrets();
-	~KeyVaultSecrets();
+	KeyVaultSecrets()
+	{
+		serialize();
+	}
+private:
+	void serialize() override
+	{
+		addMember(Stringify(value), m_value);
+		addMember(Stringify(nextLink), m_nextLink);
+	}
 
 public:
 	JsonParser::Vector<KeyVaultSecret> m_value;

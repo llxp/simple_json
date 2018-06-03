@@ -177,13 +177,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\DeSerialization.cpp" />
-    <ClCompile Include="..\src\DeSerialization2.cpp" />
     <ClCompile Include="..\src\Number.cpp" />
     <ClCompile Include="..\src\Serializable.cpp" />
     <ClCompile Include="..\src\SerializationData.cpp" />
-    <ClCompile Include="..\src\SerializationData2.cpp" />
-    <ClCompile Include="..\src\SerializationMapping.cpp" />
-    <ClCompile Include="..\src\SerializationMappingData.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -197,9 +193,6 @@
     <ClInclude Include="..\include\simple_json\Number.h" />
     <ClInclude Include="..\include\simple_json\Serializable.h" />
     <ClInclude Include="..\include\simple_json\SerializationData.h" />
-    <ClInclude Include="..\include\simple_json\SerializationData2.h" />
-    <ClInclude Include="..\include\simple_json\SerializationMapping.h" />
-    <ClInclude Include="..\include\simple_json\SerializationMappingData.h" />
     <ClInclude Include="..\include\simple_json\SerializationUtils.h" />
     <ClInclude Include="..\include\simple_json\Vector.h" />
     <ClInclude Include="..\include\simple_json\VectorBase.h" />

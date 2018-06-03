@@ -1,3 +1,4 @@
+#include "..\..\KeyVaultClientPP\KeyVaultClientPP\include\simple_json\SerializationMapping.h"
 /*
 MIT License
 
@@ -36,6 +37,8 @@ SOFTWARE.
 
 JsonParser::SerializationMapping::SerializationMapping()
 {
+	clearMapping();
+	serialize();
 }
 
 bool JsonParser::SerializationMapping::fromString()
@@ -110,6 +113,23 @@ bool JsonParser::SerializationMapping::fromStringToArrayOfArrays()
 		}
 	}
 	return true;
+}
+
+void JsonParser::SerializationMapping::clearMapping()
+{
+	this->m_kvPairMappingArrays.clear();
+	this->m_kvPairMappingBools.clear();
+	this->m_kvPairMappingNumbers.clear();
+	this->m_kvPairMappingObjects.clear();
+	this->m_kvPairMappingStrings.clear();
+
+	this->m_mappingArrayArrays = nullptr;
+	this->m_mappingBoolArrays = nullptr;
+	this->m_mappingNumberArrays = nullptr;
+	this->m_mappingObjectArrays = nullptr;
+	this->m_mappingStringArrays = nullptr;
+
+	std::cout << "cleared mapping" << std::endl;
 }
 
 bool JsonParser::SerializationMapping::fromString(
@@ -294,12 +314,11 @@ void JsonParser::SerializationMapping::addMember(
 	const JsonString & name,
 	JsonParser::Vector<JsonString>& memberVariable, bool optional)
 {
-	auto newObj = std::make_unique<SerializationMapping>();
+	auto newObj = std::make_shared<SerializationMapping>();
 	if (newObj != nullptr) {
 		newObj->m_mappingStringArrays = &memberVariable;
 		newObj->setType(JsonTypes::StringArray);
-		m_kvPairMappingArrays[name] =
-			std::unique_ptr<SerializationMappingData>(newObj.release());
+		m_kvPairMappingArrays[name] = newObj;
 		addSerializableMember(name, JsonTypes::StringArray, optional);
 	}
 }
