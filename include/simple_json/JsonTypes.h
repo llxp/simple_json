@@ -24,7 +24,7 @@ SOFTWARE.
 #ifndef SRC_JSONTYPES_H_
 #define SRC_JSONTYPES_H_
 
-enum JsonTypes
+enum JsonTypes : short
 {
 	None = 0,
 	Number = 1,

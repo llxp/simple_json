@@ -33,8 +33,8 @@ JsonParser::Number::~Number()
 
 unsigned int fast_pow10(int exp)
 {
-	if (exp >= 15) { return std::pow(10, exp); }
-	static int pow10[15] = {
+	if (exp >= 10) { return std::pow(10, exp); }
+	static int pow10[10] = {
 		1,
 		10,
 		100,
@@ -44,12 +44,12 @@ unsigned int fast_pow10(int exp)
 		1000000,
 		10000000,
 		100000000,
-		1000000000,
+		1000000000/*,
 		10000000000,
 		100000000000,
 		1000000000000,
 		10000000000000,
-		100000000000000/*,
+		100000000000000,
 		1000000000000000,
 		10000000000000000,
 		100000000000000000,
@@ -146,11 +146,18 @@ bool JsonParser::Number::isDefault() const
 	return this->m_default;
 }
 
-void JsonParser::Number::setNumberRefValue(const Number & value)
+void JsonParser::Number::setNumberRefValue(const JsonString &value)
 {
-	if (this->m_numberRef != nullptr && !this->m_isFloatingPoint) {
-		(*this->m_numberRef) = value.toNumber();
-	} else if (this->m_numberRefFP != nullptr && this->m_isFloatingPoint) {
-		(*this->m_numberRefFP) = value.toNumberFP();
+	this->m_numberStr = value;
+	switch (m_type) {
+	case NumberType::Double:
+		(*this->m_numberRefFP) = toNumberFP();
+		break;
+	case NumberType::Int64:
+		(*this->m_numberRef) = toNumber();
+		break;
+	case NumberType::Int:
+		(*this->m_numberRefInt) = toNumber();
+		break;
 	}
 }

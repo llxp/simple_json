@@ -34,6 +34,7 @@ SOFTWARE.
 #include "../Examples/KeyVaultSecrets.h"
 #include "../Examples/GeneratedJsonTestClass.h"
 #include "../Examples/AzureToken.h"
+#include "../Examples/3DCoordinates.h"
 
 #include <boost/chrono.hpp>
 #include <boost/timer/timer.hpp>
@@ -141,12 +142,12 @@ int __cdecl main()
 	{
 		std::ios_base::sync_with_stdio(false);
 		std::ifstream t4;
-		t4.open("abc.txt", std::ios::binary);
+		//t4.open("abc.txt", std::ios::binary);
 		if (!t4.is_open()) {
 			std::cout << "the file \"abc.txt\" could not be opened." << std::endl;
-			return 0;
-		}
-		//{
+			//return 0;
+		} else {
+			//{
 			JsonString keyVaultSecretString2((std::istreambuf_iterator<char>(t4)),
 				std::istreambuf_iterator<char>());
 			GeneratedJsonTestClasses test;
@@ -159,7 +160,8 @@ int __cdecl main()
 			test.fromString(strPtr);
 
 			std::cout << test.items.size() << std::endl;
-		//}
+			//}
+		}
 	}
 
 	AzureToken token = func();
@@ -169,5 +171,28 @@ int __cdecl main()
 	//((JsonParser::DeSerialization *)(&token))->clearMapping();
 	//((JsonParser::DeSerialization *)(&token))->serialize();
 	std::cout << "token1: deserialized: " << token.toString() << std::endl;
+
+	std::cout << sizeof(CoordinatesList) << '\n';
+	CoordinatesList coordinates;
+	std::cout << sizeof(coordinates) << '\n';
+	std::ifstream t4;
+	t4.open("1.json", std::ios::binary);
+	if (!t4.is_open()) {
+		std::cout << "the file \"1.json\" could not be opened." << std::endl;
+	} else {
+		JsonString jsonString((std::istreambuf_iterator<char>(t4)),
+			std::istreambuf_iterator<char>());
+		std::shared_ptr<JsonString> strPtr = std::make_shared<JsonString>(
+			jsonString.begin(), jsonString.end());
+		boost::timer::auto_cpu_timer t2(5, "%w seconds\n");
+		JsonParser::Vector<Coordinates> coords;
+		if (coordinates.fromString(strPtr)) {
+			std::cout << "coordinates parsed successfully..." << std::endl;
+			std::cout << coordinates.items.size() << std::endl;
+		} else {
+			std::cout << "parsing failed..." << std::endl;
+		}
+		//std::cout << coordinates.toString() << std::endl;
+	}
 	return 0;
 }

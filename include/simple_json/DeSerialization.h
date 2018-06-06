@@ -29,6 +29,8 @@ SOFTWARE.
 #include <map>
 #include <vector>
 #include <memory>
+#include <thread>
+#include <mutex>
 
 #include "JsonTypes.h"
 #include "Number.h"
@@ -96,7 +98,7 @@ namespace JsonParser {
 		static inline bool isNumber(char number);
 		static inline bool isBool(char c);
 		static inline bool isNull(char c);
-		inline bool isEscape(const size_t &pos) const;
+		inline bool isEscape(char ch1, char ch2) const;
 		inline size_t getString(const size_t &pos, JsonString &name) const;
 
 	private:
@@ -113,7 +115,15 @@ namespace JsonParser {
 		size_t addObjectToArray(const size_t &pos);
 		size_t addNumberToArray(const size_t &pos);
 		size_t addBoolToArray(const size_t &pos);
+
+	private:
+		std::vector<std::thread> m_workers;
+		static std::mutex m1;
+		static std::mutex m2;
+		static std::mutex m3;
 	};
 }  // namespace JsonParser
+
+//std::vector<std::thread> JsonParser::DeSerialization::m_workers;
 
 #endif  // SIMPLE_JSON_DESERIALIZATION_H_

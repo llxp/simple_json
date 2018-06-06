@@ -74,21 +74,33 @@ bool JsonParser::DeSerialization::fromString(
 
 size_t JsonParser::DeSerialization::fromString(const size_t &currentPos)
 {
+	this->clearMapping();
+	this->serialize();
 	size_t openingCount = 0;
 	size_t closeCount = 0;
 	size_t tempLen = strLen();
 	for (size_t i = currentPos; i < tempLen; ++i) {
-		if (getChar(i) == JsonObjectOpen) {
+		switch (getChar(i)) {
+		case JsonObjectOpen:
 			++openingCount;
 			if ((i = addKVPair(i)) <= 0) {
 				// Expecting position of JsonObjectClose as result
 				return 0;
 			}
+			break;
+		case JsonArrayOpen:
+			++openingCount;
+			if ((i = addArrayValues(i)) <= 0) {
+				return 0;
+			}
+			break;
 		}
 		switch (getChar(i)) {
 		case JsonObjectClose:
 			++closeCount;
 			break;
+		case JsonArrayClose:
+			++closeCount;
 		}
 		if (openingCount > 0 && openingCount == closeCount) {
 			return i;
@@ -204,12 +216,12 @@ size_t JsonParser::DeSerialization::addArrayValues(const size_t &currentPos)
 
 
 inline bool JsonParser::DeSerialization::isEscape(
-	const size_t &currentPos) const
+	char ch1, char ch2) const
 {
-	bool currentPosIsEscape = currentPos > 0 && matchChar(currentPos - 1, '\\');
+	bool currentPosIsEscape = ch1  == '\\';
 	if (currentPosIsEscape) {
 		bool previousPosIsEscaped =
-			currentPos > 1 && matchChar(currentPos - 2, '\\');
+			ch2 == '\\';
 		return !previousPosIsEscaped;
 	}
 	return currentPosIsEscape;
@@ -220,10 +232,14 @@ size_t JsonParser::DeSerialization::addKVPair(const size_t &currentPos)
 {
 	size_t tempLen = strLen();
 	JsonString name;
-	for (size_t i = currentPos; i < tempLen; ++i) {
+	for (size_t i = currentPos + 1; i < tempLen; ++i) {
 		switch (getChar(i)) {
+		case ' ':
+		case '\n':
+		case '\t':
+		case '\r':
+			continue;
 		case JsonStringSeparator:
-			name = JsonString();
 			if ((i = getString(i, name)) <= 0
 				// Expecting position of closing String quotes as result
 				) {
@@ -234,7 +250,7 @@ size_t JsonParser::DeSerialization::addKVPair(const size_t &currentPos)
 			}
 			break;
 		case JsonKvSeparator:
-			if ((i = DeSerialization::addValue(i, std::move(name))) <= 0
+			if ((i = addValue(i, std::move(name))) <= 0
 				// Expecting position of JsonObjectClose or
 				// JsonArrayClose as result
 				) {
@@ -256,11 +272,16 @@ inline size_t JsonParser::DeSerialization::getString(
 	const size_t &currentPos, JsonString &name) const
 {
 	size_t tempLen = strLen();
+	char cOld1 = 0;
+	char cOld2 = 0;
 	for (size_t i = currentPos + 1; i < tempLen; ++i) {
-		if (getChar(i) == JsonStringSeparator && !isEscape(i)) {
+		char c = getChar(i);
+		if (getChar(i) == JsonStringSeparator && !isEscape(cOld1, cOld2)) {
 			name = std::move(substr(currentPos + 1, i - (currentPos + 1)));
 			return i;
 		}
+		cOld2 = cOld1;
+		cOld1 = c;
 	}
 	return 0;
 }
@@ -392,9 +413,10 @@ size_t JsonParser::DeSerialization::addStringValue(
 	if ((i = this->getString(i, value)) <= 0) {
 		return 0;
 	}
-	if (this->m_kvPairMappingStrings.find(name)
-		!= this->m_kvPairMappingStrings.end()) {
-		(*this->m_kvPairMappingStrings[std::move(name)]) = std::move(value);
+	if (this->m_kvPairMapping.find(name)
+		!= this->m_kvPairMapping.end()) {
+		JsonString *ptr = static_cast<JsonString *>(this->m_kvPairMapping[std::move(name)]);
+		(*ptr) = std::move(value);
 	}
 	return i;
 }
@@ -404,10 +426,10 @@ size_t JsonParser::DeSerialization::addObjectValue(
 	const size_t &currentPos, JsonString &&name)
 {
 	size_t i = currentPos;
-	if (this->m_kvPairMappingObjects.find(name)
-		!= this->m_kvPairMappingObjects.end()) {
+	if (this->m_kvPairMapping.find(name)
+		!= this->m_kvPairMapping.end()) {
 		DeSerialization *obj = static_cast<DeSerialization *>(
-			this->m_kvPairMappingObjects[std::move(name)]);
+			this->m_kvPairMapping[std::move(name)]);
 		if (obj != nullptr)
 		{
 			obj->clearValues();
@@ -418,15 +440,12 @@ size_t JsonParser::DeSerialization::addObjectValue(
 			return i;
 		}
 	} else {
-		auto obj = std::make_shared<DeSerialization>();
-		if (obj != nullptr)
-		{
-			obj->setFullString(this->fullString());
-			if ((i = obj->fromString(i)) <= 0) {
-				return 0;
-			}
-			return i;
+		DeSerialization obj;
+		obj.setFullString(this->fullString());
+		if ((i = obj.fromString(i)) <= 0) {
+			return 0;
 		}
+		return i;
 	}
 	return 0;
 }
@@ -436,10 +455,9 @@ size_t JsonParser::DeSerialization::addArrayValue(
 	const size_t &currentPos, JsonString &&name)
 {
 	size_t pos = currentPos;
-	if (this->m_kvPairMappingArrays.find(name)
-		!= this->m_kvPairMappingArrays.end()) {
-		auto obj = std::static_pointer_cast<DeSerialization>(
-			this->m_kvPairMappingArrays[std::move(name)]);
+	if (this->m_kvPairMapping.find(name)
+		!= this->m_kvPairMapping.end()) {
+		DeSerialization *obj = static_cast<DeSerialization *>(this->m_kvPairMapping[std::move(name)]);
 		if (obj != nullptr)
 		{
 			obj->clearValues();
@@ -450,15 +468,12 @@ size_t JsonParser::DeSerialization::addArrayValue(
 			return pos;
 		}
 	} else {
-		auto obj = std::make_shared<DeSerialization>();
-		if (obj != nullptr)
-		{
-			obj->setFullString(this->fullString());
-			if ((pos = obj->fromStringArray(pos)) <= 0) {
-				return 0;
-			}
-			return pos;
+		DeSerialization obj;
+		obj.setFullString(this->fullString());
+		if ((pos = obj.fromStringArray(pos)) <= 0) {
+			return 0;
 		}
+		return pos;
 	}
 	return 0;
 }
@@ -470,12 +485,12 @@ size_t JsonParser::DeSerialization::addNumberValue(
 	const size_t tempLen = strLen();
 	for (size_t i = currentPos; i < tempLen; ++i) {
 		if (!isNumber(getChar(i))) {
-			JsonParser::Number number(
-				std::move(substr(currentPos, i - currentPos)));
-			if (this->m_kvPairMappingNumbers.find(name)
-				!= this->m_kvPairMappingNumbers.end()) {
-				(this->m_kvPairMappingNumbers)[name].
-					setNumberRefValue(std::move(number));
+			auto ptr = this->m_kvPairMapping.find(name);
+			if (ptr != this->m_kvPairMapping.end() && ptr->second != nullptr) {
+				JsonParser::Number *number = static_cast<JsonParser::Number *>(ptr->second);
+				if (number != nullptr) {
+					number->setNumberRefValue(std::move(substr(currentPos, i - currentPos)));
+				}
 			}
 			return i - 1;
 		}
@@ -489,16 +504,24 @@ size_t JsonParser::DeSerialization::addBoolValue(
 {
 	switch (getChar(currentPos)) {
 	case 't':  // assigning true to the name
-		if (this->m_kvPairMappingBools.find(name)
-			!= this->m_kvPairMappingBools.end()) {
-			(*this->m_kvPairMappingBools[std::move(name)]) = true;
-		}
+	{
+		//m_workers.push_back(std::thread([this, name]() {
+			auto ptr = this->m_kvPairMapping.find(name);
+			if (ptr != this->m_kvPairMapping.end() && ptr->second != nullptr) {
+				bool *boolean = static_cast<bool *>(ptr->second);
+				(*boolean) = true;
+			}
+		//}));
+	}
 		return currentPos + constLength("True") - 1;
 	case 'f':  // assigning false to the name
-		if (this->m_kvPairMappingBools.find(name)
-			!= this->m_kvPairMappingBools.end()) {
-			(*this->m_kvPairMappingBools[std::move(name)]) = false;
-		}
+		//m_workers.push_back(std::thread([this, name]() {
+			auto ptr = this->m_kvPairMapping.find(name);
+			if (ptr != this->m_kvPairMapping.end() && ptr->second != nullptr) {
+				bool *boolean = static_cast<bool *>(ptr->second);
+				(*boolean) = false;
+			}
+		//}));
 		return currentPos + constLength("False") - 1;
 	}
 	return 0;
@@ -533,14 +556,12 @@ size_t JsonParser::DeSerialization::addArrayToArray(const size_t &currentPos)
 			}
 		}
 	} else {
-		auto element = std::make_shared<DeSerialization>();
-		if (element != nullptr) {
-			element->setFullString(this->fullString());
-			if ((i = element->fromStringArray(i)) <= 0) {
-				return 0;
-			}
-			return i;
+		DeSerialization element;
+		element.setFullString(this->fullString());
+		if ((i = element.fromStringArray(i)) <= 0) {
+			return 0;
 		}
+		return i;
 	}
 	return 0;
 }
@@ -554,17 +575,10 @@ size_t JsonParser::DeSerialization::addStringToArray(const size_t &currentPos)
 		return 0;
 	}
 	if (this->m_mappingStringArrays != nullptr) {
-		void *newElement = this->m_mappingStringArrays->addNew();
-		if (newElement != nullptr) {
-			JsonString *element = static_cast<JsonString *>(newElement);
-			if (element != nullptr) {
-				*element = std::move(value);
-			}
-		}
+		this->m_mappingStringArrays->push_back(std::move(value));
 	}
 	return i;
 }
-
 
 size_t JsonParser::DeSerialization::addObjectToArray(const size_t &currentPos)
 {
@@ -583,18 +597,20 @@ size_t JsonParser::DeSerialization::addObjectToArray(const size_t &currentPos)
 			}
 		}
 	} else {
-		auto element = std::make_shared<DeSerialization>();
-		if (element != nullptr) {
-			element->setFullString(this->fullString());
-			if ((i = element->fromString(i)) <= 0) {
-				return 0;
-			}
-			return i;
+		DeSerialization element;
+		element.setFullString(this->fullString());
+		if ((i = element.fromString(i)) <= 0) {
+			return 0;
 		}
+		return i;
 	}
 	return 0;
 }
 
+//std::vector<std::thread> JsonParser::DeSerialization::m_workers;
+std::mutex JsonParser::DeSerialization::m1;
+std::mutex JsonParser::DeSerialization::m2;
+std::mutex JsonParser::DeSerialization::m3;
 
 size_t JsonParser::DeSerialization::addNumberToArray(const size_t &currentPos)
 {
@@ -603,10 +619,13 @@ size_t JsonParser::DeSerialization::addNumberToArray(const size_t &currentPos)
 	// copy the substring and create a number
 	for (size_t i = currentPos; i < tempLen; ++i) {
 		if (!isNumber(getChar(i))) {
-			JsonParser::Number number(
-				std::move(substr(currentPos, i - currentPos)));
 			if (this->m_mappingNumberArrays != nullptr) {
-				this->m_mappingNumberArrays->push_back(std::move(number));
+				JsonParser::DeSerialization::m_workers.push_back(std::thread([=](){
+					std::scoped_lock<std::mutex> lock(m1);
+					JsonParser::Number number(
+						std::move(substr(currentPos, i - currentPos)));
+					this->m_mappingNumberArrays->push_back(std::move(number));
+				}));
 			}
 			return i - 1;
 		}
@@ -619,12 +638,18 @@ size_t JsonParser::DeSerialization::addBoolToArray(const size_t &currentPos)
 	switch (getChar(currentPos)) {
 	case 't':  // adding true to the array
 		if (this->m_mappingBoolArrays != nullptr) {
-			this->m_mappingBoolArrays->push_back(true);
+			JsonParser::DeSerialization::m_workers.push_back(std::thread([=]() {
+				std::scoped_lock<std::mutex> lock(m2);
+				this->m_mappingBoolArrays->push_back(true);
+			}));
 		}
 		return currentPos + constLength("True") - 1;
 	case 'f':  // adding false to the array
 		if (this->m_mappingBoolArrays != nullptr) {
-			this->m_mappingBoolArrays->push_back(false);
+			JsonParser::DeSerialization::m_workers.push_back(std::thread([=]() {
+				std::scoped_lock<std::mutex> lock(m2);
+				this->m_mappingBoolArrays->push_back(false);
+			}));
 		}
 		return currentPos + constLength("False") - 1;
 	}
@@ -682,21 +707,24 @@ Begin addMember() region
 void JsonParser::DeSerialization::addMember(
 	JsonString &&name, __int64 & memberVariable, bool optional)
 {
-	m_kvPairMappingNumbers[name] = JsonParser::Number(&memberVariable);
+	this->m_kvPairMapping[name] = new JsonParser::Number(&memberVariable);
+	//m_kvPairMappingNumbers[name] = JsonParser::Number(&memberVariable);
 	addSerializableMember(std::move(name), JsonTypes::Number, optional);
 }
 
 void JsonParser::DeSerialization::addMember(
 	JsonString &&name, double & memberVariable, bool optional)
 {
-	m_kvPairMappingNumbers[name] = JsonParser::Number(&memberVariable);
+	this->m_kvPairMapping[name] = new JsonParser::Number(&memberVariable);
+	//m_kvPairMappingNumbers[name] = JsonParser::Number(&memberVariable);
 	addSerializableMember(std::move(name), JsonTypes::Number, optional);
 }
 
 void JsonParser::DeSerialization::addMember(
 	JsonString &&name, JsonString & memberVariable, bool optional)
 {
-	this->m_kvPairMappingStrings[name] = &memberVariable;
+	this->m_kvPairMapping[name] = &memberVariable;
+	//this->m_kvPairMappingStrings[name] = &memberVariable;
 	addSerializableMember(std::move(name), JsonTypes::String, optional);
 }
 
@@ -705,14 +733,16 @@ void JsonParser::DeSerialization::addMember(
 	JsonParser::DeSerialization & memberVariable,
 	bool optional)
 {
-	this->m_kvPairMappingObjects[name] = &memberVariable;
+	this->m_kvPairMapping[name] = &memberVariable;
+	//this->m_kvPairMappingObjects[name] = &memberVariable;
 	addSerializableMember(std::move(name), JsonTypes::Object, optional);
 }
 
 void JsonParser::DeSerialization::addMember(
 	JsonString &&name, bool & memberVariable, bool optional)
 {
-	this->m_kvPairMappingBools[name] = &memberVariable;
+	this->m_kvPairMapping[name] = &memberVariable;
+	//this->m_kvPairMappingBools[name] = &memberVariable;
 	addSerializableMember(std::move(name), JsonTypes::Bool, optional);
 }
 
@@ -720,11 +750,13 @@ void JsonParser::DeSerialization::addMember(
 	JsonString &&name,
 	JsonParser::Vector<JsonString>& memberVariable, bool optional)
 {
-	auto newObj = std::make_shared<JsonParser::DeSerialization>();
+	auto newObj = new JsonParser::DeSerialization();
 	if (newObj != nullptr) {
 		newObj->m_mappingStringArrays = &memberVariable;
 		newObj->setType(JsonTypes::StringArray);
-		m_kvPairMappingArrays[name] = newObj;
+		this->m_kvPairMapping[name] = newObj;
+		this->m_collectibleObjects.push_back(newObj);
+		//m_kvPairMappingArrays[name] = newObj;
 		addSerializableMember(std::move(name), JsonTypes::StringArray, optional);
 	}
 }
@@ -733,12 +765,14 @@ void JsonParser::DeSerialization::addMember(
 	JsonString &&name,
 	JsonParser::Vector<bool> & memberVariable, bool optional)
 {
-	auto newObj = std::make_shared<JsonParser::DeSerialization>();
+	auto newObj = new JsonParser::DeSerialization();
 	if (newObj != nullptr) {
 		newObj->m_mappingBoolArrays = &memberVariable;
 		newObj->setType(JsonTypes::BoolArray);
-		m_kvPairMappingArrays[name] =
-			std::static_pointer_cast<JsonParser::SerializationData>(newObj);
+		this->m_kvPairMapping[name] = newObj;
+		this->m_collectibleObjects.push_back(newObj);
+		//m_kvPairMappingArrays[name] =
+		//	std::static_pointer_cast<JsonParser::SerializationData>(newObj);
 		addSerializableMember(std::move(name), JsonTypes::BoolArray, optional);
 	}
 }
@@ -747,12 +781,14 @@ void JsonParser::DeSerialization::addMember(
 	JsonString &&name,
 	JsonParser::Vector<JsonParser::Number> &memberVariable, bool optional)
 {
-	auto newObj = std::make_shared<JsonParser::DeSerialization>();
+	auto newObj = new JsonParser::DeSerialization();
 	if (newObj != nullptr) {
 		newObj->m_mappingNumberArrays = &memberVariable;
 		newObj->setType(JsonTypes::NumberArray);
-		m_kvPairMappingArrays[name] =
-			std::static_pointer_cast<JsonParser::SerializationData>(newObj);
+		this->m_kvPairMapping[name] = newObj;
+		this->m_collectibleObjects.push_back(newObj);
+		//m_kvPairMappingArrays[name] =
+			//std::static_pointer_cast<JsonParser::SerializationData>(newObj);
 		addSerializableMember(
 			std::move(name), JsonTypes::NumberArray, optional);
 	}
@@ -762,12 +798,14 @@ void JsonParser::DeSerialization::addMember(
 	JsonString &&name,
 	JsonParser::VectorBase &memberVariable, bool optional)
 {
-	auto newObj = std::make_shared<JsonParser::DeSerialization>();
+	JsonParser::DeSerialization *newObj = new JsonParser::DeSerialization();
 	if (newObj != nullptr) {
 		newObj->m_mappingObjectArrays = &memberVariable;
 		newObj->setType(JsonTypes::ObjectArray);
-		m_kvPairMappingArrays[name] =
-			std::static_pointer_cast<JsonParser::SerializationData>(newObj);
+		this->m_kvPairMapping[name] = newObj;
+		this->m_collectibleObjects.push_back(newObj);
+		//m_kvPairMappingArrays[name] =
+			//std::static_pointer_cast<JsonParser::SerializationData>(newObj);
 		addSerializableMember(
 			std::move(name), JsonTypes::ObjectArray, optional);
 	}
@@ -780,11 +818,12 @@ End addMember() region
 // unregisters all mapped member variables
 void JsonParser::DeSerialization::clearMapping()
 {
-	this->m_kvPairMappingArrays.clear();
+	/*this->m_kvPairMappingArrays.clear();
 	this->m_kvPairMappingBools.clear();
 	this->m_kvPairMappingNumbers.clear();
 	this->m_kvPairMappingObjects.clear();
-	this->m_kvPairMappingStrings.clear();
+	this->m_kvPairMappingStrings.clear();*/
+	this->m_kvPairMapping.clear();
 
 	this->m_mappingArrayArrays = nullptr;
 	this->m_mappingBoolArrays = nullptr;
@@ -806,12 +845,20 @@ JsonString JsonParser::DeSerialization::toString() const
 		switch (it->second.first) {
 		case JsonTypes::Number:
 		{
-			auto number = this->m_kvPairMappingNumbers.find(index);
-			if (number != this->m_kvPairMappingNumbers.end() &&
-				((!(it->second.second && number->second.toNumber() == 0)
-				|| !it->second.second))) {
-				outputStr +=
-					SerializationUtils::makeKvPairStrNumber(index, number->second);
+			auto ptr = this->m_kvPairMapping.find(index);
+			if (ptr != this->m_kvPairMapping.end() && ptr->second != nullptr) {
+				JsonParser::Number *number = static_cast<JsonParser::Number *>(ptr->second);
+				if (number != nullptr) {
+					if ((!(it->second.second && number->toNumber() == 0)
+						|| !it->second.second)) {
+						outputStr +=
+							SerializationUtils::makeKvPairStrNumber(index, *number);
+					} else {
+						continue;
+					}
+				} else {
+					continue;
+				}
 			} else {
 				continue;
 			}
@@ -819,9 +866,14 @@ JsonString JsonParser::DeSerialization::toString() const
 		break;
 		case JsonTypes::Bool:
 		{
-			auto ptr = this->m_kvPairMappingBools.find(index);
-			if (ptr != this->m_kvPairMappingBools.end() && ptr->second != nullptr) {
-				outputStr += SerializationUtils::makeKvPairStrBool(index, ptr->second);
+			auto ptr = this->m_kvPairMapping.find(index);
+			if (ptr != this->m_kvPairMapping.end() && ptr->second != nullptr) {
+				bool *boolean = static_cast<bool *>(ptr->second);
+				if (boolean != nullptr) {
+					outputStr += SerializationUtils::makeKvPairStrBool(index, *boolean);
+				} else {
+					continue;
+				}
 			} else {
 				continue;
 			}
@@ -829,12 +881,19 @@ JsonString JsonParser::DeSerialization::toString() const
 		break;
 		case JsonTypes::String:
 		{
-			auto ptr = this->m_kvPairMappingStrings.find(index);
-			if (ptr != this->m_kvPairMappingStrings.end() &&
-				(ptr->second != nullptr &&
-				(!(it->second.second && ptr->second->length() <= 0)
-					|| !it->second.second))) {
-				outputStr += SerializationUtils::makeKvPairStrString(index, ptr->second);
+			auto ptr = this->m_kvPairMapping.find(index);
+			if (ptr != this->m_kvPairMapping.end() && ptr->second != nullptr) {
+				JsonString *string = static_cast<JsonString *>(ptr->second);
+				if (string != nullptr) {
+					if ((!(it->second.second && string->length() <= 0)
+						|| !it->second.second)) {
+						outputStr += SerializationUtils::makeKvPairStrString(index, *string);
+					} else {
+						continue;
+					}
+				} else {
+					continue;
+				}
 			} else {
 				continue;
 			}
@@ -842,14 +901,17 @@ JsonString JsonParser::DeSerialization::toString() const
 		break;
 		case JsonTypes::Object:
 		{
-			auto ptr = this->m_kvPairMappingObjects.at(index);
-			if (ptr != nullptr) {
-				auto str = SerializationUtils::makeKvPairStrObject(index, ptr);
-				if (str == SerializationUtils::makeString(index)
-					+ JsonKvSeparator + EmptyJsonObject) {
-					continue;
+			auto ptr = this->m_kvPairMapping.find(index);
+			if (ptr != this->m_kvPairMapping.end() && ptr->second != nullptr) {
+				JsonParser::SerializationData *object = static_cast<JsonParser::SerializationData *>(ptr->second);
+				if (object != nullptr) {
+					auto str = SerializationUtils::makeKvPairStrObject(index, object);
+					if (str == SerializationUtils::makeString(index)
+						+ JsonKvSeparator + EmptyJsonObject) {
+						continue;
+					}
+					outputStr += str;
 				}
-				outputStr += str;
 			}
 		}
 		break;
@@ -859,11 +921,15 @@ JsonString JsonParser::DeSerialization::toString() const
 		case JsonTypes::BoolArray:
 		case JsonTypes::NumberArray:
 		{
-			if (this->m_kvPairMappingArrays.at(index) != nullptr) {
-				auto ptr2 = static_cast<SerializationData *>(
-					this->m_kvPairMappingArrays.at(index).get());
-				outputStr +=
-					SerializationUtils::makeKvPairStrArray(index, ptr2);
+			auto ptr = this->m_kvPairMapping.find(index);
+			if (ptr != this->m_kvPairMapping.end() && ptr->second != nullptr) {
+				SerializationData *array = static_cast<SerializationData *>(ptr->second);
+				if (array != nullptr) {
+					outputStr +=
+						SerializationUtils::makeKvPairStrArray(index, array);
+				} else {
+					continue;
+				}
 			} else {
 				continue;
 			}

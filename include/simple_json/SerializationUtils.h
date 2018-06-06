@@ -81,7 +81,7 @@ namespace JsonParser {
 		static inline JsonString makeKvPairStrNumber(const JsonString &name,
 			const JsonParser::Number &value);
 		static inline JsonString makeKvPairStrString(const JsonString &name,
-			JsonString *value);
+			const JsonString &value);
 		static inline JsonString makeKvPairStrObject(const JsonString &name,
 			SerializationData *value);
 		static inline JsonString makeKvPairStrBool(const JsonString &name,
@@ -116,10 +116,10 @@ inline JsonString JsonParser::SerializationUtils::makeKvPairStrNumber(
 }
 
 inline JsonString JsonParser::SerializationUtils::makeKvPairStrString(
-	const JsonString & name, JsonString * value)
+	const JsonString & name, const JsonString & value)
 {
 	return SerializationUtils::makeString(name) + JsonKvSeparator +
-		SerializationUtils::makeString(*value);
+		SerializationUtils::makeString(value);
 }
 
 inline JsonString JsonParser::SerializationUtils::makeKvPairStrObject(

@@ -38,29 +38,34 @@ class Number
 {
 	public:
 		DLLEXPORT explicit Number(
-			const JsonString &&numberStr) : m_numberStr(std::move(numberStr)), m_default(false) {}
+			const JsonString &&numberStr) : m_numberStr(std::move(numberStr)), m_default(false), m_type(NumberType::String) {}
 		DLLEXPORT explicit Number(
-			double number) : m_numberStr(ToString(number)), m_default(false) {}
+			double number) : m_numberStr(ToString(number)), m_default(false), m_type(NumberType::Double) {}
 		DLLEXPORT explicit Number(
-			double *number) : m_numberRefFP(number), m_default(false) {}
+			double *number) : m_numberRefFP(number), m_default(false), m_type(NumberType::Double) {}
 		DLLEXPORT explicit Number(
-			__int64 number) : m_numberStr(ToString(number)), m_default(false) {}
+			__int64 number) : m_numberStr(ToString(number)), m_default(false), m_type(NumberType::Int64) {}
 		DLLEXPORT explicit Number(
-			__int64 *number) : m_numberRef(number), m_default(false) {}
-		DLLEXPORT explicit Number() : m_numberStr(Stringify(0)) {}
+			__int64 *number) : m_numberRef(number), m_default(false), m_type(NumberType::Int64) {}
+		DLLEXPORT explicit Number() : m_numberStr(Stringify(0)), m_default(true), m_type(NumberType::Default) {}
+		DLLEXPORT Number(int *number) : m_numberRefInt(number), m_default(false), m_type(NumberType::Int) {}
+		DLLEXPORT Number(int number) : m_numberStr(ToString(number)), m_default(false), m_type(NumberType::Int) {}
 		DLLEXPORT ~Number();
 		DLLEXPORT __int64 toNumber() const;
 		DLLEXPORT double toNumberFP() const;
 		DLLEXPORT JsonString toString() const;
 		DLLEXPORT bool isDefault() const;
-		DLLEXPORT void setNumberRefValue(const Number &value);
+		DLLEXPORT void setNumberRefValue(const JsonString &value);
 
 	private:
-		bool m_isFloatingPoint{ false };
+		//bool m_isFloatingPoint{ false };
 		JsonString m_numberStr{ EmptyString };
 		__int64 * m_numberRef{ nullptr };
 		double * m_numberRefFP{ nullptr };
+		int *m_numberRefInt{ nullptr };
 		bool m_default{ true };
+		enum NumberType { Int64, Double, Int, String, Default };
+		NumberType m_type;
 };
 }  // namespace JsonParser
 

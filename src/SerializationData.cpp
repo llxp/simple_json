@@ -29,6 +29,14 @@ SOFTWARE.
 #include <string>
 #include <map>
 
+JsonParser::SerializationData::~SerializationData()
+{
+	auto endPos = this->m_collectibleObjects.end();
+	for (auto it = this->m_collectibleObjects.begin(); it != endPos; it++) {
+		delete *it;
+	}
+}
+
 void JsonParser::SerializationData::setType(const JsonTypes & type)
 {
 	this->m_type = type;

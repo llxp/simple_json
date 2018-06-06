@@ -49,6 +49,7 @@ namespace JsonParser {
 	class SerializationData
 	{
 	public:
+		DLLEXPORT ~SerializationData();
 		virtual void serialize() = 0;
 		virtual bool fromString() = 0;
 		virtual JsonString toString() const = 0;
@@ -78,12 +79,13 @@ namespace JsonParser {
 		SerializationData * getPointerToArray(std::string &&name) const;*/
 
 	protected:
-		std::map<JsonString, JsonParser::Number> m_kvPairMappingNumbers;
+		/*std::map<JsonString, JsonParser::Number> m_kvPairMappingNumbers;
 		std::map<JsonString, bool *> m_kvPairMappingBools;
 		std::map<JsonString, JsonString *> m_kvPairMappingStrings;
 		std::map<JsonString, SerializationData *> m_kvPairMappingObjects;
 		std::map<JsonString,
-			std::shared_ptr<SerializationData>> m_kvPairMappingArrays;
+			std::shared_ptr<SerializationData>> m_kvPairMappingArrays;*/
+		std::map<JsonString, void *> m_kvPairMapping;
 
 		JsonParser::Vector<JsonString> *m_mappingStringArrays{ nullptr };
 		JsonParser::Vector<bool> *m_mappingBoolArrays{ nullptr };
@@ -93,6 +95,7 @@ namespace JsonParser {
 
 		std::vector<std::pair<JsonString,
 			std::pair<JsonTypes, bool>>> m_serializableMembers;
+		std::vector<void *> m_collectibleObjects;
 
 	private:
 		JsonString * m_fullString;

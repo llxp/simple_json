@@ -53,11 +53,31 @@ function generateObj() {
     return obj;
 }
 
+var x = [];
+for(var i = 0;i < 1000000;i++) {
+    var h = {
+        'x': Math.random(),
+        'y': Math.random(),
+        'z': Math.random(),
+        'name': generate(5),
+        'opts': { '1': getRandomBool() }
+    }
+    x.push(h);
+}
+
+var rootObj2 = {};
+rootObj2["items"] = x;
+
+fs.writeFile("1.json", JSON.stringify(rootObj2, null, 4), (err) => {
+    if (err) throw err;
+    console.log('The file has been saved!');
+});
+
 var rootObj = {};
 var key = "items";
 rootObj[key] = [];
 
-for(var i = 0;i < 50000;i++) {
+for(var i = 0;i < 5000;i++) {
     rootObj[key].push(generateObj());
 }
 
