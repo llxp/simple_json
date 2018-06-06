@@ -35,8 +35,6 @@ DLLEXPORT bool simple_json::Serializable::fromString()
 DLLEXPORT bool simple_json::Serializable::fromString(
 	const std::shared_ptr<JsonString>& str)
 {
-	this->clearMapping();
-	this->serialize();
 	return JsonParser::DeSerialization::fromString(str);
 }
 
@@ -49,8 +47,6 @@ DLLEXPORT JsonString simple_json::Serializable::toString()
 
 DLLEXPORT JsonString simple_json::Serializable::toStringArray()
 {
-	this->clearMapping();
-	this->serialize();
 	return std::move(JsonParser::DeSerialization::toStringArray());
 }
 

@@ -33,10 +33,10 @@ SOFTWARE.
 namespace JsonParser {
 
 	template<class T2>
-	class Vector : public std::vector<std::shared_ptr<T2>>, public VectorBase
+	class Vector : public std::vector<T2>, public VectorBase
 	{
 	public:
-		Vector() { std::vector<std::shared_ptr<T2>>::reserve(30); }
+		Vector() { std::vector<T2>::reserve(30); }
 		~Vector()
 		{
 		}
@@ -47,70 +47,71 @@ namespace JsonParser {
 			return *this;
 		}*/
 
-		T2 &operator[](size_t index)
+		/*T2 &operator[](size_t index)
 		{
-			return *std::vector<std::shared_ptr<T2>>::operator[](index);
+			return *std::vector<std::unique_ptr<T2>>::operator[](index);
 		}
 
 		T2 &at(size_t index) const
 		{
-			return *std::vector<std::shared_ptr<T2>>::at(index);
+			return *std::vector<std::unique_ptr<T2>>::at(index);
 		}
 
 		T2 &at(size_t index)
 		{
-			return *std::vector<std::shared_ptr<T2>>::at(index);
-		}
+			return *std::vector<std::unique_ptr<T2>>::at(index);
+		}*/
 
-		void push_back(const T2 &element)
+		/*void push_back(const T2 &element)
 		{
-			auto newElement = std::make_shared<T2>(element);
+			auto newElement = std::make_unique<T2>(element);
 			if (newElement != nullptr) {
-				size_t size = std::vector<std::shared_ptr<T2>>::size();
-				std::vector<std::shared_ptr<T2>>::resize(size + 1);
+				size_t size = std::vector<std::unique_ptr<T2>>::size();
+				std::vector<std::unique_ptr<T2>>::resize(size + 1);
 				//std::vector<std::shared_ptr<T2>>::push_back(std::move(newElement));
-				std::vector<std::shared_ptr<T2>>::operator[](size) = std::move(newElement);
+				std::vector<std::unique_ptr<T2>>::operator[](size) = std::move(newElement);
 			}
-		}
+		}*/
 
-		void assign(const std::vector<T2> *other)
+		/*void assign(const std::vector<T2> *other)
 		{
 			this->clear();
 			if (other == nullptr) {
 				return;
 			}
 			auto endPos = other->end();
-			std::vector<std::shared_ptr<T2>>::resize(other->size());
+			std::vector<std::unique_ptr<T2>>::resize(other->size());
 			for (auto it = other->begin(); it != endPos; it++) {
-				std::vector<std::shared_ptr<T2>>::push_back(std::move(std::make_shared<T2>(*it)));
+				std::vector<std::unique_ptr<T2>>::push_back(std::move(std::make_unique<T2>(*it)));
 			}
-		}
+		}*/
 
 		// Inherited via VectorBase
 		void clear() override
 		{
-			std::vector<std::shared_ptr<T2>>::clear();
+			std::vector<T2>::clear();
 		}
 
 		// Inherited via VectorBase
 		void *addNew() override
 		{
-			auto newElement = std::make_shared<T2>();
-			if (newElement != nullptr) {
-				void *rawPtr = newElement.get();
-				std::vector<std::shared_ptr<T2>>::push_back(std::move(newElement));
-				return rawPtr;
-			}
-			return nullptr;  // addNew() failed.
+			//auto newElement = std::make_unique<T2>();
+			//if (newElement != nullptr) {
+				//void *rawPtr = newElement.get();
+				std::vector<T2>::push_back(std::move(T2()));
+				return &this->back();
+			//}
+			//return nullptr;  // addNew() failed.
 		}
 
 		// Inherited via VectorBase
-		std::vector<void *> getElements() const override
+		std::vector<const void *> getElements() const override
 		{
-			std::vector<void *> elements;
+			std::vector<const void *> elements;
 			auto endPos = this->end();
 			for (auto it = this->begin(); it != endPos; it++) {
-				elements.push_back(static_cast<void *>((*it).get()));
+				const T2 element = *it;
+				elements.push_back(static_cast<const void *>(&element));
 			}
 			return elements;
 		}
@@ -118,7 +119,7 @@ namespace JsonParser {
 		// Inherited via VectorBase
 		virtual bool isEmpty() override
 		{
-			if (std::vector<std::shared_ptr<T2>>::size() == 0) {
+			if (std::vector<T2>::size() == 0) {
 				return true;
 			}
 			return false;

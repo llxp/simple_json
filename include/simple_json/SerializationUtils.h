@@ -45,27 +45,27 @@ namespace JsonParser {
 			outputStr += JsonArrayOpen;
 			auto endPos = vec->end();
 			for (auto it = vec->begin(); it != endPos; it++) {
-				auto currentElement = static_cast<T1 *>((*it).get());
-				if (currentElement != nullptr) {
-					outputStr += lambda(currentElement);
+				auto currentElement = static_cast<T1>(*it);
+				//if (currentElement != nullptr) {
+					outputStr += lambda(&currentElement);
 					if (it + 1 != vec->end()) {
 						outputStr += JsonEntrySeparator;
 					}
-				}
+				//}
 			}
 			outputStr += JsonArrayClose;
 			return outputStr;
 		}
 
 		static JsonString makeStrVector(
-			const std::vector<void *> *vec,
-			const std::function<JsonString(SerializationData *)> &lambda)
+			const std::vector<const void *> *vec,
+			const std::function<JsonString(const SerializationData *)> &lambda)
 		{
 			JsonString outputStr;
 			outputStr += JsonArrayOpen;
 			auto endPos = vec->end();
 			for (auto it = vec->begin(); it != endPos; it++) {
-				auto currentElement = static_cast<SerializationData *>(*it);
+				auto currentElement = static_cast<const SerializationData *>(*it);
 				if (currentElement != nullptr) {
 					outputStr += lambda(currentElement);
 					if (it + 1 != vec->end()) {
@@ -149,7 +149,7 @@ inline JsonString JsonParser::SerializationUtils::makeStrObjectArray(
 	if (value == nullptr) {
 		return EmptyJsonArray;
 	}
-	std::vector<void *> elements = value->getElements();
+	auto elements = value->getElements();
 	return JsonParser::SerializationUtils::makeStrVector(
 		&elements, [=](auto currentElement)->JsonString {
 		return currentElement->toString();

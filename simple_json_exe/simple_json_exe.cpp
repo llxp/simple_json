@@ -184,13 +184,16 @@ int __cdecl main()
 			std::istreambuf_iterator<char>());
 		std::shared_ptr<JsonString> strPtr = std::make_shared<JsonString>(
 			jsonString.begin(), jsonString.end());
-		boost::timer::auto_cpu_timer t2(5, "%w seconds\n");
 		JsonParser::Vector<Coordinates> coords;
-		if (coordinates.fromString(strPtr)) {
-			std::cout << "coordinates parsed successfully..." << std::endl;
-			std::cout << coordinates.items.size() << std::endl;
-		} else {
-			std::cout << "parsing failed..." << std::endl;
+		{
+			boost::timer::auto_cpu_timer t2(5, "%w seconds\n");
+			if (coordinates.fromString(strPtr)) {
+				std::cout << "coordinates parsed successfully..." << std::endl;
+				std::cout << coordinates.items.size() << std::endl;
+			}
+			else {
+				std::cout << "parsing failed..." << std::endl;
+			}
 		}
 		//std::cout << coordinates.toString() << std::endl;
 	}

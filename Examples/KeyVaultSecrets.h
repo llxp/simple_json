@@ -78,7 +78,7 @@ class KeyVaultSecrets : public simple_json::Serializable
 public:
 	KeyVaultSecrets()
 	{
-		serialize();
+		//serialize();
 	}
 private:
 	void serialize() override

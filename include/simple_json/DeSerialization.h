@@ -88,42 +88,33 @@ namespace JsonParser {
 		void clearValues();
 
 	private:
-		size_t fromString(const size_t &pos);
-		size_t fromStringArray(const size_t &pos);
-		size_t addArrayValues(const size_t &pos);
-		size_t addKVPair(const size_t &pos);
-		size_t addValue(const size_t &pos, JsonString &&name);
+		bool fromString(size_t &pos);
+		bool fromStringArray(size_t &pos);
+		bool addArrayValues(size_t &pos);
+		bool addKVPair(size_t &pos);
+		bool addObjectValues(size_t &pos);
+		bool addValue(size_t &pos, JsonString &&name);
 
 	private:
 		static inline bool isNumber(char number);
-		static inline bool isBool(char c);
-		static inline bool isNull(char c);
 		inline bool isEscape(char ch1, char ch2) const;
-		inline size_t getString(const size_t &pos, JsonString &name) const;
+		inline bool getString(size_t &pos, JsonString &name) const;
 
 	private:
-		size_t addStringValue(const size_t &pos, JsonString &&name);
-		size_t addObjectValue(const size_t &pos, JsonString &&name);
-		size_t addArrayValue(const size_t &pos, JsonString &&name);
-		size_t addNumberValue(const size_t &pos, const JsonString &name);
-		size_t addBoolValue(const size_t &pos, JsonString &&name);
-		void addNullValue(JsonString &&name);
+		bool addStringValue(size_t &pos, JsonString &&name);
+		bool addObjectValue(size_t &pos, JsonString &&name);
+		bool addArrayValue(size_t &pos, JsonString &&name);
+		bool addNumberValue(size_t &pos, const JsonString &name);
+		bool addBoolValue(size_t &pos, JsonString &&name);
+		bool addNullValue(size_t &pos, JsonString &&name);
 
 	private:
-		size_t addArrayToArray(const size_t &pos);
-		size_t addStringToArray(const size_t &pos);
-		size_t addObjectToArray(const size_t &pos);
-		size_t addNumberToArray(const size_t &pos);
-		size_t addBoolToArray(const size_t &pos);
-
-	private:
-		std::vector<std::thread> m_workers;
-		static std::mutex m1;
-		static std::mutex m2;
-		static std::mutex m3;
+		bool addArrayToArray(size_t &pos);
+		bool addStringToArray(size_t &pos);
+		bool addObjectToArray(size_t &pos);
+		bool addNumberToArray(size_t &pos);
+		bool addBoolToArray(size_t &pos);
 	};
 }  // namespace JsonParser
-
-//std::vector<std::thread> JsonParser::DeSerialization::m_workers;
 
 #endif  // SIMPLE_JSON_DESERIALIZATION_H_

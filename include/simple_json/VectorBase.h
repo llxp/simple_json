@@ -37,7 +37,7 @@ namespace JsonParser {
 	public:
 		virtual void clear() = 0;
 		virtual void *addNew() = 0;
-		virtual std::vector<void *> getElements() const = 0;
+		virtual std::vector<const void *> getElements() const = 0;
 		virtual bool isEmpty() = 0;
 	};
 }  // namespace JsonParser

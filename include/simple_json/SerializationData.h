@@ -65,26 +65,7 @@ namespace JsonParser {
 		inline bool matchChar(const size_t &i, JsonChar ch) const;
 		inline JsonString substr(const size_t &start, const size_t &stop) const;
 
-	/*protected:
-		void addNumberValue(std::string &&name, std::string &&number);
-		void addStringValue(std::string &&name, std::string &&str);
-		void addBoolValue(std::string &&name, bool value);
-
 	protected:
-		bool objectIsMapped(const std::string &name) const;
-		bool arrayIsMapped(const std::string &name) const;
-
-	protected:
-		SerializationData * getPointerToObject(std::string &&name) const;
-		SerializationData * getPointerToArray(std::string &&name) const;*/
-
-	protected:
-		/*std::map<JsonString, JsonParser::Number> m_kvPairMappingNumbers;
-		std::map<JsonString, bool *> m_kvPairMappingBools;
-		std::map<JsonString, JsonString *> m_kvPairMappingStrings;
-		std::map<JsonString, SerializationData *> m_kvPairMappingObjects;
-		std::map<JsonString,
-			std::shared_ptr<SerializationData>> m_kvPairMappingArrays;*/
 		std::map<JsonString, void *> m_kvPairMapping;
 
 		JsonParser::Vector<JsonString> *m_mappingStringArrays{ nullptr };
