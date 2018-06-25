@@ -21,8 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef SRC_NUMBER_H_
-#define SRC_NUMBER_H_
+#ifndef SIMPLE_JSON_NUMBER_H_
+#define SIMPLE_JSON_NUMBER_H_
 
 #include <inttypes.h>
 #include <string>
@@ -34,8 +34,8 @@ SOFTWARE.
 #include "JsonTypes.h"
 
 namespace JsonParser {
-class Number
-{
+	class Number
+	{
 	public:
 		DLLEXPORT explicit Number(
 			const JsonString &&numberStr) : m_numberStr(std::move(numberStr)), m_default(false), m_type(NumberType::String) {}
@@ -55,7 +55,7 @@ class Number
 		DLLEXPORT double toNumberFP() const;
 		DLLEXPORT JsonString toString() const;
 		DLLEXPORT bool isDefault() const;
-		DLLEXPORT void setNumberRefValue(const JsonString &value);
+		DLLEXPORT void setNumberRefValue(JsonString &&value);
 
 	private:
 		//bool m_isFloatingPoint{ false };
@@ -66,7 +66,7 @@ class Number
 		bool m_default{ true };
 		enum NumberType { Int64, Double, Int, String, Default };
 		NumberType m_type;
-};
+	};
 }  // namespace JsonParser
 
-#endif  // SRC_NUMBER_H_
+#endif  // SIMPLE_JSON_NUMBER_H_

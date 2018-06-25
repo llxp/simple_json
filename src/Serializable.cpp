@@ -27,39 +27,53 @@ SOFTWARE.
 #include <memory>
 #include <string>
 
-DLLEXPORT bool simple_json::Serializable::fromString()
+// function used inside addMember() function to register the name for
+// serialization, later used in toString() and toStringArray() methods
+void simple_json::Serializable::addSerializableMember(
+	JsonString &&name, JsonTypes type, bool optional)
 {
-	return JsonParser::DeSerialization::fromString();
+	m_serializableMembers.push_back(
+		std::pair<JsonString, std::pair<JsonTypes, bool>>(
+			std::move(name), std::pair<JsonTypes, bool>(type, optional))
+	);
 }
 
-DLLEXPORT bool simple_json::Serializable::fromString(
-	const std::shared_ptr<JsonString>& str)
-{
-	return JsonParser::DeSerialization::fromString(str);
-}
+/*
+################################################################
+addMember() registers the address of the class member,
+so that the variable can be later assigned during deserialization
+################################################################
+Begin addMember() region
+################################################################
+*/
 
-DLLEXPORT JsonString simple_json::Serializable::toString()
+JsonString simple_json::Serializable::toString()
 {
-	this->clearMapping();
-	this->serialize();
-	return std::move(JsonParser::DeSerialization::toString());
-}
-
-DLLEXPORT JsonString simple_json::Serializable::toStringArray()
-{
-	return std::move(JsonParser::DeSerialization::toStringArray());
+	this->refresh();
+	return DeSerialization::toString();
 }
 
 void simple_json::Serializable::addMember(
 	JsonString &&name, __int64 & memberVariable, bool optional)
 {
-	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
+	this->m_kvPairNumbers[name] = new JsonParser::Number(&memberVariable);
+	this->m_collectibleObjects.push_back(this->m_kvPairNumbers[name]);
+	addSerializableMember(std::move(name), JsonTypes::Number, optional);
+}
+
+void simple_json::Serializable::addMember(
+	JsonString &&name, double & memberVariable, bool optional)
+{
+	this->m_kvPairNumbers[name] = new JsonParser::Number(&memberVariable);
+	this->m_collectibleObjects.push_back(this->m_kvPairNumbers[name]);
+	addSerializableMember(std::move(name), JsonTypes::Number, optional);
 }
 
 void simple_json::Serializable::addMember(
 	JsonString &&name, JsonString & memberVariable, bool optional)
 {
-	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
+	this->m_kvPairStrings[name] = &memberVariable;
+	addSerializableMember(std::move(name), JsonTypes::String, optional);
 }
 
 void simple_json::Serializable::addMember(
@@ -67,39 +81,25 @@ void simple_json::Serializable::addMember(
 	simple_json::Serializable & memberVariable,
 	bool optional)
 {
-	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
+	this->m_kvPairObjects[name] = &memberVariable;
+	addSerializableMember(std::move(name), JsonTypes::Object, optional);
 }
 
 void simple_json::Serializable::addMember(
 	JsonString &&name, bool & memberVariable, bool optional)
 {
-	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
-}
-
-void simple_json::Serializable::addMember(
-	JsonString &&name,
-	JsonParser::Vector<JsonString>& memberVariable, bool optional)
-{
-	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
-}
-
-void simple_json::Serializable::addMember(
-	JsonString &&name,
-	JsonParser::Vector<bool> & memberVariable, bool optional)
-{
-	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
-}
-
-void simple_json::Serializable::addMember(
-	JsonString &&name,
-	JsonParser::Vector<JsonParser::Number> &memberVariable, bool optional)
-{
-	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
+	this->m_kvPairBools[name] = &memberVariable;
+	addSerializableMember(std::move(name), JsonTypes::Bool, optional);
 }
 
 void simple_json::Serializable::addMember(
 	JsonString &&name,
 	JsonParser::VectorBase &memberVariable, bool optional)
 {
-	JsonParser::DeSerialization::addMember(std::move(name), memberVariable, optional);
+	this->m_kvPairArrays[name] = &memberVariable;
+	addSerializableMember(std::move(name), JsonTypes::Array, optional);
 }
+
+/*################################################################
+End addMember() region
+################################################################*/

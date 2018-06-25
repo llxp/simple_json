@@ -27,6 +27,9 @@
     <ClCompile Include="..\src\Serializable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\StringContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="simple_json_lib.licenseheader" />
@@ -60,12 +63,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\simple_json\VectorBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\simple_json\DeSerialization2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\simple_json\SerializationData2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

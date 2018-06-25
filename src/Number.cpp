@@ -31,10 +31,10 @@ JsonParser::Number::~Number()
 {
 }
 
-unsigned int fast_pow10(int exp)
+unsigned long long fast_pow10(unsigned int exp)
 {
-	if (exp >= 10) { return std::pow(10, exp); }
-	static int pow10[10] = {
+	if (exp >= 20) { return static_cast<unsigned long long>(std::pow(10, exp)); }
+	static unsigned long long pow10[20] = {
 		1,
 		10,
 		100,
@@ -44,7 +44,7 @@ unsigned int fast_pow10(int exp)
 		1000000,
 		10000000,
 		100000000,
-		1000000000/*,
+		1000000000,
 		10000000000,
 		100000000000,
 		1000000000000,
@@ -54,7 +54,7 @@ unsigned int fast_pow10(int exp)
 		10000000000000000,
 		100000000000000000,
 		1000000000000000000,
-		10000000000000000000*/
+		10000000000000000000
 	};
 
 	return pow10[exp];
@@ -65,16 +65,16 @@ __int64 JsonParser::Number::toNumber() const
 	if (m_numberStr.size() <= 0) {
 		return 0;
 	}
-	size_t pos = 0;
-	int result = 0;
+	unsigned int pos = 0;
+	__int64 result = 0;
 	double afterCommaResult = 0;
 	bool devide = false;
-	unsigned int tenCounter = 0;
+	unsigned long long tenCounter = 0;
 	bool negative = false;
 	for (size_t i = m_numberStr.length() - 1;
 		i >= 0 && i < m_numberStr.length();
 		--i) {
-		JsonChar ch = m_numberStr[i];
+		const JsonChar &ch = m_numberStr[i];
 		if (ch == '-') {
 			negative = true;
 			continue;
@@ -87,7 +87,7 @@ __int64 JsonParser::Number::toNumber() const
 		unsigned int chValue = ((static_cast<unsigned int>(ch)) - 48);
 		tenCounter = fast_pow10(pos);
 		result += std::move(tenCounter * chValue);
-		pos++;
+		++pos;
 	}
 	if (negative) {
 		return -(result);
@@ -100,21 +100,21 @@ DLLEXPORT double JsonParser::Number::toNumberFP() const
 	if (m_numberStr.size() <= 0) {
 		return 0;
 	}
-	size_t pos = 0;
-	int result = 0;
+	unsigned int pos = 0;
+	signed long long result = 0;
 	double afterCommaResult = 0;
-	unsigned int tenCounter = 0;
+	unsigned long long tenCounter = 0;
 	bool negative = false;
 	for (size_t i = m_numberStr.length() - 1;
 		i >= 0 && i < m_numberStr.length();
 		--i) {
-		JsonChar ch = m_numberStr[i];
+		const JsonChar &ch = m_numberStr[i];
 		if (ch == '-') {
 			negative = true;
 			continue;
 		}
 		if (ch == '.') {
-			afterCommaResult = result / tenCounter;
+			afterCommaResult = static_cast<double>(result / tenCounter);
 			result = 0;
 			pos = 0;
 			continue;
@@ -122,7 +122,7 @@ DLLEXPORT double JsonParser::Number::toNumberFP() const
 		unsigned int chValue = ((static_cast<unsigned int>(ch)) - 48);
 		tenCounter = fast_pow10(pos);
 		result += std::move(tenCounter * chValue);
-		pos++;
+		++pos;
 	}
 	if (negative) {
 		return -(result + afterCommaResult);
@@ -146,7 +146,7 @@ bool JsonParser::Number::isDefault() const
 	return this->m_default;
 }
 
-void JsonParser::Number::setNumberRefValue(const JsonString &value)
+void JsonParser::Number::setNumberRefValue(JsonString &&value)
 {
 	this->m_numberStr = value;
 	switch (m_type) {
@@ -157,7 +157,7 @@ void JsonParser::Number::setNumberRefValue(const JsonString &value)
 		(*this->m_numberRef) = toNumber();
 		break;
 	case NumberType::Int:
-		(*this->m_numberRefInt) = toNumber();
+		(*this->m_numberRefInt) = static_cast<int>(toNumber());
 		break;
 	}
 }

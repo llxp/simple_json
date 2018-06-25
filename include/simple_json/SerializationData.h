@@ -32,82 +32,41 @@ SOFTWARE.
 
 #include "Number.h"
 #include "JsonTypes.h"
-#include "Vector.h"
+#include <simple_json/SerializableBase.h>
+#include <simple_json/StringContainer.h>
+#include <simple_json/VectorBase.h>
 
 #ifdef __GNUC__
 #define __cdecl __attribute__((__cdecl__))
 #define __int64 long long
 #endif
 
-#define lazyInit(var, type)\
-if (var == nullptr)\
-{ var = new type(); }\
-return var;
-
 namespace JsonParser {
 
-	class SerializationData
+	class SerializationData : public SerializableBase, public StringContainer
 	{
 	public:
-		DLLEXPORT ~SerializationData();
-		virtual void serialize() = 0;
-		virtual bool fromString() = 0;
-		virtual JsonString toString() const = 0;
-		virtual JsonString toStringArray() const = 0;
+		DLLEXPORT virtual ~SerializationData();
+		DLLEXPORT virtual void serialize() = 0;
+		DLLEXPORT virtual void refresh() = 0;
 
 	protected:
-		void setType(const JsonTypes &type);
-		JsonTypes type() const;
-		void setFullString(JsonString *str);
-		JsonString *fullString() const;
-		inline JsonChar getChar(const size_t &pos) const;
-		inline size_t strLen() const;
-		inline bool matchChar(const size_t &i, JsonChar ch) const;
-		inline JsonString substr(const size_t &start, const size_t &stop) const;
-
-	protected:
-		std::map<JsonString, void *> m_kvPairMapping;
-
-		JsonParser::Vector<JsonString> *m_mappingStringArrays{ nullptr };
-		JsonParser::Vector<bool> *m_mappingBoolArrays{ nullptr };
-		JsonParser::Vector<JsonParser::Number> *m_mappingNumberArrays{ nullptr };
-		JsonParser::VectorBase *m_mappingObjectArrays{ nullptr };
-		JsonParser::VectorBase *m_mappingArrayArrays{ nullptr };
+		std::map<JsonString, JsonParser::SerializationData *> m_kvPairObjects;
+		std::map<JsonString, bool *> m_kvPairBools;
+		std::map<JsonString, JsonString *> m_kvPairStrings;
+		std::map<JsonString, JsonParser::Number *> m_kvPairNumbers;
+		std::map<JsonString, JsonParser::VectorBase *> m_kvPairArrays;
+		std::vector<void *> m_collectibleObjects;
 
 		std::vector<std::pair<JsonString,
 			std::pair<JsonTypes, bool>>> m_serializableMembers;
-		std::vector<void *> m_collectibleObjects;
+		
+	protected:
+		void setType(const JsonTypes &type);
+		JsonTypes type() const;
 
 	private:
-		JsonString * m_fullString;
-		size_t m_strLen{ 0 };
 		JsonTypes m_type{ JsonTypes::Object };
 	};
-
-	inline JsonChar JsonParser::SerializationData::getChar(const size_t & pos) const
-	{
-		if (pos >= 0 && strLen() > 0 && pos < strLen()) {
-			return this->m_fullString->at(pos);
-		}
-		return 0;
-	}
 }  // namespace JsonParser
-
-inline size_t JsonParser::SerializationData::strLen() const
-{
-	return this->m_strLen;
-}
-
-inline bool JsonParser::SerializationData::matchChar(
-	const size_t &i, JsonChar ch) const
-{
-	return this->m_fullString->at(i) == ch;
-}
-
-inline JsonString JsonParser::SerializationData::substr(
-	const size_t & start, const size_t & stop) const
-{
-	return this->m_fullString->substr(start, stop);
-}
-
 #endif  // JSON_SERIALIZATIONDATA_H_

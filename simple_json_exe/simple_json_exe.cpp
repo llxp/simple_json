@@ -22,6 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "../Examples/DataMappingTest.h"
+#include "../Examples/KeyVaultSecrets.h"
+#include "../Examples/GeneratedJsonTestClass.h"
+#include "../Examples/AzureToken.h"
+#include "../Examples/3DCoordinates.h"
 #include <fstream>
 #include <streambuf>
 #include <iostream>
@@ -30,16 +35,9 @@ SOFTWARE.
 #include <direct.h>
 #include <sstream>
 
-#include "../Examples/DataMappingTest.h"
-#include "../Examples/KeyVaultSecrets.h"
-#include "../Examples/GeneratedJsonTestClass.h"
-#include "../Examples/AzureToken.h"
-#include "../Examples/3DCoordinates.h"
+#include <chrono>
 
-#include <boost/chrono.hpp>
-#include <boost/timer/timer.hpp>
-
-#pragma comment(lib, "simple_json_dll.lib")
+#pragma comment(lib, "simple_json_lib.lib")
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -50,9 +48,8 @@ SOFTWARE.
 
 AzureToken func()
 {
-	std::string json("{\"access_token\":\"test123\"}");
 	AzureToken token = AzureToken();
-	token.fromString(std::make_shared<std::string>(json));
+	token.access_token = "123";
 	return std::move(token);
 }
 
@@ -60,6 +57,7 @@ template<typename T>
 T func2()
 {
 	T obj;
+	obj.access_token = "234";
 	return obj;
 }
 
@@ -70,7 +68,7 @@ int __cdecl main()
 	std::cout << "CWD: " << buffer << std::endl;
 	free(buffer);
 	KeyVaultSecrets secrets;
-	{
+	/*{
 		std::cout << "1...." << std::endl;
 		void *newElement = secrets.m_value.addNew();
 		if (newElement == nullptr) {
@@ -83,7 +81,7 @@ int __cdecl main()
 			std::cout << "size: " << secrets.m_value.size() << std::endl;
 			std::cout << secrets.toString() << std::endl;
 		}
-	}
+	}*/
 	{
 		std::ifstream t3;
 		t3.open("secrets.txt");
@@ -94,11 +92,11 @@ int __cdecl main()
 			std::shared_ptr<JsonString> strPtr = std::make_shared<JsonString>(
 				keyVaultSecretString.begin(), keyVaultSecretString.end());
 			{
-				boost::timer::auto_cpu_timer t2(5, "%w seconds\n");
-				for (int i = 0; i < 50000; ++i) {
+				auto time1 = std::chrono::high_resolution_clock::now();
+				//for (int i = 0; i < 50000; ++i) {\
 					//KeyVaultSecrets secrets;
 					//std::istreambuf_iterator<char> iter(t3);
-					if (!secrets.fromString(strPtr)) {
+					if (!secrets.fromString(&keyVaultSecretString)) {
 						std::cout << "parsing failed..." << std::endl;
 						t3.close();
 						return 0;
@@ -106,13 +104,17 @@ int __cdecl main()
 					//t3.close();
 					//t3.open("secrets.txt", std::ios_base::binary);
 					//t3.seekg(0, std::ios::beg);
-				}
+				//}
+					auto time2 = std::chrono::high_resolution_clock::now();
+					std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(time2 - time1).count() << "ms" << std::endl;
 			}
 			{
-				boost::timer::auto_cpu_timer t2(5, "%w seconds\n");
-				for (int i = 0; i < 50000; ++i) {
+				auto time1 = std::chrono::high_resolution_clock::now();
+				//for (int i = 0; i < 50000; ++i) {
 					secrets.toString();
-				}
+				//}
+					auto time2 = std::chrono::high_resolution_clock::now();
+					std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(time2 - time1).count() << "ms" << std::endl;
 			}
 			std::cout << secrets.toString() << std::endl;
 			std::cout << "2...." << std::endl;
@@ -142,12 +144,12 @@ int __cdecl main()
 	{
 		std::ios_base::sync_with_stdio(false);
 		std::ifstream t4;
-		//t4.open("abc.txt", std::ios::binary);
+		t4.open("abc.txt", std::ios::binary);
 		if (!t4.is_open()) {
 			std::cout << "the file \"abc.txt\" could not be opened." << std::endl;
-			//return 0;
-		} else {
-			//{
+			return 0;
+		}
+		//{
 			JsonString keyVaultSecretString2((std::istreambuf_iterator<char>(t4)),
 				std::istreambuf_iterator<char>());
 			GeneratedJsonTestClasses test;
@@ -155,13 +157,14 @@ int __cdecl main()
 				keyVaultSecretString2.begin(), keyVaultSecretString2.end());
 			std::istringstream istr(keyVaultSecretString2);
 
-			boost::timer::auto_cpu_timer t2(5, "%w seconds\n");
+			auto time1 = std::chrono::high_resolution_clock::now();
 			std::istreambuf_iterator<char> iter(istr);
-			test.fromString(strPtr);
+			test.fromString(&keyVaultSecretString2);
+			auto time2 = std::chrono::high_resolution_clock::now();
+			std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(time2 - time1).count() << "ms" << std::endl;
 
 			std::cout << test.items.size() << std::endl;
-			//}
-		}
+		//}
 	}
 
 	AzureToken token = func();
@@ -170,6 +173,7 @@ int __cdecl main()
 	std::cout << "token2:" << token2.access_token << std::endl;
 	//((JsonParser::DeSerialization *)(&token))->clearMapping();
 	//((JsonParser::DeSerialization *)(&token))->serialize();
+	token.refresh();
 	std::cout << "token1: deserialized: " << token.toString() << std::endl;
 
 	std::cout << sizeof(CoordinatesList) << '\n';
@@ -179,21 +183,24 @@ int __cdecl main()
 	t4.open("1.json", std::ios::binary);
 	if (!t4.is_open()) {
 		std::cout << "the file \"1.json\" could not be opened." << std::endl;
-	} else {
+	}
+	else {
 		JsonString jsonString((std::istreambuf_iterator<char>(t4)),
 			std::istreambuf_iterator<char>());
 		std::shared_ptr<JsonString> strPtr = std::make_shared<JsonString>(
 			jsonString.begin(), jsonString.end());
 		JsonParser::Vector<Coordinates> coords;
 		{
-			boost::timer::auto_cpu_timer t2(5, "%w seconds\n");
-			if (coordinates.fromString(strPtr)) {
+			auto time1 = std::chrono::high_resolution_clock::now();
+			if (coordinates.fromString(&jsonString)) {
 				std::cout << "coordinates parsed successfully..." << std::endl;
 				std::cout << coordinates.items.size() << std::endl;
 			}
 			else {
 				std::cout << "parsing failed..." << std::endl;
 			}
+			auto time2 = std::chrono::high_resolution_clock::now();
+			std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(time2 - time1).count() << "ms" << std::endl;
 		}
 		//std::cout << coordinates.toString() << std::endl;
 	}

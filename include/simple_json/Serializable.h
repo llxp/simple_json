@@ -30,18 +30,16 @@ SOFTWARE.
 #include <simple_json\Vector.h>
 
 namespace simple_json {
-	class Serializable : private JsonParser::DeSerialization
+	class Serializable : public JsonParser::DeSerialization
 	{
 	public:
-		DLLEXPORT bool fromString();
-		DLLEXPORT bool fromString(const std::shared_ptr<JsonString> &str);
-
-		DLLEXPORT virtual JsonString toString();
-		DLLEXPORT virtual JsonString toStringArray();
-
+		JsonString toString();
 	protected:
 		DLLEXPORT void addMember(JsonString &&name,
 			__int64 &memberVariable,
+			bool optional = false);
+		DLLEXPORT void addMember(JsonString &&name,
+			double &memberVariable,
 			bool optional = false);
 		DLLEXPORT void addMember(JsonString &&name,
 			JsonString &memberVariable,
@@ -53,16 +51,21 @@ namespace simple_json {
 			bool &memberVariable,
 			bool optional = false);
 
-		DLLEXPORT void addMember(JsonString &&name,
+		/*DLLEXPORT void addMember(JsonString &&name,
 			JsonParser::Vector<JsonString> &memberVariable,
 			bool optional = false);
 		DLLEXPORT void addMember(JsonString &&name,
 			JsonParser::Vector<JsonParser::Number> &memberVariable,
 			bool optional = false);
 		DLLEXPORT void addMember(JsonString &&name,
-			JsonParser::Vector<bool> &memberVariable, bool optional = false);
+			JsonParser::Vector<bool> &memberVariable, bool optional = false);*/
 		DLLEXPORT void addMember(JsonString &&name,
 			JsonParser::VectorBase &memberVariable, bool optional = false);
+
+	private:
+		void addSerializableMember(JsonString &&name,
+			JsonTypes type,
+			bool optional = false);
 	};
 }  // namespace simple_json
 

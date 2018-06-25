@@ -28,18 +28,21 @@ SOFTWARE.
 #include <memory>
 #include <vector>
 
+#include <simple_json\StringContainer.h>
+#include <simple_json\SerializableBase.h>
+
 namespace JsonParser {
-	class VectorBase
-	{
+class DeSerialization;
+class VectorBase : public JsonParser::SerializableBase, protected JsonParser::StringContainer
+{
+	friend class DeSerialization;
 	public:
-		virtual ~VectorBase() {}
+		DLLEXPORT virtual ~VectorBase() {}
 
 	public:
 		virtual void clear() = 0;
-		virtual void *addNew() = 0;
-		virtual std::vector<const void *> getElements() const = 0;
 		virtual bool isEmpty() = 0;
-	};
+};
 }  // namespace JsonParser
 
 #endif  // SRC_VECTORBASE_H_

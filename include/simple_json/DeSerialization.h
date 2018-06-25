@@ -43,68 +43,33 @@ namespace JsonParser {
 
 	class DeSerialization : public SerializationData
 	{
-	protected:
-		DLLEXPORT JsonString toString() const override;
-		DLLEXPORT JsonString toStringArray() const override;
 
-		DLLEXPORT virtual bool fromString(const std::shared_ptr<JsonString> &str);
-		DLLEXPORT bool fromString() override;
-
-	protected:
+	public:
+		DLLEXPORT virtual ~DeSerialization() {}
 		void clearMapping();
-		void serialize() override {}
-
-		void addMember(JsonString &&name,
-			__int64 &memberVariable,
-			bool optional = false);
-		void addMember(JsonString &&name,
-			double &memberVariable,
-			bool optional = false);
-		void addMember(JsonString &&name,
-			JsonString &memberVariable,
-			bool optional = false);
-		void addMember(JsonString &&name,
-			DeSerialization &memberVariable,
-			bool optional = false);
-		void addMember(JsonString &&name,
-			bool &memberVariable,
-			bool optional = false);
-
-		void addMember(JsonString &&name,
-			JsonParser::Vector<JsonString> &memberVariable,
-			bool optional = false);
-		void addMember(JsonString &&name,
-			JsonParser::Vector<JsonParser::Number> &memberVariable,
-			bool optional = false);
-		void addMember(JsonString &&name,
-			JsonParser::Vector<bool> &memberVariable, bool optional = false);
-		void addMember(JsonString &&name,
-			JsonParser::VectorBase &memberVariable, bool optional = false);
+		// Inherited via SerializationData
+		DLLEXPORT JsonString toString() const override;
+		// Inherited via SerializationData
+		DLLEXPORT virtual bool fromString(JsonString * string) override;
+		DLLEXPORT bool parseString(size_t &pos) override;
+		// Inherited via SerializationData
+		DLLEXPORT virtual void refresh() override;
 
 	private:
-		void addSerializableMember(JsonString &&name,
-			JsonTypes type,
-			bool optional = false);
 		void clearValues();
 
 	private:
-		bool fromString(size_t &pos);
-		bool fromStringArray(size_t &pos);
+		// Inherited via SerializationData
 		bool addArrayValues(size_t &pos);
 		bool addKVPair(size_t &pos);
 		bool addObjectValues(size_t &pos);
 		bool addValue(size_t &pos, JsonString &&name);
 
 	private:
-		static inline bool isNumber(char number);
-		inline bool isEscape(char ch1, char ch2) const;
-		inline bool getString(size_t &pos, JsonString &name) const;
-
-	private:
 		bool addStringValue(size_t &pos, JsonString &&name);
 		bool addObjectValue(size_t &pos, JsonString &&name);
 		bool addArrayValue(size_t &pos, JsonString &&name);
-		bool addNumberValue(size_t &pos, const JsonString &name);
+		bool addNumberValue(size_t &pos, JsonString &&name);
 		bool addBoolValue(size_t &pos, JsonString &&name);
 		bool addNullValue(size_t &pos, JsonString &&name);
 
@@ -114,6 +79,12 @@ namespace JsonParser {
 		bool addObjectToArray(size_t &pos);
 		bool addNumberToArray(size_t &pos);
 		bool addBoolToArray(size_t &pos);
+
+	private:
+		JsonString makeKvPairStrBool(const JsonString &name, bool value) const;
+
+		// Inherited via SerializationData
+		virtual void serialize() override {}
 	};
 }  // namespace JsonParser
 

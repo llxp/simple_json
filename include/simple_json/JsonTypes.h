@@ -24,32 +24,36 @@ SOFTWARE.
 #ifndef SRC_JSONTYPES_H_
 #define SRC_JSONTYPES_H_
 
-enum JsonTypes : short
+#include <string>
+#include <iostream>
+
+enum JsonTypes : uint8_t
 {
-	None = 0,
-	Number = 1,
-	String = 2,
-	Bool = 3,
-	Object = 4,
-	Null = 5,
-	NumberArray = 6,
+	None,
+	Number,
+	String,
+	Bool,
+	Object,
+	Null,
+	Array
+	/*NumberArray = 6,
 	StringArray = 7,
 	BoolArray = 8,
 	ObjectArray = 9,
-	ArrayArray = 10
+	ArrayArray = 10*/
 };
 
 #define Stringify(val) #val
 
-#define EmptyJsonArray Stringify([])
-#define EmptyJsonObject Stringify({})
-#define JsonKvSeparator ':'
-#define JsonEntrySeparator ','
-#define JsonObjectOpen '{'
-#define JsonObjectClose '}'
-#define JsonArrayOpen '['
-#define JsonArrayClose ']'
-#define JsonStringSeparator '"'
+static const char * EmptyJsonArray = Stringify([]);
+static const char * EmptyJsonObject = Stringify({});
+static constexpr char JsonKvSeparator = ':';
+static constexpr char JsonEntrySeparator = ',';
+static constexpr char JsonObjectOpen = '{';
+static constexpr char JsonObjectClose = '}';
+static constexpr char JsonArrayOpen = '[';
+static constexpr char JsonArrayClose = ']';
+static constexpr char JsonStringSeparator = '"';
 
 #define JsonKvSeparatorStr ":"
 #define JsonEntrySeparatorStr ","
@@ -65,9 +69,38 @@ typedef char JsonChar;
 #define EmptyString ""
 #define ToString std::to_string
 
-#define ADD(MEMBER) addMember(std::move(#MEMBER), MEMBER);
+#define ADD(MEMBER) addMember(#MEMBER, MEMBER);
 #define ADD2(MEMBERNAME, MEMBER, OPT) addMember(MEMBERNAME, MEMBER, OPT)
 
-constexpr short MAX_JSON_NUMBER_LENGTH = 325;
+static constexpr short MAX_JSON_NUMBER_LENGTH = 325;
+
+static size_t lineCounter = 0;
+
+constexpr size_t constLength(const char* str)
+{
+	return (*str == 0) ? 0 : constLength(str + 1) + 1;
+}
+
+inline void printDebugMessage(const std::string &function, int line)
+{
+#ifdef _DEBUG
+	std::cout << "line: " << lineCounter << std::endl;
+	std::cout << function << " : " << line << std::endl;
+#else
+	function;
+	line;
+#endif
+}
+
+inline void* operator new(std::size_t sz) {
+	try {
+		//std::printf("global op new called, size = %zu\n", sz);
+		return std::malloc(sz);
+	}
+	catch (std::bad_alloc) {
+		return nullptr;
+	}
+	return nullptr;
+}
 
 #endif  // SRC_JSONTYPES_H_

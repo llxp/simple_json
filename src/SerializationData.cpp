@@ -29,15 +29,20 @@ SOFTWARE.
 #include <string>
 #include <map>
 
+#define lazyInit(var, type)\
+	if (var == nullptr){\
+		var = new type();\
+	}\
+	return var;
+
 JsonParser::SerializationData::~SerializationData()
 {
-	auto endPos = this->m_collectibleObjects.end();
-	for (auto it = this->m_collectibleObjects.begin(); it != endPos; it++) {
-		delete *it;
+	for (auto &element : this->m_collectibleObjects) {
+		delete element;
 	}
 }
 
-void JsonParser::SerializationData::setType(const JsonTypes & type)
+void JsonParser::SerializationData::setType(const JsonTypes &type)
 {
 	this->m_type = type;
 }
@@ -45,15 +50,4 @@ void JsonParser::SerializationData::setType(const JsonTypes & type)
 JsonTypes JsonParser::SerializationData::type() const
 {
 	return this->m_type;
-}
-
-void JsonParser::SerializationData::setFullString(JsonString *str)
-{
-	this->m_fullString = str;
-	this->m_strLen = str->length();
-}
-
-JsonString *JsonParser::SerializationData::fullString() const
-{
-	return this->m_fullString;
 }
